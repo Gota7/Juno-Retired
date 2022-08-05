@@ -18,5 +18,6 @@ struct JTexture
     int width, height, numChannels;
 
     JTexture(std::string path);
+    void Use();
     ~JTexture();
 };

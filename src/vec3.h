@@ -12,6 +12,6 @@ struct Vec3
         this->z = z;
     }
 
-    Vec3 operator+(Vec3 b) { return Vec3(x + b.x, y + b.y, z + b.z);  };
-    Vec3 operator-(Vec3 b) { return Vec3(x - b.x, y - b.y, z - b.z);  };
+    Vec3 operator+(Vec3 b) { return Vec3(x + b.x, y + b.y, z + b.z); };
+    Vec3 operator-(Vec3 b) { return Vec3(x - b.x, y - b.y, z - b.z); };
 };

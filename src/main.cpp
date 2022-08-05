@@ -2,8 +2,9 @@
 #include "shader.h"
 #include "texture.h"
 #include "window.h"
+#include "vec2.h"
 #include "vec3.h"
-#include "vertexModes/vertexColor.h"
+#include "vertexModes/vertexColorUV.h"
 #include <memory>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -13,16 +14,18 @@ std::unique_ptr<JShader> shader;
 std::unique_ptr<JTexture> texture;
 std::unique_ptr<JBuffers> buffers;
 
-VertexColor vertices[] =
+VertexColorUV vertices[] =
 {
-    VertexColor(Vec3(-0.5f, -0.5f, 0.0f), Vec3(1.0f, 0.0f, 0.0f )), // Left.
-    VertexColor(Vec3(0.5f, -0.5f, 0.0f), Vec3(0.0f, 1.0f, 0.0f )), // Right.
-    VertexColor(Vec3(0.0f,  0.5f, 0.0f), Vec3(0.0f, 0.0f, 1.0f )) // Top.
+    VertexColorUV(Vec3(0.5f, 0.5f, 0.0f), Vec3(1.0f, 0.0f, 0.0f ), Vec2(1.0f, 1.0f)), // Top right.
+    VertexColorUV(Vec3(0.5f, -0.5f, 0.0f), Vec3(0.0f, 1.0f, 0.0f ), Vec2(1.0f, 0.0f)), // Bottom right.
+    VertexColorUV(Vec3(-0.5f,  -0.5f, 0.0f), Vec3(0.0f, 0.0f, 1.0f ), Vec2(0.0f, 0.0f)), // Bottom left.
+    VertexColorUV(Vec3(-0.5f,  0.5f, 0.0f), Vec3(1.0f, 1.0f, 0.0f ), Vec2(0.0f, 1.0f)) // Top left.
 };
 
 GLuint indices[] =
 {
-    0, 1, 2
+    0, 1, 3,
+    1, 2, 3
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -34,9 +37,10 @@ void window_draw(GLFWwindow* window)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    texture->Use();
     shader->Use();
     buffers->Bind();
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void window_callback(GLFWwindow* window)
@@ -61,7 +65,7 @@ int main()
 
     // Vertex buffers.
     buffers = std::make_unique<JBuffers>(vertices, sizeof(vertices), GL_STATIC_DRAW, indices, sizeof(indices), GL_STATIC_DRAW);
-    VertexColor::SetAttributes();
+    VertexColorUV::SetAttributes();
 
     // Unbind buffers.
     Buffers_Bind(VertexBuffer(0, 0, 0));
