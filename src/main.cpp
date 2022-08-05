@@ -11,7 +11,8 @@
 #include "stb_image.h"
 
 std::unique_ptr<JShader> shader;
-std::unique_ptr<JTexture> texture;
+std::unique_ptr<JTexture> texture1;
+std::unique_ptr<JTexture> texture2;
 std::unique_ptr<JBuffers> buffers;
 
 VertexColorUV vertices[] =
@@ -37,7 +38,10 @@ void window_draw(GLFWwindow* window)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    texture->Use();
+    glActiveTexture(GL_TEXTURE0);
+    texture1->Use();
+    glActiveTexture(GL_TEXTURE1);
+    texture2->Use();
     shader->Use();
     buffers->Bind();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -71,11 +75,11 @@ int main()
     Buffers_Bind(VertexBuffer(0, 0, 0));
 
     // Texture stuff.
-    texture = std::make_unique<JTexture>("res/tex/colfawnGotaPfp.png");
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    texture1 = std::make_unique<JTexture>("res/tex/colfawnGotaPfp.png");
+    texture2 = std::make_unique<JTexture>("res/tex/AsylumServerIcon.png");
+    shader->Use();
+    shader->SetInt("texture1", 0); // Texture units 0 and 1.
+    shader->SetInt("texture2", 1);
 
     // Run and close.
     Window_Main(window, window_callback);

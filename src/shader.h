@@ -27,8 +27,8 @@ struct JShader
 
     JShader(ShaderList shaders);
     void Use();
-    void SetBool(std::string& name, bool value);
-    void SetInt(std::string& name, int value);
-    void SetFloat(std::string& name, float value);
+    void SetBool(const std::string& name, bool value);
+    void SetInt(const std::string& name, int value);
+    void SetFloat(const std::string& name, float value);
     ~JShader();
 };
