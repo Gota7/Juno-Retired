@@ -1,4 +1,5 @@
 #include "buffers.h"
+#include "model.h"
 #include "shader.h"
 #include "texture.h"
 #include "window.h"
@@ -11,16 +12,14 @@
 #include "stb_image.h"
 
 std::unique_ptr<JShader> shader;
-std::unique_ptr<JTexture> texture1;
-std::unique_ptr<JTexture> texture2;
-std::unique_ptr<JBuffers> buffers;
+std::unique_ptr<JModel> model;
 
 VertexColorUV vertices[] =
 {
     VertexColorUV(glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f ), glm::vec2(1.0f, 1.0f)), // Top right.
     VertexColorUV(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f ), glm::vec2(1.0f, 0.0f)), // Bottom right.
-    VertexColorUV(glm::vec3(-0.5f,  -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f ), glm::vec2(0.0f, 0.0f)), // Bottom left.
-    VertexColorUV(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f ), glm::vec2(0.0f, 1.0f)) // Top left.
+    VertexColorUV(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f ), glm::vec2(0.0f, 0.0f)), // Bottom left.
+    VertexColorUV(glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f ), glm::vec2(0.0f, 1.0f)) // Top left.
 };
 
 GLuint indices[] =
@@ -41,23 +40,9 @@ void window_draw(GLFWwindow* window)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Texturing.
-    glActiveTexture(GL_TEXTURE0);
-    texture1->Use();
-    glActiveTexture(GL_TEXTURE1);
-    texture2->Use();
-
-    // Bindings.
-    shader->Use();
-    buffers->Bind();
-
-    // Transforms.
-    glm::mat4 transform(1.0f);
-    transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-    shader->SetMatrix("transform", glm::value_ptr(transform));
-
     // Drawing.
-    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);
+    model->Render();
+    model->matrix = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
 }
 
@@ -81,19 +66,27 @@ int main()
     shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
     shader = std::make_unique<JShader>(shaderList);
 
-    // Vertex buffers.
-    buffers = std::make_unique<JBuffers>(vertices, sizeof(vertices), GL_STATIC_DRAW, indices, sizeof(indices), GL_STATIC_DRAW);
+    // Model setup.
+    std::vector<std::string> textures;
+    textures.push_back("res/tex/colfawnGotaPfp.png");
+    textures.push_back("res/tex/AsylumServerIcon.png");
+    model = std::make_unique<JModel> (
+        vertices,
+        sizeof(vertices),
+        GL_STATIC_DRAW,
+        indices,
+        sizeof(indices),
+        GL_STATIC_DRAW,
+        textures,
+        *shader,
+        GL_TRIANGLES,
+        sizeof(indices) / sizeof(indices[0]),
+        GL_UNSIGNED_INT
+    );
     VertexColorUV::SetAttributes();
 
     // Unbind buffers.
     Buffers_Bind(EMPTY_BUFFER);
-
-    // Texture stuff.
-    texture1 = std::make_unique<JTexture>("res/tex/colfawnGotaPfp.png");
-    texture2 = std::make_unique<JTexture>("res/tex/AsylumServerIcon.png");
-    shader->Use();
-    shader->SetInt("texture1", 0); // Texture units 0 and 1.
-    shader->SetInt("texture2", 1);
 
     // Run and close.
     Window_Main(window, window_callback);
