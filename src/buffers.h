@@ -28,3 +28,11 @@ void Buffers_Bind(VertexBuffer buffers);
 
 // Delete vertex buffers.
 void Buffers_Delete(VertexBuffer buffers);
+
+// Buffers object.
+struct JBuffers : VertexBuffer
+{
+    JBuffers(void* vertexData, size_t vertexSize, GLenum vertexUsage, void* indexData, size_t indexSize, GLenum indexUsage);
+    void Bind();
+    ~JBuffers();
+};

@@ -56,3 +56,33 @@ void Shader_DeleteProgram(ShaderProgram program)
 {
     glDeleteProgram(program);
 }
+
+JShader::JShader(ShaderList shaders)
+{
+    shaderProgram = Shader_CreateProgram(shaders);
+}
+
+void JShader::Use()
+{
+    glUseProgram(shaderProgram);
+}
+
+void JShader::SetBool(std::string& name, bool value)
+{
+    glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), (int)value);
+}
+
+void JShader::SetInt(std::string& name, int value)
+{
+    glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
+}
+
+void JShader::SetFloat(std::string& name, float value)
+{
+    glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
+}
+
+JShader::~JShader()
+{
+    Shader_DeleteProgram(shaderProgram);
+}

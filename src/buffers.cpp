@@ -28,3 +28,17 @@ void Buffers_Delete(VertexBuffer buffers)
     glDeleteVertexArrays(1, &buffers.vertexArray);
     glDeleteBuffers(1, &buffers.vertexBuffer);
 }
+
+JBuffers::JBuffers(void* vertexData, size_t vertexSize, GLenum vertexUsage, void* indexData, size_t indexSize, GLenum indexUsage) : VertexBuffer(Buffers_Generate(vertexData, vertexSize, vertexUsage, indexData, indexSize, indexUsage))
+{
+}
+
+void JBuffers::Bind()
+{
+    Buffers_Bind(*this);
+}
+
+JBuffers::~JBuffers()
+{
+    Buffers_Delete(*this);
+}

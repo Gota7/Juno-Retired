@@ -19,3 +19,16 @@ ShaderProgram Shader_CreateProgram(ShaderList shaders);
 
 // Delete a shader program.
 void Shader_DeleteProgram(ShaderProgram program);
+
+// Shader class for easier handling.
+struct JShader
+{
+    ShaderProgram shaderProgram = 0;
+
+    JShader(ShaderList shaders);
+    void Use();
+    void SetBool(std::string& name, bool value);
+    void SetInt(std::string& name, int value);
+    void SetFloat(std::string& name, float value);
+    ~JShader();
+};

@@ -1,19 +1,23 @@
 #include "buffers.h"
 #include "shader.h"
+#include "texture.h"
 #include "window.h"
 #include "vec3.h"
+#include "vertexModes/vertexColor.h"
+#include <memory>
 
-ShaderProgram shaderProgram;
-VertexBuffer buffers;
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-Vec3 vertices[] =
+std::unique_ptr<JShader> shader;
+std::unique_ptr<JTexture> texture;
+std::unique_ptr<JBuffers> buffers;
+
+VertexColor vertices[] =
 {
-    { -0.5f, -0.5f, 0.0f }, // Left.
-    { 1.0f, 0.0f, 0.0f }, // Red.
-    { 0.5f, -0.5f, 0.0f }, // Right.
-    { 0.0f, 1.0f, 0.0f }, // Green.
-    { 0.0f,  0.5f, 0.0f },  // Top.
-    { 0.0f, 0.0f, 1.0f } // Blue.
+    VertexColor(Vec3(-0.5f, -0.5f, 0.0f), Vec3(1.0f, 0.0f, 0.0f )), // Left.
+    VertexColor(Vec3(0.5f, -0.5f, 0.0f), Vec3(0.0f, 1.0f, 0.0f )), // Right.
+    VertexColor(Vec3(0.0f,  0.5f, 0.0f), Vec3(0.0f, 0.0f, 1.0f )) // Top.
 };
 
 GLuint indices[] =
@@ -30,8 +34,8 @@ void window_draw(GLFWwindow* window)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    glUseProgram(shaderProgram);
-    Buffers_Bind(buffers);
+    shader->Use();
+    buffers->Bind();
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 }
 
@@ -53,21 +57,24 @@ int main()
     ShaderList shaderList;
     shaderList.push_back(std::pair("res/shd/defaultVert.glsl", GL_VERTEX_SHADER));
     shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
-    shaderProgram = Shader_CreateProgram(shaderList);
+    shader = std::make_unique<JShader>(shaderList);
 
     // Vertex buffers.
-    buffers = Buffers_Generate(vertices, sizeof(vertices), GL_STATIC_DRAW, indices, sizeof(indices), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3) * 2, (void*)0); // Also connects VBO to the VAO, but not EBO to VAO. Dumb.
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3) * 2, (void*)sizeof(Vec3));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+    buffers = std::make_unique<JBuffers>(vertices, sizeof(vertices), GL_STATIC_DRAW, indices, sizeof(indices), GL_STATIC_DRAW);
+    VertexColor::SetAttributes();
 
     // Unbind buffers.
     Buffers_Bind(VertexBuffer(0, 0, 0));
 
+    // Texture stuff.
+    texture = std::make_unique<JTexture>("res/tex/colfawnGotaPfp.png");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     // Run and close.
     Window_Main(window, window_callback);
-    Buffers_Delete(buffers);
     Window_Close();
     return 0;
 
