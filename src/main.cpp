@@ -1,4 +1,8 @@
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include "buffers.h"
+#include "camera.h"
+#include "frame.h"
 #include "model.h"
 #include "shader.h"
 #include "texture.h"
@@ -13,6 +17,7 @@
 
 std::unique_ptr<JShader> shader;
 std::unique_ptr<JModel> model;
+std::unique_ptr<JCamera> camera;
 
 VertexUV vertices[] =
 {
@@ -101,7 +106,7 @@ void window_draw(GLFWwindow* window)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Drawing.
-    shader->SetMatrix("view", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f))));
+    shader->SetMatrix("view", glm::value_ptr(camera->Matrix()));
     for (int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
     {
         model->matrix = glm::translate(glm::mat4(1.0f), cubePositions[i]);
@@ -109,6 +114,7 @@ void window_draw(GLFWwindow* window)
         model->matrix = glm::rotate(model->matrix, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
         model->Render();
     }
+    JFrame::Update();
 
 }
 
@@ -117,6 +123,21 @@ void window_callback(GLFWwindow* window)
     window_draw(window);
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    // Camera.
+    float cameraSpeed = static_cast<float>(2.5 * JFrame::deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera->cameraPos += cameraSpeed * camera->cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera->cameraPos -= cameraSpeed * camera->cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera->cameraPos -= glm::normalize(glm::cross(camera->cameraFront, camera->cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera->cameraPos += glm::normalize(glm::cross(camera->cameraFront, camera->cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera->cameraPos += cameraSpeed * camera->cameraUp;
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera->cameraPos -= cameraSpeed * camera->cameraUp;
 }
 
 int main()
@@ -133,7 +154,6 @@ int main()
     shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
     shader = std::make_unique<JShader>(shaderList);
     shader->Use();
-    //shader->SetMatrix("projection", glm::value_ptr(glm::mat4(1.0f)));
     shader->SetMatrix("projection", glm::value_ptr(glm::perspective(
         glm::radians(45.0f),
         (float)SCR_WIDTH / SCR_HEIGHT,
@@ -142,6 +162,8 @@ int main()
     )));
 
     // Model setup.
+    camera = std::make_unique<JCamera>();
+    camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     std::vector<std::string> textures;
     textures.push_back("res/tex/colfawnGotaPfp.png");
     textures.push_back("res/tex/AsylumServerIcon.png");
