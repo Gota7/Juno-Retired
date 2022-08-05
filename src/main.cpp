@@ -3,7 +3,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "window.h"
-#include "vertexModes/vertexColorUV.h"
+#include "vertexModes/vertexUV.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
@@ -14,18 +14,65 @@
 std::unique_ptr<JShader> shader;
 std::unique_ptr<JModel> model;
 
-VertexColorUV vertices[] =
+VertexUV vertices[] =
 {
-    VertexColorUV(glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f ), glm::vec2(1.0f, 1.0f)), // Top right.
-    VertexColorUV(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f ), glm::vec2(1.0f, 0.0f)), // Bottom right.
-    VertexColorUV(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f ), glm::vec2(0.0f, 0.0f)), // Bottom left.
-    VertexColorUV(glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f ), glm::vec2(0.0f, 1.0f)) // Top left.
+        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 0.0f)),
+        VertexUV(glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(1.0f, 0.0f)),
+        VertexUV(glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
+        VertexUV(glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
+        VertexUV(glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
+        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 0.0f)),
+
+        VertexUV(glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
+        VertexUV(glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
+        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 1.0f)),
+        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 1.0f)),
+        VertexUV(glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(0.0f, 1.0f)),
+        VertexUV(glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
+
+        VertexUV(glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
+        VertexUV(glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
+        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
+        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
+        VertexUV(glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
+        VertexUV(glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
+
+        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
+        VertexUV(glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
+        VertexUV(glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
+        VertexUV(glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
+        VertexUV(glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
+        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0)),
+
+        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
+        VertexUV(glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
+        VertexUV(glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
+        VertexUV(glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
+        VertexUV(glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
+        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
+
+        VertexUV(glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
+        VertexUV(glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
+        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
+        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
+        VertexUV(glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
+        VertexUV(glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(0.0f, 1.0f))
 };
 
 GLuint indices[] =
 {
-    0, 1, 3,
-    1, 2, 3
+    0, 1, 2,
+    3, 4, 5,
+    6, 7, 8,
+    9, 10, 11,
+    12, 13, 14,
+    15, 16, 17,
+    18, 19, 20,
+    21, 22, 23,
+    24, 25, 26,
+    27, 28, 29,
+    30, 31, 32,
+    33, 34, 35
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -38,7 +85,7 @@ void window_draw(GLFWwindow* window)
 
     // Clear background.
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Drawing.
     shader->SetMatrix("view", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f))));
@@ -64,6 +111,7 @@ int main()
     if (!window) return -1;
 
     // Setup shaders.
+    glEnable(GL_DEPTH_TEST);
     ShaderList shaderList;
     shaderList.push_back(std::pair("res/shd/defaultVert.glsl", GL_VERTEX_SHADER));
     shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
@@ -94,7 +142,7 @@ int main()
         sizeof(indices) / sizeof(indices[0]),
         GL_UNSIGNED_INT
     );
-    VertexColorUV::SetAttributes();
+    VertexUV::SetAttributes();
 
     // Unbind buffers.
     Buffers_Bind(EMPTY_BUFFER);
