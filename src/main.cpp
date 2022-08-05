@@ -41,8 +41,11 @@ void window_draw(GLFWwindow* window)
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Drawing.
+    shader->SetMatrix("view", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f))));
+    //shader->SetMatrix("view", glm::value_ptr(glm::mat4(1.0f)));
     model->Render();
-    model->matrix = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    model->matrix = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model->matrix = glm::rotate(model->matrix, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
 }
 
@@ -65,6 +68,14 @@ int main()
     shaderList.push_back(std::pair("res/shd/defaultVert.glsl", GL_VERTEX_SHADER));
     shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
     shader = std::make_unique<JShader>(shaderList);
+    shader->Use();
+    //shader->SetMatrix("projection", glm::value_ptr(glm::mat4(1.0f)));
+    shader->SetMatrix("projection", glm::value_ptr(glm::perspective(
+        glm::radians(45.0f),
+        (float)SCR_WIDTH / SCR_HEIGHT,
+        0.1f,
+        100.0f
+    )));
 
     // Model setup.
     std::vector<std::string> textures;

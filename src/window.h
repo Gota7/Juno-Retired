@@ -3,6 +3,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+// Settings.
+#define SCR_WIDTH 800
+#define SCR_HEIGHT 600
+
 typedef void (*WindowCallback)(GLFWwindow* window);
 typedef void (*FramebufferSizeCallback)(GLFWwindow* window, int width, int height);
 
