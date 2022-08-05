@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <vector>
 
+#define EMPTY_BUFFER VertexBuffer(0, 0, 0)
+
 typedef GLuint VBO, VAO, EBO;
 struct VertexBuffer
 {

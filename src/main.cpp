@@ -2,8 +2,6 @@
 #include "shader.h"
 #include "texture.h"
 #include "window.h"
-#include "vec2.h"
-#include "vec3.h"
 #include "vertexModes/vertexColorUV.h"
 #include <memory>
 
@@ -17,10 +15,10 @@ std::unique_ptr<JBuffers> buffers;
 
 VertexColorUV vertices[] =
 {
-    VertexColorUV(Vec3(0.5f, 0.5f, 0.0f), Vec3(1.0f, 0.0f, 0.0f ), Vec2(1.0f, 1.0f)), // Top right.
-    VertexColorUV(Vec3(0.5f, -0.5f, 0.0f), Vec3(0.0f, 1.0f, 0.0f ), Vec2(1.0f, 0.0f)), // Bottom right.
-    VertexColorUV(Vec3(-0.5f,  -0.5f, 0.0f), Vec3(0.0f, 0.0f, 1.0f ), Vec2(0.0f, 0.0f)), // Bottom left.
-    VertexColorUV(Vec3(-0.5f,  0.5f, 0.0f), Vec3(1.0f, 1.0f, 0.0f ), Vec2(0.0f, 1.0f)) // Top left.
+    VertexColorUV(glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f ), glm::vec2(1.0f, 1.0f)), // Top right.
+    VertexColorUV(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f ), glm::vec2(1.0f, 0.0f)), // Bottom right.
+    VertexColorUV(glm::vec3(-0.5f,  -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f ), glm::vec2(0.0f, 0.0f)), // Bottom left.
+    VertexColorUV(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f ), glm::vec2(0.0f, 1.0f)) // Top left.
 };
 
 GLuint indices[] =
@@ -44,7 +42,7 @@ void window_draw(GLFWwindow* window)
     texture2->Use();
     shader->Use();
     buffers->Bind();
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);
 }
 
 void window_callback(GLFWwindow* window)
@@ -72,7 +70,7 @@ int main()
     VertexColorUV::SetAttributes();
 
     // Unbind buffers.
-    Buffers_Bind(VertexBuffer(0, 0, 0));
+    Buffers_Bind(EMPTY_BUFFER);
 
     // Texture stuff.
     texture1 = std::make_unique<JTexture>("res/tex/colfawnGotaPfp.png");

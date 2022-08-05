@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../vec3.h"
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 // Vertex color positions.
 struct VertexColor
 {
-    Vec3 vertex;
-    Vec3 color;
+    glm::vec3 vertex;
+    glm::vec3 color;
 
-    VertexColor(Vec3 vertex, Vec3 color) : vertex(vertex), color(color) {}
+    VertexColor(glm::vec3 vertex, glm::vec3 color) : vertex(vertex), color(color) {}
 
     static void SetAttributes()
     {

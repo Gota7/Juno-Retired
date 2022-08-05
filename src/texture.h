@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <string>
 
+#define EMPTY_TEXTURE 0
+
 typedef GLuint Texture;
 
 // Create a texture.
