@@ -3,6 +3,8 @@
 #include "texture.h"
 #include "window.h"
 #include "vertexModes/vertexColorUV.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <memory>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -34,15 +36,29 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void window_draw(GLFWwindow* window)
 {
+
+    // Clear background.
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    // Texturing.
     glActiveTexture(GL_TEXTURE0);
     texture1->Use();
     glActiveTexture(GL_TEXTURE1);
     texture2->Use();
+
+    // Bindings.
     shader->Use();
     buffers->Bind();
+
+    // Transforms.
+    glm::mat4 transform(1.0f);
+    transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    shader->SetMatrix("transform", glm::value_ptr(transform));
+
+    // Drawing.
     glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);
+
 }
 
 void window_callback(GLFWwindow* window)

@@ -82,6 +82,11 @@ void JShader::SetFloat(const std::string& name, float value)
     glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
 }
 
+void JShader::SetMatrix(const std::string& name, const GLfloat* value)
+{
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE, value);
+}
+
 JShader::~JShader()
 {
     Shader_DeleteProgram(shaderProgram);
