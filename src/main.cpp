@@ -19,6 +19,9 @@ std::unique_ptr<JShader> shader;
 std::unique_ptr<JModel> model;
 std::unique_ptr<JCamera> camera;
 
+float lastX = 800.0f / 2.0;
+float lastY = 600.0 / 2.0;
+
 VertexUV vertices[] =
 {
         VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 0.0f)),
@@ -106,7 +109,9 @@ void window_draw(GLFWwindow* window)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Drawing.
-    shader->SetMatrix("view", glm::value_ptr(camera->Matrix()));
+    camera->Update();
+    shader->SetMatrix("projection", glm::value_ptr(camera->ProjectionMatrix()));
+    shader->SetMatrix("view", glm::value_ptr(camera->ViewMatrix()));
     for (int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
     {
         model->matrix = glm::translate(glm::mat4(1.0f), cubePositions[i]);
@@ -140,12 +145,54 @@ void window_callback(GLFWwindow* window)
         camera->cameraPos -= cameraSpeed * camera->cameraUp;
 }
 
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS)
+    {
+        lastX = xpos;
+        lastY = ypos;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // Reversed since y-coordinates go from bottom to top.
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f; // Change this value to your liking.
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    camera->yaw += xoffset;
+    camera->pitch += yoffset;
+
+    // Make sure that when pitch is out of bounds, screen doesn't get flipped.
+    if (camera->pitch > 89.0f)
+        camera->pitch = 89.0f;
+    if (camera->pitch < -89.0f)
+        camera->pitch = -89.0f;
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera->fov -= (float)yoffset;
+    if (camera->fov < 1.0f)
+        camera->fov = 1.0f;
+    if (camera->fov > 45.0f)
+        camera->fov = 45.0f;
+}
+
 int main()
 {
 
     // Window init.
-    GLFWwindow* window = Window_Init(framebuffer_size_callback);
+    GLFWwindow* window = Window_Init();
     if (!window) return -1;
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     // Setup shaders.
     glEnable(GL_DEPTH_TEST);
@@ -153,13 +200,6 @@ int main()
     shaderList.push_back(std::pair("res/shd/defaultVert.glsl", GL_VERTEX_SHADER));
     shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
     shader = std::make_unique<JShader>(shaderList);
-    shader->Use();
-    shader->SetMatrix("projection", glm::value_ptr(glm::perspective(
-        glm::radians(45.0f),
-        (float)SCR_WIDTH / SCR_HEIGHT,
-        0.1f,
-        100.0f
-    )));
 
     // Model setup.
     camera = std::make_unique<JCamera>();

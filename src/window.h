@@ -8,10 +8,9 @@
 #define SCR_HEIGHT 576
 
 typedef void (*WindowCallback)(GLFWwindow* window);
-typedef void (*FramebufferSizeCallback)(GLFWwindow* window, int width, int height);
 
 // Init window.
-GLFWwindow* Window_Init(FramebufferSizeCallback sizeCallback);
+GLFWwindow* Window_Init();
 
 // Main window.
 void Window_Main(GLFWwindow* window, WindowCallback callback = nullptr);

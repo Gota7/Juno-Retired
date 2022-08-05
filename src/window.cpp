@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-GLFWwindow* Window_Init(FramebufferSizeCallback sizeCallback)
+GLFWwindow* Window_Init()
 {
     // glfw: initialize and configure
     // ------------------------------
@@ -25,7 +25,6 @@ GLFWwindow* Window_Init(FramebufferSizeCallback sizeCallback)
         return nullptr;
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, sizeCallback);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
