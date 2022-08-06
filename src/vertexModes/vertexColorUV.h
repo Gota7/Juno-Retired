@@ -14,9 +14,9 @@ struct VertexColorUV
 
     static void SetAttributes()
     {
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexColorUV), (void*)0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexColorUV), (void*)sizeof(glm::vec3));
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexColorUV), (void*)(sizeof(glm::vec3) * 2));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexColorUV), (void*)offsetof(VertexColorUV, vertex));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexColorUV), (void*)offsetof(VertexColorUV, color));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexColorUV), (void*)offsetof(VertexColorUV, uv));
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);

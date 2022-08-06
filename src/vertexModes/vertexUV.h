@@ -13,8 +13,8 @@ struct VertexUV
 
     static void SetAttributes()
     {
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexUV), (void*)0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexUV), (void*)sizeof(glm::vec3));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexUV), (void*)offsetof(VertexUV, vertex));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexUV), (void*)offsetof(VertexUV, uv));
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
     }

@@ -7,7 +7,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "window.h"
-#include "vertexModes/vertexUV.h"
+#include "vertexModes/vertexNormal.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
@@ -20,49 +20,43 @@ std::unique_ptr<JShader> shader;
 std::unique_ptr<JModel> model;
 std::unique_ptr<JFreeCam> camera;
 
-VertexUV vertices[] =
-{
-        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 0.0f)),
-        VertexUV(glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(1.0f, 0.0f)),
-        VertexUV(glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
-        VertexUV(glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
-        VertexUV(glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
-        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 0.0f)),
-
-        VertexUV(glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
-        VertexUV(glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
-        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 1.0f)),
-        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 1.0f)),
-        VertexUV(glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(0.0f, 1.0f)),
-        VertexUV(glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
-
-        VertexUV(glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
-        VertexUV(glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
-        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
-        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
-        VertexUV(glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
-        VertexUV(glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
-
-        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
-        VertexUV(glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
-        VertexUV(glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
-        VertexUV(glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
-        VertexUV(glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
-        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0)),
-
-        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
-        VertexUV(glm::vec3( 0.5f, -0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
-        VertexUV(glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
-        VertexUV(glm::vec3( 0.5f, -0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
-        VertexUV(glm::vec3(-0.5f, -0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
-        VertexUV(glm::vec3(-0.5f, -0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
-
-        VertexUV(glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(0.0f, 1.0f)),
-        VertexUV(glm::vec3( 0.5f,  0.5f, -0.5f),  glm::vec2(1.0f, 1.0f)),
-        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
-        VertexUV(glm::vec3( 0.5f,  0.5f,  0.5f),  glm::vec2(1.0f, 0.0f)),
-        VertexUV(glm::vec3(-0.5f,  0.5f,  0.5f),  glm::vec2(0.0f, 0.0f)),
-        VertexUV(glm::vec3(-0.5f,  0.5f, -0.5f),  glm::vec2(0.0f, 1.0f))
+VertexNormal vertices[] = {
+        VertexNormal(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f)),
+        VertexNormal(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f)),
+        VertexNormal(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f)),
+        VertexNormal(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f)),
+        VertexNormal(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f)),
+        VertexNormal(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f)),
+        VertexNormal(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f)),
+        VertexNormal(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f)),
+        VertexNormal(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3( 1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3( 1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3( 1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3( 1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 1.0f,  0.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f, -1.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3( 0.0f, -1.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3( 0.0f, -1.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3( 0.0f, -1.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3( 0.0f, -1.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f, -1.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  1.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  1.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  1.0f,  0.0f)),
+        VertexNormal(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  1.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  1.0f,  0.0f)),
+        VertexNormal(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  1.0f,  0.0f))
 };
 
 GLuint indices[] =
@@ -112,11 +106,12 @@ void window_draw(GLFWwindow* window)
     const GLfloat* view = glm::value_ptr(camera->ViewMatrix());
 
     // Light cube.
+    const glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
     lightShader->Use();
     lightShader->SetMatrix("projection", projection);
     lightShader->SetMatrix("view", view);
     model->matrix = glm::mat4(1.0f);
-    model->matrix = glm::translate(glm::mat4(1.0f), glm::vec3(1.2f, 1.0f, 2.0f));
+    model->matrix = glm::translate(glm::mat4(1.0f), lightPos);
     model->matrix = glm::scale(model->matrix, glm::vec3(0.2f)); // A smaller cube.
     model->Render();
 
@@ -124,6 +119,7 @@ void window_draw(GLFWwindow* window)
     shader->Use();
     shader->SetVec3("objectColor", glm::value_ptr(glm::vec3(1.0f, 0.5f, 0.31f)));
     shader->SetVec3("lightColor", glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
+    shader->SetVec3("lightPos", glm::value_ptr(lightPos));
     shader->SetMatrix("projection", projection);
     shader->SetMatrix("view", view);
     model->matrix = glm::mat4(1.0f);
@@ -197,9 +193,7 @@ int main()
         sizeof(indices) / sizeof(indices[0]),
         GL_UNSIGNED_INT
     );
-    //VertexUV::SetAttributes();
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexUV), (void*)0);
-    glEnableVertexAttribArray(0);
+    VertexNormal::SetAttributes();
 
     // Unbind buffers.
     Buffers_Bind(EMPTY_BUFFER);
