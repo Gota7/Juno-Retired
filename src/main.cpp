@@ -106,7 +106,10 @@ void window_draw(GLFWwindow* window)
     const GLfloat* view = glm::value_ptr(camera->ViewMatrix());
 
     // Light cube.
-    const glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+    glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+    lightPos.x += cos(glfwGetTime());
+    lightPos.y += sin(glfwGetTime());
+    lightPos.z += cos(glfwGetTime()) * sin(glfwGetTime());
     lightShader->Use();
     lightShader->SetMatrix("projection", projection);
     lightShader->SetMatrix("view", view);
@@ -120,6 +123,7 @@ void window_draw(GLFWwindow* window)
     shader->SetVec3("objectColor", glm::value_ptr(glm::vec3(1.0f, 0.5f, 0.31f)));
     shader->SetVec3("lightColor", glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
     shader->SetVec3("lightPos", glm::value_ptr(lightPos));
+    shader->SetVec3("viewPos", glm::value_ptr(camera->cameraPos));
     shader->SetMatrix("projection", projection);
     shader->SetMatrix("view", view);
     model->matrix = glm::mat4(1.0f);
