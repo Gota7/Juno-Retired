@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "buffers.h"
-#include "camera.h"
+#include "cameras/freeCam.h"
 #include "frame.h"
 #include "model.h"
 #include "shader.h"
@@ -17,10 +17,7 @@
 
 std::unique_ptr<JShader> shader;
 std::unique_ptr<JModel> model;
-std::unique_ptr<JCamera> camera;
-
-float lastX = 800.0f / 2.0;
-float lastY = 600.0 / 2.0;
+std::unique_ptr<JFreeCam> camera;
 
 VertexUV vertices[] =
 {
@@ -128,60 +125,17 @@ void window_callback(GLFWwindow* window)
     window_draw(window);
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
-    // Camera.
-    float cameraSpeed = static_cast<float>(2.5 * JFrame::deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera->cameraPos += cameraSpeed * camera->cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera->cameraPos -= cameraSpeed * camera->cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera->cameraPos -= glm::normalize(glm::cross(camera->cameraFront, camera->cameraUp)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera->cameraPos += glm::normalize(glm::cross(camera->cameraFront, camera->cameraUp)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera->cameraPos += cameraSpeed * camera->cameraUp;
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera->cameraPos -= cameraSpeed * camera->cameraUp;
+    camera->GLFWKeys(window);
 }
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS)
-    {
-        lastX = xpos;
-        lastY = ypos;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // Reversed since y-coordinates go from bottom to top.
-    lastX = xpos;
-    lastY = ypos;
-
-    float sensitivity = 0.1f; // Change this value to your liking.
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    camera->yaw += xoffset;
-    camera->pitch += yoffset;
-
-    // Make sure that when pitch is out of bounds, screen doesn't get flipped.
-    if (camera->pitch > 89.0f)
-        camera->pitch = 89.0f;
-    if (camera->pitch < -89.0f)
-        camera->pitch = -89.0f;
+    camera->GLFWMouse(window, xposIn, yposIn);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera->fov -= (float)yoffset;
-    if (camera->fov < 1.0f)
-        camera->fov = 1.0f;
-    if (camera->fov > 45.0f)
-        camera->fov = 45.0f;
+    camera->Forward(yoffset);
 }
 
 int main()
@@ -202,7 +156,7 @@ int main()
     shader = std::make_unique<JShader>(shaderList);
 
     // Model setup.
-    camera = std::make_unique<JCamera>();
+    camera = std::make_unique<JFreeCam>();
     camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     std::vector<std::string> textures;
     textures.push_back("res/tex/colfawnGotaPfp.png");
