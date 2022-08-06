@@ -15,6 +15,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+std::unique_ptr<JShader> lightShader;
 std::unique_ptr<JShader> shader;
 std::unique_ptr<JModel> model;
 std::unique_ptr<JFreeCam> camera;
@@ -105,17 +106,35 @@ void window_draw(GLFWwindow* window)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Drawing.
+    // Camera stuff.
     camera->Update();
-    shader->SetMatrix("projection", glm::value_ptr(camera->ProjectionMatrix()));
-    shader->SetMatrix("view", glm::value_ptr(camera->ViewMatrix()));
-    for (int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
-    {
-        model->matrix = glm::translate(glm::mat4(1.0f), cubePositions[i]);
-        model->matrix = glm::rotate(model->matrix, glm::radians(20.0f + i), glm::vec3(1.0f, 0.3f, 0.5f));
-        model->matrix = glm::rotate(model->matrix, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        model->Render();
-    }
+    const GLfloat* projection = glm::value_ptr(camera->ProjectionMatrix());
+    const GLfloat* view = glm::value_ptr(camera->ViewMatrix());
+
+    // Light cube.
+    lightShader->Use();
+    lightShader->SetMatrix("projection", projection);
+    lightShader->SetMatrix("view", view);
+    model->matrix = glm::mat4(1.0f);
+    model->matrix = glm::translate(glm::mat4(1.0f), glm::vec3(1.2f, 1.0f, 2.0f));
+    model->matrix = glm::scale(model->matrix, glm::vec3(0.2f)); // A smaller cube.
+    model->Render();
+
+    // Normal cube.
+    shader->Use();
+    shader->SetVec3("objectColor", glm::value_ptr(glm::vec3(1.0f, 0.5f, 0.31f)));
+    shader->SetVec3("lightColor", glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
+    shader->SetMatrix("projection", projection);
+    shader->SetMatrix("view", view);
+    model->matrix = glm::mat4(1.0f);
+    model->Render();
+    // for (int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
+    // {
+    //     model->matrix = glm::translate(glm::mat4(1.0f), cubePositions[i]);
+    //     model->matrix = glm::rotate(model->matrix, glm::radians(20.0f + i), glm::vec3(1.0f, 0.3f, 0.5f));
+    //     model->matrix = glm::rotate(model->matrix, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    //     model->Render();
+    // }
     JFrame::Update();
 
 }
@@ -154,13 +173,17 @@ int main()
     shaderList.push_back(std::pair("res/shd/defaultVert.glsl", GL_VERTEX_SHADER));
     shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
     shader = std::make_unique<JShader>(shaderList);
+    shaderList.clear();
+    shaderList.push_back(std::pair("res/shd/lightVert.glsl", GL_VERTEX_SHADER));
+    shaderList.push_back(std::pair("res/shd/lightFrag.glsl", GL_FRAGMENT_SHADER));
+    lightShader = std::make_unique<JShader>(shaderList);
 
     // Model setup.
     camera = std::make_unique<JFreeCam>();
     camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     std::vector<std::string> textures;
-    textures.push_back("res/tex/colfawnGotaPfp.png");
-    textures.push_back("res/tex/AsylumServerIcon.png");
+    // textures.push_back("res/tex/colfawnGotaPfp.png");
+    // textures.push_back("res/tex/AsylumServerIcon.png");
     model = std::make_unique<JModel> (
         vertices,
         sizeof(vertices),
@@ -174,7 +197,9 @@ int main()
         sizeof(indices) / sizeof(indices[0]),
         GL_UNSIGNED_INT
     );
-    VertexUV::SetAttributes();
+    //VertexUV::SetAttributes();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexUV), (void*)0);
+    glEnableVertexAttribArray(0);
 
     // Unbind buffers.
     Buffers_Bind(EMPTY_BUFFER);
