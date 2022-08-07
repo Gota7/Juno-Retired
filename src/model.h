@@ -44,6 +44,7 @@ struct JModel
         {
             this->textures.push_back(std::make_unique<JTexture>(tex));
             shader.SetInt("texture" + std::to_string(num), num);
+            this->textures[num]->id = num;
             num++;
         }
     }

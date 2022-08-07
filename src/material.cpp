@@ -9,3 +9,10 @@ void JMaterial::SetVars(JShader& shader, std::string materialName)
     shader.SetVec3(materialName + ".specular", glm::value_ptr(specular));
     shader.SetFloat(materialName + ".specularExponent", specularExponent);
 }
+
+void JMaterialTex::SetVars(JShader& shader, std::string materialName)
+{
+    shader.SetInt(materialName + ".diffuse", diffuse.id);
+    shader.SetInt(materialName + ".specular", specular.id);
+    shader.SetFloat(materialName + ".specularExponent", specularExponent);
+}
