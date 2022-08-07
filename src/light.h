@@ -5,7 +5,7 @@
 #include <string>
 
 // General light that is at a point and gives light off in every direction.
-struct JLight
+struct JLightPoint
 {
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 ambient = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -15,7 +15,7 @@ struct JLight
     float quadratic = 0.032f;
 
     // Set shader variables that corresponds to the light.
-    void SetVars(JShader& shader, std::string lightName = "light");
+    void SetVars(JShader& shader, std::string lightName = "lightPoint");
 
 };
 
@@ -31,7 +31,7 @@ struct JLightDirectional
     JLightDirectional(glm::vec3 direction) : direction(direction) {}
 
     // Set shader variables that corresponds to the light.
-    void SetVars(JShader& shader, std::string lightName = "light");
+    void SetVars(JShader& shader, std::string lightName = "lightDirectional");
 
 };
 
@@ -52,6 +52,6 @@ struct JLightSpot
     JLightSpot(glm::vec3 direction) : direction(direction) {}
 
     // Set shader variables that corresponds to the light.
-    void SetVars(JShader& shader, std::string lightName = "light");
+    void SetVars(JShader& shader, std::string lightName = "lightSpot");
 
 };

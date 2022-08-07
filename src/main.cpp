@@ -21,7 +21,9 @@ std::unique_ptr<JShader> lightShader;
 std::unique_ptr<JShader> shader;
 std::unique_ptr<JModel> model;
 std::unique_ptr<JFreeCam> camera;
-std::unique_ptr<JLightSpot> light;
+std::unique_ptr<JLightPoint> lightPoint;
+std::unique_ptr<JLightDirectional> lightDirectional;
+std::unique_ptr<JLightSpot> lightSpot;
 std::unique_ptr<JMaterialTex> material;
 
 VertexNormalUV vertices[] = {
@@ -114,20 +116,22 @@ void window_draw(GLFWwindow* window)
     lightPos.x += cos(glfwGetTime());
     lightPos.y += sin(glfwGetTime());
     lightPos.z += cos(glfwGetTime()) * sin(glfwGetTime());
-    //light->position = lightPos;
+    lightPoint->position = lightPos;
     lightShader->Use();
     lightShader->SetMatrix("projection", projection);
     lightShader->SetMatrix("view", view);
     model->matrix = glm::mat4(1.0f);
     model->matrix = glm::translate(glm::mat4(1.0f), lightPos);
     model->matrix = glm::scale(model->matrix, glm::vec3(0.2f)); // A smaller cube.
-    //model->Render();
-    light->position = camera->cameraPos;
-    light->direction = camera->cameraFront;
+    model->Render();
+    lightSpot->position = camera->cameraPos;
+    lightSpot->direction = camera->cameraFront;
 
     // Normal cube.
     shader->Use();
-    light->SetVars(*shader);
+    lightPoint->SetVars(*shader);
+    lightDirectional->SetVars(*shader);
+    lightSpot->SetVars(*shader);
     shader->SetVec3("viewPos", glm::value_ptr(camera->cameraPos));
     shader->SetMatrix("projection", projection);
     shader->SetMatrix("view", view);
@@ -203,7 +207,9 @@ int main()
     VertexNormalUV::SetAttributes();
 
     // Other setups.
-    light = std::make_unique<JLightSpot>(camera->cameraFront);
+    lightPoint = std::make_unique<JLightPoint>();
+    lightDirectional = std::make_unique<JLightDirectional>(glm::vec3(-0.2f, -1.0f, -0.3f));
+    lightSpot = std::make_unique<JLightSpot>(camera->cameraFront);
     material = std::make_unique<JMaterialTex>(*model->textures[0], *model->textures[1]);
     shader->Use();
     material->SetVars(*shader);
