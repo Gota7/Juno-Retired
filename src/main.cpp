@@ -85,8 +85,7 @@ GLuint indices[] =
 };
 
 glm::vec3 cubePositions[] = {
-    //glm::vec3( 0.0f, 0.0f, 0.0f),
-    glm::vec3( -10.0f, 0.0f, 0.0f),
+    glm::vec3( 0.0f, 0.0f, 0.0f),
     glm::vec3( 2.0f, 5.0f, -15.0f),
     glm::vec3(-1.5f, -2.2f, -2.5f),
     glm::vec3(-3.8f, -2.0f, -12.3f),
@@ -135,14 +134,14 @@ void window_draw(GLFWwindow* window)
     shader->Use();
     lightPoint->SetVars(*shader);
     lightDirectional->SetVars(*shader);
-    lightSpot->SetVars(*shader);
+    //lightSpot->SetVars(*shader);
     shader->SetVec3("viewPos", glm::value_ptr(camera->cameraPos));
     shader->SetMatrix("projection", glm::value_ptr(projection));
     shader->SetMatrix("view", glm::value_ptr(view));
 
     // Draw level and backpack.
     levelModel->Render();
-    backpackModel->Render();
+    //backpackModel->Render();
 
     // Draw cubes.
     for (int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
@@ -225,8 +224,9 @@ int main()
     VertexNormalUV::SetAttributes();
 
     // Level model setups.
-    levelModel = std::make_unique<JModel>("res/mdl/Skygarden/Skygarden.dae", *shader);
-    levelModel->matrix = glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f) * 5.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    levelModel = std::make_unique<JModel>("res/mdl/GardenPlanet/diskgardenplanet.dae", *shader);
+    //levelModel->matrix = glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f) * 5.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    levelModel->matrix = glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f) * 0.0025f), glm::vec3(-5000.0f, 0.0f, 0.0f));
 
     // Backpack model setup.
     backpackModel = std::make_unique<JModel>("res/mdl/Backpack/backpack.obj", *shader);
@@ -234,7 +234,9 @@ int main()
 
     // Other setups.
     lightPoint = std::make_unique<JLightPoint>();
-    lightDirectional = std::make_unique<JLightDirectional>(glm::vec3(-0.2f, -1.0f, -0.3f));
+    lightDirectional = std::make_unique<JLightDirectional>(glm::vec3(-0.0f, -1.0f, -0.0f));
+    lightDirectional->diffuse = glm::vec3(0.95f, 0.95f, 0.7f);
+    lightDirectional->ambient = glm::vec3(1.0f, 0.501f, 0.188f) * 0.45f;
     lightSpot = std::make_unique<JLightSpot>(camera->cameraFront);
 
     // Unbind buffers.
