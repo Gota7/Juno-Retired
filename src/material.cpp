@@ -1,8 +1,7 @@
 #include "material.h"
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
 
-void JMaterial::SetVars(JShader& shader, std::string materialName)
+void JMaterialSolid::SetVars(JShader& shader, std::string materialName)
 {
     shader.SetVec3(materialName + ".ambient", glm::value_ptr(ambient));
     shader.SetVec3(materialName + ".diffuse", glm::value_ptr(diffuse));
@@ -12,7 +11,7 @@ void JMaterial::SetVars(JShader& shader, std::string materialName)
 
 void JMaterialTex::SetVars(JShader& shader, std::string materialName)
 {
-    shader.SetInt(materialName + ".diffuse", diffuse.id);
-    shader.SetInt(materialName + ".specular", specular.id);
+    shader.SetInt(materialName + ".diffuse", diffuse);
+    shader.SetInt(materialName + ".specular", specular);
     shader.SetFloat(materialName + ".specularExponent", specularExponent);
 }

@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include "buffers.h"
 #include "cameras/freeCam.h"
 #include "frame.h"
@@ -12,6 +13,7 @@
 #include "vertexModes/vertexNormalUV.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 #include <memory>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -191,18 +193,24 @@ int main()
     std::vector<std::string> textures;
     textures.push_back("res/tex/AsylumServerIcon.png");
     textures.push_back("res/tex/AsylumServerIconSpec.png");
-    model = std::make_unique<JModel> (
+    std::vector<std::unique_ptr<JMesh>> meshes;
+    material = std::make_unique<JMaterialTex>("res/tex/AsylumServerIcon.png", "res/tex/AsylumServerIconSpec.png");
+    meshes.push_back(std::make_unique<JMesh>(
         vertices,
         sizeof(vertices),
         GL_STATIC_DRAW,
         indices,
         sizeof(indices),
         GL_STATIC_DRAW,
-        textures,
-        *shader,
         GL_TRIANGLES,
         sizeof(indices) / sizeof(indices[0]),
-        GL_UNSIGNED_INT
+        GL_UNSIGNED_INT,
+        material
+    ));
+    model = std::make_unique<JModel> (
+        meshes,
+        textures,
+        *shader
     );
     VertexNormalUV::SetAttributes();
 
@@ -210,9 +218,6 @@ int main()
     lightPoint = std::make_unique<JLightPoint>();
     lightDirectional = std::make_unique<JLightDirectional>(glm::vec3(-0.2f, -1.0f, -0.3f));
     lightSpot = std::make_unique<JLightSpot>(camera->cameraFront);
-    material = std::make_unique<JMaterialTex>(*model->textures[0], *model->textures[1]);
-    shader->Use();
-    material->SetVars(*shader);
 
     // Unbind buffers.
     Buffers_Bind(EMPTY_BUFFER);

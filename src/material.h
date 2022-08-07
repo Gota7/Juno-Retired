@@ -5,8 +5,14 @@
 #include <glm/glm.hpp>
 #include <memory>
 
-// Material for models.
-struct JMaterial
+// Standard material.
+/*struct JMaterial
+{
+    virtual void SetVars(JShader& shader, std::string materialName = "material") {}
+};*/
+
+// Solid material for models.
+struct JMaterialSolid //: JMaterial
 {
     glm::vec3 ambient = glm::vec3(1.0f, 1.0f, 1.0f);
     glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -19,14 +25,16 @@ struct JMaterial
 };
 
 // Material for models.
-struct JMaterialTex
+struct JMaterialTex //: JMaterial
 {
-    JTexture& diffuse;
-    JTexture& specular;
+    int diffuse;
+    int specular;
     float specularExponent = 32.0f;
+    std::string diffuseName;
+    std::string specularName;
 
     // Constructor.
-    JMaterialTex(JTexture& diffuse, JTexture& specular) : diffuse(diffuse), specular(specular) {}
+    JMaterialTex(std::string diffuseName, std::string specularName) : diffuseName(diffuseName), specularName(specularName) {}
 
     // Set variables.
     void SetVars(JShader& shader, std::string materialName = "material");

@@ -43,6 +43,7 @@ in vec2 TexCoords;
 out vec4 FragColor;
 
 // Uniforms.
+#define NUM_MATERIALS 3
 uniform LightPoint lightPoint;
 uniform LightDirectional lightDirectional;
 uniform LightSpot lightSpot;
@@ -128,7 +129,7 @@ vec3 CalcSpotLight(LightSpot light, vec3 normal, vec3 fragPos, vec3 viewDir)
 // Main method.
 void main()
 {
-    // Properties
+    // Properties.
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 result = CalcDirLight(lightDirectional, norm, viewDir);
