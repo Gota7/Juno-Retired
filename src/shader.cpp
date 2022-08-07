@@ -87,6 +87,11 @@ void JShader::SetVec3(const std::string& name, const GLfloat* value)
     glUniform3fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, value);
 }
 
+void JShader::SetVec4(const std::string& name, const GLfloat* value)
+{
+    glUniform4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, value);
+}
+
 void JShader::SetMatrix(const std::string& name, const GLfloat* value)
 {
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE, value);
