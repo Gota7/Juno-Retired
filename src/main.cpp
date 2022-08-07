@@ -21,7 +21,7 @@ std::unique_ptr<JShader> lightShader;
 std::unique_ptr<JShader> shader;
 std::unique_ptr<JModel> model;
 std::unique_ptr<JFreeCam> camera;
-std::unique_ptr<JLightDirectional> light;
+std::unique_ptr<JLightSpot> light;
 std::unique_ptr<JMaterialTex> material;
 
 VertexNormalUV vertices[] = {
@@ -121,7 +121,9 @@ void window_draw(GLFWwindow* window)
     model->matrix = glm::mat4(1.0f);
     model->matrix = glm::translate(glm::mat4(1.0f), lightPos);
     model->matrix = glm::scale(model->matrix, glm::vec3(0.2f)); // A smaller cube.
-    model->Render();
+    //model->Render();
+    light->position = camera->cameraPos;
+    light->direction = camera->cameraFront;
 
     // Normal cube.
     shader->Use();
@@ -201,7 +203,7 @@ int main()
     VertexNormalUV::SetAttributes();
 
     // Other setups.
-    light = std::make_unique<JLightDirectional>(glm::vec3(-0.2f, -1.0f, -0.3f));
+    light = std::make_unique<JLightSpot>(camera->cameraFront);
     material = std::make_unique<JMaterialTex>(*model->textures[0], *model->textures[1]);
     shader->Use();
     material->SetVars(*shader);

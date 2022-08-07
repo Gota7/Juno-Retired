@@ -10,9 +10,9 @@
 // Standard model.
 struct JModel
 {
-    glm::mat4 matrix;
+    glm::mat4 matrix = glm::mat4(1.0f);
     std::unique_ptr<JBuffers> buffers;
-    std::vector<std::unique_ptr<JTexture>> textures;
+    std::vector<std::unique_ptr<JTexture>> textures = std::vector<std::unique_ptr<JTexture>>();
     JShader& shader;
     GLenum drawMode;
     GLsizei drawCount;

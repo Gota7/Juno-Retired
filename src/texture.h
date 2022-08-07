@@ -17,7 +17,7 @@ void Texture_Delete(Texture texture);
 struct JTexture
 {
     Texture texture;
-    int width, height, numChannels, id;
+    int width, height, numChannels, id = 0;
 
     JTexture(std::string path);
     void Use();
