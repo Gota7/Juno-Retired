@@ -23,6 +23,7 @@ std::unique_ptr<JShader> lightShader;
 std::unique_ptr<JShader> shader;
 std::unique_ptr<JModel> cubeModel;
 std::unique_ptr<JModel> levelModel;
+std::unique_ptr<JModel> backpackModel;
 std::unique_ptr<JFreeCam> camera;
 std::unique_ptr<JLightPoint> lightPoint;
 std::unique_ptr<JLightDirectional> lightDirectional;
@@ -84,7 +85,8 @@ GLuint indices[] =
 };
 
 glm::vec3 cubePositions[] = {
-    glm::vec3( 0.0f, 0.0f, 0.0f),
+    //glm::vec3( 0.0f, 0.0f, 0.0f),
+    glm::vec3( -10.0f, 0.0f, 0.0f),
     glm::vec3( 2.0f, 5.0f, -15.0f),
     glm::vec3(-1.5f, -2.2f, -2.5f),
     glm::vec3(-3.8f, -2.0f, -12.3f),
@@ -105,13 +107,13 @@ void window_draw(GLFWwindow* window)
 {
 
     // Clear background.
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.7f, 0.7f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Camera stuff.
     camera->Update();
-    const GLfloat* projection = glm::value_ptr(camera->ProjectionMatrix());
-    const GLfloat* view = glm::value_ptr(camera->ViewMatrix());
+    glm::mat4 projection = camera->ProjectionMatrix();
+    glm::mat4 view = camera->ViewMatrix();
 
     // Light cube.
     glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
@@ -120,8 +122,8 @@ void window_draw(GLFWwindow* window)
     lightPos.z += cos(glfwGetTime()) * sin(glfwGetTime());
     lightPoint->position = lightPos;
     lightShader->Use();
-    lightShader->SetMatrix("projection", projection);
-    lightShader->SetMatrix("view", view);
+    lightShader->SetMatrix("projection", glm::value_ptr(projection));
+    lightShader->SetMatrix("view", glm::value_ptr(view));
     cubeModel->matrix = glm::mat4(1.0f);
     cubeModel->matrix = glm::translate(glm::mat4(1.0f), lightPos);
     cubeModel->matrix = glm::scale(cubeModel->matrix, glm::vec3(0.2f)); // A smaller cube.
@@ -135,11 +137,12 @@ void window_draw(GLFWwindow* window)
     lightDirectional->SetVars(*shader);
     lightSpot->SetVars(*shader);
     shader->SetVec3("viewPos", glm::value_ptr(camera->cameraPos));
-    shader->SetMatrix("projection", projection);
-    shader->SetMatrix("view", view);
+    shader->SetMatrix("projection", glm::value_ptr(projection));
+    shader->SetMatrix("view", glm::value_ptr(view));
 
-    // Draw level.
+    // Draw level and backpack.
     levelModel->Render();
+    backpackModel->Render();
 
     // Draw cubes.
     for (int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
@@ -222,7 +225,12 @@ int main()
     VertexNormalUV::SetAttributes();
 
     // Level model setups.
-    levelModel = std::make_unique<JModel>("res/mdl/Test.obj", *shader);
+    levelModel = std::make_unique<JModel>("res/mdl/Skygarden/Skygarden.dae", *shader);
+    levelModel->matrix = glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f) * 5.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+
+    // Backpack model setup.
+    backpackModel = std::make_unique<JModel>("res/mdl/Backpack/backpack.obj", *shader);
+    backpackModel->matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 2.0f));
 
     // Other setups.
     lightPoint = std::make_unique<JLightPoint>();

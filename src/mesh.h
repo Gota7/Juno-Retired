@@ -15,7 +15,7 @@ struct JMesh
     GLenum drawMode;
     GLsizei drawCount;
     GLenum drawType;
-    int materialIndex;
+    unsigned int materialIndex;
 
     JMesh(
         void* vertexData,
@@ -27,7 +27,7 @@ struct JMesh
         GLenum drawMode,
         GLsizei drawCount,
         GLenum drawType,
-        int materialIndex
+        unsigned int materialIndex
     ) : buffers(std::make_unique<JBuffers>(vertexData, vertexSize, vertexUsage, indexData, indexSize, indexUsage)),
         drawMode(drawMode),
         drawCount(drawCount),

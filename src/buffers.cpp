@@ -27,6 +27,7 @@ void Buffers_Delete(VertexBuffer buffers)
 {
     glDeleteVertexArrays(1, &buffers.vertexArray);
     glDeleteBuffers(1, &buffers.vertexBuffer);
+    glDeleteBuffers(1, &buffers.elementBuffer);
 }
 
 JBuffers::JBuffers(void* vertexData, size_t vertexSize, GLenum vertexUsage, void* indexData, size_t indexSize, GLenum indexUsage) : VertexBuffer(Buffers_Generate(vertexData, vertexSize, vertexUsage, indexData, indexSize, indexUsage))
