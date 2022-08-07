@@ -21,12 +21,12 @@
 
 std::unique_ptr<JShader> lightShader;
 std::unique_ptr<JShader> shader;
-std::unique_ptr<JModel> model;
+std::unique_ptr<JModel> cubeModel;
+std::unique_ptr<JModel> levelModel;
 std::unique_ptr<JFreeCam> camera;
 std::unique_ptr<JLightPoint> lightPoint;
 std::unique_ptr<JLightDirectional> lightDirectional;
 std::unique_ptr<JLightSpot> lightSpot;
-std::unique_ptr<JMaterialTex> material;
 
 VertexNormalUV vertices[] = {
     VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec2(0.0f, 0.0f)),
@@ -122,14 +122,14 @@ void window_draw(GLFWwindow* window)
     lightShader->Use();
     lightShader->SetMatrix("projection", projection);
     lightShader->SetMatrix("view", view);
-    model->matrix = glm::mat4(1.0f);
-    model->matrix = glm::translate(glm::mat4(1.0f), lightPos);
-    model->matrix = glm::scale(model->matrix, glm::vec3(0.2f)); // A smaller cube.
-    model->Render();
+    cubeModel->matrix = glm::mat4(1.0f);
+    cubeModel->matrix = glm::translate(glm::mat4(1.0f), lightPos);
+    cubeModel->matrix = glm::scale(cubeModel->matrix, glm::vec3(0.2f)); // A smaller cube.
+    cubeModel->Render(lightShader.get());
     lightSpot->position = camera->cameraPos;
     lightSpot->direction = camera->cameraFront;
 
-    // Normal cube.
+    // Light stuff.
     shader->Use();
     lightPoint->SetVars(*shader);
     lightDirectional->SetVars(*shader);
@@ -137,12 +137,17 @@ void window_draw(GLFWwindow* window)
     shader->SetVec3("viewPos", glm::value_ptr(camera->cameraPos));
     shader->SetMatrix("projection", projection);
     shader->SetMatrix("view", view);
+
+    // Draw level.
+    levelModel->Render();
+
+    // Draw cubes.
     for (int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
     {
-        model->matrix = glm::translate(glm::mat4(1.0f), cubePositions[i]);
-        model->matrix = glm::rotate(model->matrix, glm::radians(20.0f + i), glm::vec3(1.0f, 0.3f, 0.5f));
-        model->matrix = glm::rotate(model->matrix, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        model->Render();
+        cubeModel->matrix = glm::translate(glm::mat4(1.0f), cubePositions[i]);
+        cubeModel->matrix = glm::rotate(cubeModel->matrix, glm::radians(20.0f + i), glm::vec3(1.0f, 0.3f, 0.5f));
+        cubeModel->matrix = glm::rotate(cubeModel->matrix, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        cubeModel->Render();
     }
     JFrame::Update();
 
@@ -187,14 +192,15 @@ int main()
     shaderList.push_back(std::pair("res/shd/lightFrag.glsl", GL_FRAGMENT_SHADER));
     lightShader = std::make_unique<JShader>(shaderList);
 
-    // Model setup.
+    // Cube model setup.
     camera = std::make_unique<JFreeCam>();
     camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     std::vector<std::string> textures;
     textures.push_back("res/tex/AsylumServerIcon.png");
     textures.push_back("res/tex/AsylumServerIconSpec.png");
+    std::vector<std::unique_ptr<JMaterialTex>> materials;
+    materials.push_back(std::make_unique<JMaterialTex>("res/tex/AsylumServerIcon.png", "res/tex/AsylumServerIconSpec.png"));
     std::vector<std::unique_ptr<JMesh>> meshes;
-    material = std::make_unique<JMaterialTex>("res/tex/AsylumServerIcon.png", "res/tex/AsylumServerIconSpec.png");
     meshes.push_back(std::make_unique<JMesh>(
         vertices,
         sizeof(vertices),
@@ -205,14 +211,18 @@ int main()
         GL_TRIANGLES,
         sizeof(indices) / sizeof(indices[0]),
         GL_UNSIGNED_INT,
-        material
+        0
     ));
-    model = std::make_unique<JModel> (
+    cubeModel = std::make_unique<JModel> (
         meshes,
         textures,
+        materials,
         *shader
     );
     VertexNormalUV::SetAttributes();
+
+    // Level model setups.
+    levelModel = std::make_unique<JModel>("res/mdl/Test.obj", *shader);
 
     // Other setups.
     lightPoint = std::make_unique<JLightPoint>();

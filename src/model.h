@@ -1,8 +1,14 @@
 #pragma once
 
+#include "material.h"
 #include "mesh.h"
 #include "texture.h"
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <glm/glm.hpp>
+#include <iostream>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -12,39 +18,55 @@ struct JModel
     glm::mat4 matrix = glm::mat4(1.0f);
     std::vector<std::unique_ptr<JMesh>> meshes = std::vector<std::unique_ptr<JMesh>>();
     std::vector<std::unique_ptr<JTexture>> textures = std::vector<std::unique_ptr<JTexture>>();
+    std::vector<std::unique_ptr<JMaterialTex>> materials = std::vector<std::unique_ptr<JMaterialTex>>();
     JShader& shader;
+    std::map<std::string, int> textureNameToTextureIndex;
+    std::string relativeDirectory; // Used for loading textures from proper place.
 
     // Create a model from a singular mesh.
-    JModel(std::vector<std::unique_ptr<JMesh>>& meshes, std::vector<std::string> textureNames, JShader& shader, glm::mat4 matrix = glm::mat4(1.0f)) :
+    JModel(std::vector<std::unique_ptr<JMesh>>& meshes, std::vector<std::string> textureNames, std::vector<std::unique_ptr<JMaterialTex>>& materials, JShader& shader, glm::mat4 matrix = glm::mat4(1.0f)) :
     matrix(matrix),
     meshes(std::move(meshes)),
+    materials(std::move(materials)),
     shader(shader)
     {
         shader.Use();
-        int num = 0;
         for (auto& tex : textureNames)
         {
-            textures.push_back(std::make_unique<JTexture>(tex));
-            shader.SetInt("texture" + std::to_string(num), num);
-            textures[num]->id = num;
-            num++;
+            AddTexture(tex);
         }
-        for (auto& mesh : this->meshes) {
-            for (int i = 0; i < textureNames.size(); i++)
-            {
-                if (mesh->material->diffuseName == textureNames[i])
-                {
-                    mesh->material->diffuse = textures[i]->id;
-                }
-                else if (mesh->material->specularName == textureNames[i])
-                {
-                    mesh->material->specular = textures[i]->id;
-                }
-            }
+        for (auto& mat : this->materials) {
+            mat->diffuse = textureNameToTextureIndex[mat->diffuseName];
+            mat->specular = textureNameToTextureIndex[mat->specularName];
         }
     }
 
+    // Create a model from a file.
+    JModel(std::string path, JShader& shader, glm::mat4 matrix = glm::mat4(1.0f)) : shader(shader), matrix(matrix)
+    {
+        Assimp::Importer import;
+        const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
+        relativeDirectory = path.substr(0, path.find_last_of('/'));
+        if (relativeDirectory != "")
+            relativeDirectory += "/";
+        if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        {
+            std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+            return;
+        }
+        ImportNode(scene, scene->mRootNode);
+    }
+
+    // Add a texture.
+    void AddTexture(const std::string& name);
+
+    // Import a node.
+    void ImportNode(const aiScene* scene, aiNode* node);
+
+    // Import a mesh.
+    void ImportMesh(const aiScene* scene, aiMesh* mesh);
+
     // Render a model.
-    void Render();
+    void Render(JShader* other = nullptr);
 
 };
