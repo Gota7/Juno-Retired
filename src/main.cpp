@@ -30,42 +30,42 @@ std::unique_ptr<JLightDirectional> lightDirectional;
 std::unique_ptr<JLightSpot> lightSpot;
 
 VertexNormalUV vertices[] = {
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec2(0.0f, 0.0f)),
-    VertexNormalUV(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec2(1.0f, 1.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec2(1.0f, 1.0f)),
-    VertexNormalUV(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec2(0.0f, 1.0f)),
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec2(0.0f, 0.0f)),
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec2(0.0f, 0.0f)),
-    VertexNormalUV(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec2(1.0f, 1.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec2(1.0f, 1.0f)),
-    VertexNormalUV(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec2(0.0f, 1.0f)),
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec2(0.0f, 0.0f)),
-    VertexNormalUV(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(1.0f, 1.0f)),
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(0.0f, 1.0f)),
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(0.0f, 1.0f)),
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(0.0f, 0.0f)),
-    VertexNormalUV(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec2(1.0f, 1.0f)),
-    VertexNormalUV(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec2(0.0f, 1.0f)),
-    VertexNormalUV(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec2(0.0f, 1.0f)),
-    VertexNormalUV(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec2(0.0f, 0.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec2(0.0f, 1.0f)),
-    VertexNormalUV(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec2(1.0f, 1.0f)),
-    VertexNormalUV(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec2(0.0f, 0.0f)),
-    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec2(0.0f, 1.0f)),
-    VertexNormalUV(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec2(0.0f, 1.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec2(1.0f, 1.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec2(1.0f, 0.0f)),
-    VertexNormalUV(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec2(0.0f, 0.0f)),
-    VertexNormalUV(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec2(0.0f, 1.0f))
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 1.0f)), // top-right
+    VertexNormalUV(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // bottom-right
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 1.0f)), // top-right
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
+    VertexNormalUV(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // top-left
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
+    VertexNormalUV(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // bottom-right
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 1.0f)), // top-right
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 1.0f)), // top-right
+    VertexNormalUV(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // top-left
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
+    VertexNormalUV(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // top-right
+    VertexNormalUV(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 1.0f)), // top-left
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // bottom-left
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // bottom-left
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-right
+    VertexNormalUV(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // top-right
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // top-left
+    VertexNormalUV(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // bottom-right
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 1.0f)), // top-right
+    VertexNormalUV(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // bottom-right
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // top-left
+    VertexNormalUV(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // top-right
+    VertexNormalUV(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 1.0f)), // top-left
+    VertexNormalUV(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // bottom-left
+    VertexNormalUV(glm::vec3( 0.5f, -0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // bottom-left
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-right
+    VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // top-right
+    VertexNormalUV(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // top-left
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // bottom-right
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 1.0f)), // top-right
+    VertexNormalUV(glm::vec3( 0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(1.0f, 0.0f)), // bottom-right
+    VertexNormalUV(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)), // top-left
+    VertexNormalUV(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)) // bottom-left
 };
 
 GLuint indices[] =
@@ -185,6 +185,10 @@ int main()
 
     // Setup shaders.
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     ShaderList shaderList;
     shaderList.push_back(std::pair("res/shd/defaultVert.glsl", GL_VERTEX_SHADER));
     shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
