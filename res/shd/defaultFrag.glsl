@@ -43,7 +43,6 @@ in vec2 TexCoords;
 out vec4 FragColor;
 
 // Uniforms.
-#define NUM_MATERIALS 3
 uniform LightPoint lightPoint;
 uniform LightDirectional lightDirectional;
 uniform LightSpot lightSpot;

@@ -1,12 +1,14 @@
 #pragma once
 
+#include "shader.h"
 #include <glad/glad.h>
 #include <stddef.h>
 #include <vector>
 
 #define EMPTY_BUFFER VertexBuffer(0, 0, 0)
+#define EMPTY_UNIFORM_BUFFER 0
 
-typedef GLuint VBO, VAO, EBO;
+typedef GLuint VBO, VAO, EBO, UBO;
 struct VertexBuffer
 {
     VAO vertexArray;
@@ -37,4 +39,19 @@ struct JBuffers : VertexBuffer
     JBuffers(void* vertexData, size_t vertexSize, GLenum vertexUsage, void* indexData, size_t indexSize, GLenum indexUsage);
     void Bind();
     ~JBuffers();
+};
+
+// Uniform buffer object.
+struct JUniformBuffer
+{
+    UBO uniformBuffer;
+    int index;
+    static int currIndex;
+
+    JUniformBuffer(size_t size, GLenum type);
+    void ConnectToShader(JShader& shader, std::string blockName);
+    void Bind();
+    void SendData(size_t offset, size_t size, void* data);
+    void Unbind();
+    ~JUniformBuffer();
 };

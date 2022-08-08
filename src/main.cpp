@@ -36,6 +36,7 @@ std::unique_ptr<JLightPoint> lightPoint;
 std::unique_ptr<JLightDirectional> lightDirectional;
 std::unique_ptr<JLightSpot> lightSpot;
 std::unique_ptr<JFramebuffer> framebuffer;
+std::unique_ptr<JUniformBuffer> matrices;
 
 VertexNormalUV vertices[] = {
     VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
@@ -179,6 +180,10 @@ void window_draw(GLFWwindow* window)
     camera->Update();
     glm::mat4 projection = camera->ProjectionMatrix();
     glm::mat4 view = camera->ViewMatrix();
+    matrices->Bind();
+    matrices->SendData(0, sizeof(glm::mat4), glm::value_ptr(projection));
+    matrices->SendData(sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+    matrices->Unbind();
 
     // Light cube.
     glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
@@ -187,8 +192,6 @@ void window_draw(GLFWwindow* window)
     lightPos.z += cos(glfwGetTime()) * sin(glfwGetTime());
     lightPoint->position = lightPos;
     lightShader->Use();
-    lightShader->SetMatrix("projection", glm::value_ptr(projection));
-    lightShader->SetMatrix("view", glm::value_ptr(view));
     cubeModel->matrix = glm::mat4(1.0f);
     cubeModel->matrix = glm::translate(glm::mat4(1.0f), lightPos);
     cubeModel->matrix = glm::scale(cubeModel->matrix, glm::vec3(0.2f)); // A smaller cube.
@@ -202,8 +205,6 @@ void window_draw(GLFWwindow* window)
     lightDirectional->SetVars(*shader);
     //lightSpot->SetVars(*shader);
     shader->SetVec3("viewPos", glm::value_ptr(camera->cameraPos));
-    shader->SetMatrix("projection", glm::value_ptr(projection));
-    shader->SetMatrix("view", glm::value_ptr(view));
 
     // Draw level and backpack.
     levelModel->Render();
@@ -380,6 +381,11 @@ int main()
     lightDirectional->diffuse = glm::vec3(0.95f, 0.95f, 0.7f);
     lightDirectional->ambient = glm::vec3(1.0f, 0.501f, 0.188f) * 0.45f;
     lightSpot = std::make_unique<JLightSpot>(camera->cameraFront);
+
+    // Uniform buffer setup.
+    matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STATIC_DRAW);
+    matrices->ConnectToShader(*shader, "Matrices");
+    matrices->ConnectToShader(*lightShader, "Matrices");
 
     // Unbind buffers.
     Buffers_Bind(EMPTY_BUFFER);
