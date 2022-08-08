@@ -4,6 +4,7 @@
 #include "buffers.h"
 #include "cameras/freeCam.h"
 #include "frame.h"
+#include "framebuffer.h"
 #include "light.h"
 #include "material.h"
 #include "model.h"
@@ -11,6 +12,7 @@
 #include "texture.h"
 #include "window.h"
 #include "vertexModes/vertexNormalUV.h"
+#include "vertexModes/vertexUV.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
@@ -21,13 +23,16 @@
 
 std::unique_ptr<JShader> lightShader;
 std::unique_ptr<JShader> shader;
+std::unique_ptr<JShader> framebufferShader;
 std::unique_ptr<JModel> cubeModel;
 std::unique_ptr<JModel> levelModel;
 std::unique_ptr<JModel> backpackModel;
+std::unique_ptr<JMesh> quadMesh;
 std::unique_ptr<JFreeCam> camera;
 std::unique_ptr<JLightPoint> lightPoint;
 std::unique_ptr<JLightDirectional> lightDirectional;
 std::unique_ptr<JLightSpot> lightSpot;
+std::unique_ptr<JFramebuffer> framebuffer;
 
 VertexNormalUV vertices[] = {
     VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
@@ -84,6 +89,20 @@ GLuint indices[] =
     33, 34, 35
 };
 
+VertexUV quadVertices[] = {
+    VertexUV(glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec2(0.0f, 1.0f)),
+    VertexUV(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
+    VertexUV(glm::vec3( 1.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f)),
+    VertexUV(glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec2(0.0f, 1.0f)),
+    VertexUV(glm::vec3( 1.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f)),
+    VertexUV(glm::vec3( 1.0f,  1.0f, 0.0f), glm::vec2(1.0f, 1.0f))
+};
+
+int quadIndices[] = {
+    0, 1, 2,
+    3, 4, 5
+};
+
 glm::vec3 cubePositions[] = {
     glm::vec3( 0.0f, 0.0f, 0.0f),
     glm::vec3( 2.0f, 5.0f, -15.0f),
@@ -100,10 +119,15 @@ glm::vec3 cubePositions[] = {
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    framebuffer = std::make_unique<JFramebuffer>(width, height);
 }
 
 void window_draw(GLFWwindow* window)
 {
+
+    // Use framebuffer.
+    framebuffer->Bind();
+    glEnable(GL_DEPTH_TEST);
 
     // Clear background.
     glClearColor(0.7f, 0.7f, 1.0f, 1.0f);
@@ -151,6 +175,18 @@ void window_draw(GLFWwindow* window)
         cubeModel->matrix = glm::rotate(cubeModel->matrix, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
         cubeModel->Render();
     }
+
+    // Draw framebuffer.
+    glBindFramebuffer(GL_FRAMEBUFFER, EMPTY_FRAMEBUFFER);
+    glDisable(GL_DEPTH_TEST);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    framebufferShader->Use();
+    glActiveTexture(GL_TEXTURE0);
+    framebuffer->texture.Use();
+    quadMesh->Render();
+
+    // Finally update frame.
     JFrame::Update();
 
 }
@@ -233,8 +269,28 @@ int main()
     levelModel->matrix = glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f) * 0.0025f), glm::vec3(-5000.0f, 0.0f, 0.0f));
 
     // Backpack model setup.
-    backpackModel = std::make_unique<JModel>("res/mdl/Backpack/backpack.obj", *shader);
-    backpackModel->matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 2.0f));
+    //backpackModel = std::make_unique<JModel>("res/mdl/Backpack/backpack.obj", *shader);
+    //backpackModel->matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 2.0f));
+
+    // Quad model setup.
+    shaderList.clear();
+    shaderList.push_back(std::pair("res/shd/framebufferVert.glsl", GL_VERTEX_SHADER));
+    shaderList.push_back(std::pair("res/shd/framebufferFrag.glsl", GL_FRAGMENT_SHADER));
+    framebufferShader = std::make_unique<JShader>(shaderList);
+    quadMesh = std::make_unique<JMesh>(
+        quadVertices,
+        sizeof(quadVertices),
+        GL_STATIC_DRAW,
+        quadIndices,
+        sizeof(quadIndices),
+        GL_STATIC_DRAW,
+        GL_TRIANGLES,
+        sizeof(quadIndices) / sizeof(quadIndices[0]),
+        GL_UNSIGNED_INT,
+        0
+    );
+    VertexUV::SetAttributes();
+    framebuffer = std::make_unique<JFramebuffer>(SCR_WIDTH, SCR_HEIGHT);
 
     // Other setups.
     lightPoint = std::make_unique<JLightPoint>();

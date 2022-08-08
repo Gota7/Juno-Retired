@@ -29,6 +29,17 @@ Texture Texture_Create(std::string path, int& width, int& height, int& numChanne
     }
 }
 
+Texture Texture_Generate(int width, int height)
+{
+    Texture ret;
+    glGenTextures(1, &ret);
+    glBindTexture(GL_TEXTURE_2D, ret);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    return ret;
+}
+
 void Texture_Delete(Texture texture)
 {
     glDeleteTextures(1, &texture);
@@ -37,6 +48,11 @@ void Texture_Delete(Texture texture)
 JTexture::JTexture(std::string path)
 {
     texture = Texture_Create(path, width, height, numChannels);
+}
+
+JTexture::JTexture(int width, int height)
+{
+    texture = Texture_Generate(width, height);
 }
 
 void JTexture::Use()
