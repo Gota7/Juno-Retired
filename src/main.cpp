@@ -11,6 +11,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "window.h"
+#include "vertexModes/vertex.h"
 #include "vertexModes/vertexNormalUV.h"
 #include "vertexModes/vertexUV.h"
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,9 +25,11 @@
 std::unique_ptr<JShader> lightShader;
 std::unique_ptr<JShader> shader;
 std::unique_ptr<JShader> framebufferShader;
+std::unique_ptr<JShader> skyboxShader;
 std::unique_ptr<JModel> cubeModel;
 std::unique_ptr<JModel> levelModel;
 std::unique_ptr<JModel> backpackModel;
+std::unique_ptr<JModel> skyboxModel;
 std::unique_ptr<JMesh> quadMesh;
 std::unique_ptr<JFreeCam> camera;
 std::unique_ptr<JLightPoint> lightPoint;
@@ -103,6 +106,45 @@ int quadIndices[] = {
     3, 4, 5
 };
 
+Vertex skyboxVertices[] = {
+    Vertex(glm::vec3(-1.0f,  1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f, -1.0f, -1.0f)),
+    Vertex(glm::vec3( 1.0f, -1.0f, -1.0f)),
+    Vertex(glm::vec3( 1.0f, -1.0f, -1.0f)),
+    Vertex(glm::vec3( 1.0f,  1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f,  1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f, -1.0f,  1.0f)),
+    Vertex(glm::vec3(-1.0f, -1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f,  1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f,  1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f,  1.0f,  1.0f)),
+    Vertex(glm::vec3(-1.0f, -1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f, -1.0f, -1.0f)),
+    Vertex(glm::vec3( 1.0f, -1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f,  1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f,  1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f,  1.0f, -1.0f)),
+    Vertex(glm::vec3( 1.0f, -1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f, -1.0f,  1.0f)),
+    Vertex(glm::vec3(-1.0f,  1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f,  1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f,  1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f, -1.0f,  1.0f)),
+    Vertex(glm::vec3(-1.0f, -1.0f,  1.0f)),
+    Vertex(glm::vec3(-1.0f,  1.0f, -1.0f)),
+    Vertex(glm::vec3( 1.0f,  1.0f, -1.0f)),
+    Vertex(glm::vec3( 1.0f,  1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f,  1.0f,  1.0f)),
+    Vertex(glm::vec3(-1.0f,  1.0f,  1.0f)),
+    Vertex(glm::vec3(-1.0f,  1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f, -1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f, -1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f, -1.0f, -1.0f)),
+    Vertex(glm::vec3( 1.0f, -1.0f, -1.0f)),
+    Vertex(glm::vec3(-1.0f, -1.0f,  1.0f)),
+    Vertex(glm::vec3( 1.0f, -1.0f,  1.0f))
+};
+
 glm::vec3 cubePositions[] = {
     glm::vec3( 0.0f, 0.0f, 0.0f),
     glm::vec3( 2.0f, 5.0f, -15.0f),
@@ -166,6 +208,14 @@ void window_draw(GLFWwindow* window)
     // Draw level and backpack.
     levelModel->Render();
     //backpackModel->Render();
+
+    // Draw skybox.
+    glDepthFunc(GL_LEQUAL);
+    skyboxShader->Use();
+    skyboxShader->SetMatrix("projection", glm::value_ptr(projection));
+    skyboxShader->SetMatrix("view", glm::value_ptr(glm::mat4(glm::mat3(view))));
+    skyboxModel->Render();
+    glDepthFunc(GL_LESS);
 
     // Draw cubes.
     for (int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
@@ -291,6 +341,38 @@ int main()
     );
     VertexUV::SetAttributes();
     framebuffer = std::make_unique<JFramebuffer>(SCR_WIDTH, SCR_HEIGHT);
+
+    // Skybox setup.
+    shaderList.clear();
+    shaderList.push_back(std::pair("res/shd/skyboxVert.glsl", GL_VERTEX_SHADER));
+    shaderList.push_back(std::pair("res/shd/skyboxFrag.glsl", GL_FRAGMENT_SHADER));
+    skyboxShader = std::make_unique<JShader>(shaderList);
+    ModelCubemapTextures cubemapTextures;
+    cubemapTextures.push_back(std::tuple("res/tex/Skybox/left.png", "res/tex/Skybox/right.png", "res/tex/Skybox/top.png", "res/tex/Skybox/bottom.png", "res/tex/Skybox/front.png", "res/tex/Skybox/back.png"));
+    materials.clear();
+    materials.push_back(std::make_unique<JMaterialTex>(COMBINED_CUBEMAP_NAME(std::string("res/tex/Skybox/left.png"), "res/tex/Skybox/right.png", "res/tex/Skybox/top.png", "res/tex/Skybox/bottom.png", "res/tex/Skybox/front.png", "res/tex/Skybox/back.png"), "res/tex/null.png"));
+    meshes.clear();
+    meshes.push_back(std::make_unique<JMesh>(
+        skyboxVertices,
+        sizeof(skyboxVertices),
+        GL_STATIC_DRAW,
+        indices,
+        sizeof(indices),
+        GL_STATIC_DRAW,
+        GL_TRIANGLES,
+        sizeof(indices) / sizeof(indices[0]),
+        GL_UNSIGNED_INT,
+        0
+    ));
+    skyboxModel = std::make_unique<JModel> (
+        meshes,
+        cubemapTextures,
+        materials,
+        *skyboxShader
+    );
+    skyboxShader->Use();
+    skyboxShader->SetInt("skybox", 0);
+    Vertex::SetAttributes();
 
     // Other setups.
     lightPoint = std::make_unique<JLightPoint>();

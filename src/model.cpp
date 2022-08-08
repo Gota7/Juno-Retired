@@ -1,6 +1,93 @@
 #include "model.h"
 #include <glm/gtc/type_ptr.hpp>
 
+JModel::JModel(std::vector<std::unique_ptr<JMesh>>& meshes, std::vector<std::string> textureNames, std::vector<std::unique_ptr<JMaterialTex>>& materials, JShader& shader, glm::mat4 matrix) :
+matrix(matrix),
+meshes(std::move(meshes)),
+materials(std::move(materials)),
+shader(shader)
+{
+    shader.Use();
+    for (auto& tex : textureNames)
+    {
+        AddTexture(tex);
+    }
+    for (auto& mat : this->materials) {
+        mat->diffuse = textureNameToTextureIndex[mat->diffuseName];
+        mat->specular = textureNameToTextureIndex[mat->specularName];
+    }
+}
+
+JModel::JModel(std::vector<std::unique_ptr<JMesh>>& meshes, ModelCubemapTextures textureNames, std::vector<std::unique_ptr<JMaterialTex>>& materials, JShader& shader, glm::mat4 matrix) :
+matrix(matrix),
+meshes(std::move(meshes)),
+materials(std::move(materials)),
+shader(shader)
+{
+    shader.Use();
+    for (auto& tex : textureNames)
+    {
+        AddTexture(std::get<0>(tex), std::get<1>(tex), std::get<2>(tex), std::get<3>(tex), std::get<4>(tex), std::get<5>(tex));
+    }
+    for (auto& mat : this->materials) {
+        mat->diffuse = textureNameToTextureIndex[mat->diffuseName];
+        mat->specular = textureNameToTextureIndex[mat->specularName];
+    }
+}
+
+JModel::JModel(std::string path, JShader& shader, glm::mat4 matrix) : shader(shader), matrix(matrix)
+{
+
+    // Initial setup.
+    Assimp::Importer import;
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
+    relativeDirectory = path.substr(0, path.find_last_of('/'));
+    if (relativeDirectory != "")
+        relativeDirectory += "/";
+    if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        return;
+    }
+
+    // Add null texture.
+    const std::string nullTex = "res/tex/null.png";
+    AddTexture(nullTex);
+
+    // Add materials.
+    for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+    {
+        aiMaterial* mat = scene->mMaterials[i];
+        std::string diffuseName = nullTex;
+        std::string specularName = nullTex;
+        if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0) // Only assume 1 texture.
+        {
+            aiString str;
+            mat->GetTexture(aiTextureType_DIFFUSE, 0, &str);
+            std::string texName = relativeDirectory + str.C_Str();
+            AddTexture(texName);
+            diffuseName = texName;
+        }
+        if (mat->GetTextureCount(aiTextureType_SPECULAR) > 0) // Only assume 1 texture.
+        {
+            aiString str;
+            mat->GetTexture(aiTextureType_SPECULAR, 0, &str);
+            std::string texName = relativeDirectory + str.C_Str();
+            AddTexture(texName);
+            specularName = texName;
+        }
+        materials.push_back(std::make_unique<JMaterialTex>(diffuseName, specularName));
+    }
+    for (auto& mat : this->materials) {
+        mat->diffuse = textureNameToTextureIndex[mat->diffuseName];
+        mat->specular = textureNameToTextureIndex[mat->specularName];
+    }
+
+    // Import root node.
+    ImportNode(scene, scene->mRootNode);
+
+}
+
 void JModel::AddTexture(const std::string& name)
 {
     if (textureNameToTextureIndex.find(name) == textureNameToTextureIndex.end())
@@ -10,6 +97,20 @@ void JModel::AddTexture(const std::string& name)
         shader.SetInt("texture" + std::to_string(num), num);
         textures[num]->id = num;
         textureNameToTextureIndex[name] = num;
+        num++;
+    }
+}
+
+void JModel::AddTexture(const std::string& left, const std::string& right, const std::string& top, const std::string& bottom, const std::string& front, const std::string& back)
+{
+    std::string combinedName = COMBINED_CUBEMAP_NAME(left, right, top, bottom, front, back);
+    if (textureNameToTextureIndex.find(combinedName) == textureNameToTextureIndex.end())
+    {
+        int num = textureNameToTextureIndex.size();
+        textures.push_back(std::make_unique<JTexture>(left, right, top, bottom, front, back));
+        shader.SetInt("texture" + std::to_string(num), num);
+        textures[num]->id = num;
+        textureNameToTextureIndex[combinedName] = num;
         num++;
     }
 }

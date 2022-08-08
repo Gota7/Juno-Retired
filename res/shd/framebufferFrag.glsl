@@ -19,10 +19,15 @@ void main()
     vec2( 0.0f, -offset), // bottom-center
     vec2( offset, -offset) // bottom-right
     );
+    // float kernel[9] = float[](
+    //     -1, -1, -1,
+    //     -1,  9, -1,
+    //     -1, -1, -1
+    // );
     float kernel[9] = float[](
-    -1, -1, -1,
-    -1, 9, -1,
-    -1, -1, -1
+        0, 0, 0,
+        0, 1, 0,
+        0, 0, 0
     );
     vec3 sampleTex[9];
     for(int i = 0; i < 9; i++)
@@ -37,7 +42,7 @@ void main()
 }
 
 /*
-Greyscale code:
+Greyscale
     FragColor = texture(screenTexture, TexCoords);
     float average = 0.2126 * FragColor.r + 0.7152 * FragColor.g + 0.0722 * FragColor.b;
     FragColor = vec4(average, average, average, 1.0);
