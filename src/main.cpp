@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "asystem.h"
 #include "jsystem.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -27,6 +28,7 @@ std::unique_ptr<JLightSpot> lightSpot;
 std::unique_ptr<JFramebuffer> framebuffer;
 std::unique_ptr<JUniformBuffer> matrices;
 std::unique_ptr<JInstanceBuffer> cubePositions;
+std::unique_ptr<Music> music;
 
 VertexNormalUV vertices[] = {
     VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
@@ -220,6 +222,7 @@ void window_draw(GLFWwindow* window)
 
 void window_callback(GLFWwindow* window)
 {
+    UpdateMusicStream(*music);
     window_draw(window);
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -388,8 +391,15 @@ int main()
     // Unbind buffers.
     Buffers_Bind(EMPTY_BUFFER);
 
+    // Audio test.
+    InitAudioDevice();
+    music = std::make_unique<Music>(LoadMusicStream("res/mus/KeepYourBearings.ogg"));
+    PlayMusicStream(*music);
+
     // Run and close.
     Window_Main(window, window_callback);
+    UnloadMusicStream(*music);
+    CloseAudioDevice();
     Window_Close();
     return 0;
 
