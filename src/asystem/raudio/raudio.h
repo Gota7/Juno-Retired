@@ -112,6 +112,8 @@ typedef struct Music {
     AudioStream stream;         // Audio stream
     unsigned int frameCount;    // Total number of frames (considering channels)
     bool looping;               // Music looping enable
+    unsigned int loopStart;     // Looping start point.
+    unsigned int loopEnd;       // Looping end point.
 
     int ctxType;                // Type of music context (audio filetype)
     void *ctxData;              // Audio context data, depends on type
