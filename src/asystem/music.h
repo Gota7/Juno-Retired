@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-// Music track.
+// Music track. TODO: IMPLEMENT PROPER LOOPING IN RAUDIO.C!
 struct AMusic
 {
     Music music;
@@ -22,6 +22,7 @@ struct AMusic
     void Play();
     void Pause();
     void Stop();
+    void Update();
     ~AMusic();
 };
 
@@ -37,4 +38,5 @@ struct AMusicTracked
     void Play();
     void Pause();
     void Stop();
+    void Update();
 };

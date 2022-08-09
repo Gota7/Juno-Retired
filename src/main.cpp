@@ -28,7 +28,7 @@ std::unique_ptr<JLightSpot> lightSpot;
 std::unique_ptr<JFramebuffer> framebuffer;
 std::unique_ptr<JUniformBuffer> matrices;
 std::unique_ptr<JInstanceBuffer> cubePositions;
-std::unique_ptr<ASoundCollection> sounds;
+std::unique_ptr<AMusic> music;
 
 VertexNormalUV vertices[] = {
     VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
@@ -226,6 +226,7 @@ void window_callback(GLFWwindow* window)
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     camera->GLFWKeys(window);
+    music->Update();
 }
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
@@ -391,12 +392,13 @@ int main()
     Buffers_Bind(EMPTY_BUFFER);
 
     // Audio test.
-    InitAudioDevice();
-    sounds = std::make_unique<ASoundCollection>();
+    ASystem_Init();
+    music = std::make_unique<AMusic>("res/mus/KeepYourBearings.ogg");
+    music->Play();
 
     // Run and close.
     Window_Main(window, window_callback);
-    CloseAudioDevice();
+    ASystem_Close();
     Window_Close();
     return 0;
 

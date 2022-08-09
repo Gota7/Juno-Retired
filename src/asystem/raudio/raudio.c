@@ -1745,7 +1745,7 @@ void UpdateMusicStream(Music music)
         AUDIO.System.pcmBufferSize = pcmSize;
     }
 
-    int framesLeft = music.frameCount - music.stream.buffer->framesProcessed;  // Frames left to be processed
+    int framesLeft = music.looping ? (music.loopEnd - music.stream.buffer->framesProcessed) : (music.frameCount - music.stream.buffer->framesProcessed);  // Frames left to be processed
     int framesToStream = 0;                 // Total frames to be streamed
     unsigned int framesLoopingExtra = 0;    // In case music requires to loop, we could need to add more frames from beginning to fill buffer
 
@@ -1776,7 +1776,7 @@ void UpdateMusicStream(Music music)
 
                 if (framesLoopingExtra > 0)
                 {
-                    drwav_seek_to_pcm_frame((drwav *)music.ctxData, 0);
+                    drwav_seek_to_pcm_frame((drwav *)music.ctxData, music.loopStart);
 
                     if (music.stream.sampleSize == 16) drwav_read_pcm_frames_s16((drwav *)music.ctxData, framesLoopingExtra, (short *)AUDIO.System.pcmBuffer + framesToStream*music.stream.channels);
                     else if (music.stream.sampleSize == 32) drwav_read_pcm_frames_f32((drwav *)music.ctxData, framesLoopingExtra, (float *)AUDIO.System.pcmBuffer + framesToStream*music.stream.channels);

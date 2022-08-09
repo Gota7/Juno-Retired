@@ -64,13 +64,18 @@ void AMusic::Stop()
     paused = false;
 }
 
+void AMusic::Update()
+{
+    UpdateMusicStream(music);
+}
+
 AMusic::~AMusic()
 {
     Stop();
     UnloadMusicStream(music);
 }
 
-void AMusicTracked::AddTrack(std::string path, float volume = 0.8f, float pan = 0.5f, float pitch = 1.0f)
+void AMusicTracked::AddTrack(std::string path, float volume, float pan, float pitch)
 {
     tracks.push_back(std::make_unique<AMusic>(path, loopStart, loopEnd, volume, pan, pitch));
 }
@@ -102,5 +107,13 @@ void AMusicTracked::Stop()
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
         tracks[i]->Stop();
+    }
+}
+
+void AMusicTracked::Update()
+{
+    for (unsigned int i = 0; i < tracks.size(); i++)
+    {
+        tracks[i]->Update();
     }
 }
