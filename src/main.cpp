@@ -1,26 +1,11 @@
 // Here lies some very bad sample code for the JSystem.
-// TODO: Multisampling?
+// TODO: Multisampling, Deferred Rendering?
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include "buffers.h"
-#include "cameras/freeCam.h"
-#include "frame.h"
-#include "framebuffer.h"
-#include "light.h"
-#include "material.h"
-#include "model.h"
-#include "shader.h"
-#include "texture.h"
-#include "window.h"
-#include "vertexModes/vertex.h"
-#include "vertexModes/vertexNormalUV.h"
-#include "vertexModes/vertexUV.h"
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-#include <memory>
+
+#include "jsystem.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
