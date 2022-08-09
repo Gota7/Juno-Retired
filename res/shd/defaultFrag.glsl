@@ -58,8 +58,8 @@ vec4 CalcDirLight(LightDirectional light, vec3 normal, vec3 viewDir)
     float diff = max(dot(normal, lightDir), 0.0);
 
     // Specular shading.
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.specularExponent);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.specularExponent);
 
     // Combine results.
     vec4 ambient = vec4(light.ambient, 1.0) * texture(material.diffuse, TexCoords);
@@ -77,8 +77,8 @@ vec4 CalcPointLight(LightPoint light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float diff = max(dot(normal, lightDir), 0.0);
 
     // Specular shading.
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.specularExponent);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.specularExponent);
 
     // Attenuation.
     float distance = length(light.position - fragPos);
@@ -103,8 +103,8 @@ vec4 CalcSpotLight(LightSpot light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float diff = max(dot(normal, lightDir), 0.0);
 
     // Specular shading.
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.specularExponent);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.specularExponent);
 
     // Attenuation.
     float distance = length(light.position - fragPos);

@@ -1,3 +1,6 @@
+// Here lies some very bad sample code for the JSystem.
+// TODO: Multisampling?
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
