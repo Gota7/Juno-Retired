@@ -67,7 +67,7 @@ void JUniformBuffer::Bind()
     glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer);
 }
 
-void JUniformBuffer::SendData(size_t offset, size_t size, void* data)
+void JUniformBuffer::SendData(size_t offset, void* data, size_t size)
 {
     glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
 }
@@ -81,4 +81,21 @@ JUniformBuffer::~JUniformBuffer()
 {
     glDeleteBuffers(1, &uniformBuffer);
     currIndex--;
+}
+
+JInstanceBuffer::JInstanceBuffer(void* data, size_t size, GLenum type)
+{
+    glGenBuffers(1, &instanceBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
+    glBufferData(GL_ARRAY_BUFFER, size, data, type);
+}
+
+void JInstanceBuffer::Bind()
+{
+    glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
+}
+
+JInstanceBuffer::~JInstanceBuffer()
+{
+    glDeleteBuffers(1, &instanceBuffer);
 }

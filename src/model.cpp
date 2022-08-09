@@ -183,7 +183,7 @@ void JModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
     JModelVertex::SetAttributes();
 }
 
-void JModel::Render(JShader* other)
+void JModel::Render(JShader* other, unsigned int instanceCount)
 {
     JShader* toUse = &shader;
     if (other)
@@ -198,6 +198,6 @@ void JModel::Render(JShader* other)
     for (auto& mesh : meshes)
     {
         materials[mesh->materialIndex]->SetVars(*toUse);
-        mesh->Render();
+        mesh->Render(instanceCount);
     }
 }

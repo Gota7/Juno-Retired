@@ -36,6 +36,6 @@ struct JMesh
     {}
 
     // Render a model.
-    void Render();
+    void Render(unsigned int instanceCount = 0);
 
 };

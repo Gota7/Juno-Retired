@@ -53,6 +53,6 @@ struct JModel
     void ImportMesh(const aiScene* scene, aiMesh* mesh);
 
     // Render a model.
-    void Render(JShader* other = nullptr);
+    void Render(JShader* other = nullptr, unsigned int instanceCount = 0);
 
 };

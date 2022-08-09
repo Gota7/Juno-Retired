@@ -6,6 +6,7 @@
 // Settings.
 #define SCR_WIDTH 1024
 #define SCR_HEIGHT 576
+//#define DEBUG
 
 typedef void (*WindowCallback)(GLFWwindow* window);
 

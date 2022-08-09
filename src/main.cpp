@@ -24,6 +24,7 @@
 
 std::unique_ptr<JShader> lightShader;
 std::unique_ptr<JShader> shader;
+std::unique_ptr<JShader> shaderInstanced;
 std::unique_ptr<JShader> framebufferShader;
 std::unique_ptr<JShader> skyboxShader;
 std::unique_ptr<JModel> cubeModel;
@@ -37,6 +38,7 @@ std::unique_ptr<JLightDirectional> lightDirectional;
 std::unique_ptr<JLightSpot> lightSpot;
 std::unique_ptr<JFramebuffer> framebuffer;
 std::unique_ptr<JUniformBuffer> matrices;
+std::unique_ptr<JInstanceBuffer> cubePositions;
 
 VertexNormalUV vertices[] = {
     VertexNormalUV(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f), glm::vec2(0.0f, 0.0f)), // bottom-left
@@ -146,19 +148,6 @@ Vertex skyboxVertices[] = {
     Vertex(glm::vec3( 1.0f, -1.0f,  1.0f))
 };
 
-glm::vec3 cubePositions[] = {
-    glm::vec3( 0.0f, 0.0f, 0.0f),
-    glm::vec3( 2.0f, 5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3( 2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f, 3.0f, -7.5f),
-    glm::vec3( 1.3f, -2.0f, -2.5f),
-    glm::vec3( 1.5f, 2.0f, -2.5f),
-    glm::vec3( 1.5f, 0.2f, -1.5f),
-    glm::vec3(-1.3f, 1.0f, -1.5f)
-};
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -181,8 +170,8 @@ void window_draw(GLFWwindow* window)
     glm::mat4 projection = camera->ProjectionMatrix();
     glm::mat4 view = camera->ViewMatrix();
     matrices->Bind();
-    matrices->SendData(0, sizeof(glm::mat4), glm::value_ptr(projection));
-    matrices->SendData(sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+    matrices->SendData(0, glm::value_ptr(projection), sizeof(glm::mat4));
+    matrices->SendData(sizeof(glm::mat4), glm::value_ptr(view), sizeof(glm::mat4));
     matrices->Unbind();
 
     // Light cube.
@@ -205,6 +194,10 @@ void window_draw(GLFWwindow* window)
     lightDirectional->SetVars(*shader);
     //lightSpot->SetVars(*shader);
     shader->SetVec3("viewPos", glm::value_ptr(camera->cameraPos));
+    shaderInstanced->Use();
+    lightPoint->SetVars(*shaderInstanced);
+    lightDirectional->SetVars(*shaderInstanced);
+    shaderInstanced->SetVec3("viewPos", glm::value_ptr(camera->cameraPos));
 
     // Draw level and backpack.
     levelModel->Render();
@@ -219,13 +212,8 @@ void window_draw(GLFWwindow* window)
     glDepthFunc(GL_LESS);
 
     // Draw cubes.
-    for (int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
-    {
-        cubeModel->matrix = glm::translate(glm::mat4(1.0f), cubePositions[i]);
-        cubeModel->matrix = glm::rotate(cubeModel->matrix, glm::radians(20.0f + i), glm::vec3(1.0f, 0.3f, 0.5f));
-        cubeModel->matrix = glm::rotate(cubeModel->matrix, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        cubeModel->Render();
-    }
+    cubeModel->matrix = glm::mat4(1.0f);
+    cubeModel->Render(shaderInstanced.get(), 100 * 100);
 
     // Draw framebuffer.
     glBindFramebuffer(GL_FRAMEBUFFER, EMPTY_FRAMEBUFFER);
@@ -281,9 +269,26 @@ int main()
     shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
     shader = std::make_unique<JShader>(shaderList);
     shaderList.clear();
+    shaderList.push_back(std::pair("res/shd/defaultInstancedVert.glsl", GL_VERTEX_SHADER));
+    shaderList.push_back(std::pair("res/shd/defaultFrag.glsl", GL_FRAGMENT_SHADER));
+    shaderInstanced = std::make_unique<JShader>(shaderList);
+    shaderList.clear();
     shaderList.push_back(std::pair("res/shd/lightVert.glsl", GL_VERTEX_SHADER));
     shaderList.push_back(std::pair("res/shd/lightFrag.glsl", GL_FRAGMENT_SHADER));
     lightShader = std::make_unique<JShader>(shaderList);
+
+    // Setup cube positions.
+    shaderInstanced->Use();
+    glm::vec3 base = glm::vec3(-1.0f, 0.0f, -100.0f);
+    std::vector<glm::vec3> positions;
+    for (int x = 0; x < 100; x++)
+    {
+        for (int z = 0; z < 100; z++)
+        {
+            positions.push_back(base + glm::vec3(x * 2, (rand() % 1000) / 100.0f - 5.0f, z * 2));
+        }
+    }
+    cubePositions = std::make_unique<JInstanceBuffer>(&positions[0], sizeof(glm::vec3) * positions.size(), GL_STATIC_DRAW);
 
     // Cube model setup.
     camera = std::make_unique<JFreeCam>();
@@ -313,6 +318,10 @@ int main()
         *shader
     );
     VertexNormalUV::SetAttributes();
+    glEnableVertexAttribArray(3);
+    cubePositions->Bind();
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+    glVertexAttribDivisor(3, 1);
 
     // Level model setups.
     levelModel = std::make_unique<JModel>("res/mdl/GardenPlanet/diskgardenplanet.dae", *shader);
@@ -385,6 +394,7 @@ int main()
     // Uniform buffer setup.
     matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STATIC_DRAW);
     matrices->ConnectToShader(*shader, "Matrices");
+    matrices->ConnectToShader(*shaderInstanced, "Matrices");
     matrices->ConnectToShader(*lightShader, "Matrices");
 
     // Unbind buffers.

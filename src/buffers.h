@@ -8,7 +8,7 @@
 #define EMPTY_BUFFER VertexBuffer(0, 0, 0)
 #define EMPTY_UNIFORM_BUFFER 0
 
-typedef GLuint VBO, VAO, EBO, UBO;
+typedef GLuint VBO, VAO, EBO, UBO, IBO;
 struct VertexBuffer
 {
     VAO vertexArray;
@@ -51,7 +51,17 @@ struct JUniformBuffer
     JUniformBuffer(size_t size, GLenum type);
     void ConnectToShader(JShader& shader, std::string blockName);
     void Bind();
-    void SendData(size_t offset, size_t size, void* data);
+    void SendData(size_t offset, void* data, size_t size);
     void Unbind();
     ~JUniformBuffer();
+};
+
+// Instance buffer object. Also can be used as a singular buffer.
+struct JInstanceBuffer
+{
+    IBO instanceBuffer;
+
+    JInstanceBuffer(void* data, size_t size, GLenum type);
+    void Bind();
+    ~JInstanceBuffer();
 };
