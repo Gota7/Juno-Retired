@@ -1,3 +1,4 @@
 #pragma once
 
-#include "asystem/aplayer.h"
+#include "asystem/music.h"
+#include "asystem/sound.h"
