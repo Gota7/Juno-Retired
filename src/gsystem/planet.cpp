@@ -1,10 +1,10 @@
 #include "planet.h"
+#include "scenario.h"
 
-GPlanet::GPlanet(GScenario* scenario, std::string model, std::string modelLow, glm::mat4 mat)
+GPlanet::GPlanet(GScenario* scenario, std::string model, std::string modelLow, glm::mat4 mat) : modelPath(model), modelLowPath(modelPath), mat(mat)
 {
     this->model = scenario->modelGroup.LoadOrGetModel(model, scenario->defShader, mat);
     this->modelLow = scenario->modelGroup.LoadOrGetModel(model, scenario->defShader, mat);
-    this->mat = mat;
 }
 
 void GPlanet::Render(float distToPlayer)

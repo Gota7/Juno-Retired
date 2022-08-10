@@ -90,6 +90,8 @@ int main()
     // Game.
     game = std::make_unique<GGame>();
     game->LoadLevelScenario("TestMap", 0);
+    //game->scenario->planets[0]->mat = glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, -3.0f, -5.0f)), glm::vec3(1.0f, 1.0f, 1.0f) * 0.0025f);
+    //game->scenario->Save("res/scn/TestMap/dummy.yaml");
 
     // Unbind buffers.
     Buffers_Bind(EMPTY_BUFFER);

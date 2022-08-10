@@ -15,5 +15,5 @@ include_directories("src")
 file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cpp" "src/*.c")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} glfw assimp GL X11 pthread Xrandr Xi dl)
+target_link_libraries(${PROJECT_NAME} glfw assimp yaml-cpp GL X11 pthread Xrandr Xi dl)
 target_include_directories(${PROJECT_NAME} PUBLIC include)

@@ -26,6 +26,13 @@ GGame::GGame()
     camera = std::make_unique<JFreeCam>();
     camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 
+    // Light setup.
+    shader->Use();
+    lightDirectional = std::make_unique<JLightDirectional>(glm::vec3(-0.0f, -1.0f, -0.0f));
+    lightDirectional->diffuse = glm::vec3(0.95f, 0.95f, 0.7f);
+    lightDirectional->ambient = glm::vec3(1.0f, 0.501f, 0.188f) * 0.45f;
+    lightDirectional->SetVars(*shader);
+
     // Uniform buffer setup.
     matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STATIC_DRAW);
     matrices->ConnectToShader(*shader, "Matrices");

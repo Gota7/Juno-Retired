@@ -13,6 +13,7 @@ struct GGame
     std::unique_ptr<JCamera> camera;
     std::unique_ptr<JShader> shader;
     std::unique_ptr<JShader> skyboxShader;
+    std::unique_ptr<JLightDirectional> lightDirectional;
     std::unique_ptr<JUniformBuffer> matrices;
 
     // Initialize the game.
