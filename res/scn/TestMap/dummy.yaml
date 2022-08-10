@@ -1,0 +1,6 @@
+SkyboxLeft: res/tex/Skybox/left.png
+SkyboxRight: res/tex/Skybox/right.png
+SkyboxTop: res/tex/Skybox/top.png
+SkyboxBottom: res/tex/Skybox/bottom.png
+SkyboxFront: res/tex/Skybox/front.png
+SkyboxBack: res/tex/Skybox/back.png
