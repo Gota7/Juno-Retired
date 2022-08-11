@@ -1,4 +1,5 @@
 #pragma once
+
 #include "jsystem/cameras/freeCam.h"
 #include "jsystem/vertexModes/vertex.h"
 #include "jsystem/vertexModes/vertexColor.h"
