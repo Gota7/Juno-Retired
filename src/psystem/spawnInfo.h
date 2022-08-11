@@ -1,7 +1,8 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include "texture.h"
+#include <glm/glm.hpp>
+#include <memory>
 
 // Particle spawn shape.
 enum PSpawnShapeEnum
@@ -64,5 +65,5 @@ struct PSpawnInfo
     float velStretchFactor; // How much to stretch by velocity.
     unsigned int logTexRepeatHorizontal; // Repeat texture in X direction count.
     unsigned int logTexRepeatVertical; // Repeat texture in Y direction count.
-    PTexture texture; // Texture to use.
+    std::shared_ptr<PTexture> texture; // Texture to use.
 };

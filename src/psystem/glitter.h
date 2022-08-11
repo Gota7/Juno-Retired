@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../spawnInfo.h"
+#include "spawnInfo.h"
 
 // Angle copy mode.
 enum PGlitterAngleCopyMode
