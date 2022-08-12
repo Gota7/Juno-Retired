@@ -9,6 +9,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+//#define VSYNC 1
+
 std::unique_ptr<JFramebuffer> framebuffer;
 std::unique_ptr<JShader> framebufferShader;
 std::unique_ptr<JMesh> quadMesh;
@@ -62,6 +64,9 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+#ifndef VSYNC
+    glfwSwapInterval(0);
+#endif
     ASystem_Init();
 
     // Setup framebuffer shader.

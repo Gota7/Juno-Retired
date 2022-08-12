@@ -23,12 +23,13 @@ struct PParticle
     unsigned int lifetimeInv;
     unsigned int alpha;
     unsigned int alphaMult;
-    std::shared_ptr<PTexture> sprite;
+    PTexture sprite;
+    bool die;
 
     // Initialize a particle.
-    void Init(PSystem* system, int index, int total);
+    PParticle(PSystem* system, int index, int total);
 
     // Update a particle.
-    void Update(PSystem* system, std::stack<PParticle*>& freeParticles);
+    void Update(PSystem* system);
 
 };

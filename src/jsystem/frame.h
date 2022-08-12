@@ -7,7 +7,15 @@ struct JFrame
 {
     static double lastFrame;
     static double currentFrame;
-    static float deltaTime;
+    static double deltaTime;
+    static double lastSecond;
+    static unsigned int targetFps;
+    static double targetTime;
+    static int fps;
+    static int frameCounter;
+
+    // Set FPS. Runs unlimited otherwise.
+    static void SetFPS(unsigned int fps);
 
     // Update time.
     static void Update();

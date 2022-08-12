@@ -50,6 +50,7 @@ struct PSpawnInfo
     glm::vec3 color; // Color of particles.
     float perpSpeed; // Speed away from particle system's direction.
     float speed; // Speed in particle system's direction.
+    float scale; // Half the side length of the particle square.
     float horizontalScaleMultiplier; // What to multiply the horizontal scale by.
     float minAngularSpeed; // Minimum angular speed.
     float maxAngularSpeed; // Maximum angular speed.
@@ -65,5 +66,9 @@ struct PSpawnInfo
     float velStretchFactor; // How much to stretch by velocity.
     unsigned int logTexRepeatHorizontal; // Repeat texture in X direction count.
     unsigned int logTexRepeatVertical; // Repeat texture in Y direction count.
-    std::shared_ptr<PTexture> texture; // Texture to use.
+    PTexture texture; // Texture to use.
+
+    // Load from a YAML file.
+    void Load(PTextureCache& texCache, std::string name);
+
 };

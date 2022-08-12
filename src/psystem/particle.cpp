@@ -12,7 +12,7 @@ glm::vec3 RandomNormalized()
     return glm::normalize(glm::vec3(rand() >> 8, rand() >> 8, rand() >> 8));
 }
 
-void PParticle::Init(PSystem* system, int index, int total)
+PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->definition->spawnInfo.texture)
 {
     PSpawnInfo& info = system->definition->spawnInfo;
     switch (info.spawnShape)
@@ -59,12 +59,26 @@ void PParticle::Init(PSystem* system, int index, int total)
     age = 0;
 
     // TODO: TEXTURE SEQUENCE!
-    sprite = info.texture;
+    //sprite = info.texture;
 
     altLenInv = 0x10000 / (info.altLength != 0 ? info.altLength : 1);
     lifetimeInv = 0x10000 / (lifetime != 0 ? lifetime : 1);
+    die = false;
 }
 
-void PParticle::Update(PSystem* system, std::stack<PParticle*>& freeParticles)
+void PParticle::Update(PSystem* system)
 {
+    PSpawnInfo& info = system->definition->spawnInfo;
+    if (info.followSystem) pos = system->pos;
+
+    glm::vec3 velInc = glm::vec3(0.0f);
+    // TODO: EFFECTS!!!
+
+    angle += angleSpeed;
+    vel = vel * (float)(info.speedFalloff + 0x180) / (float)0x200 + velInc;
+    offset += vel * system->vel;
+
+    // TODO: GLITTER!!!
+
+    age++;
 }

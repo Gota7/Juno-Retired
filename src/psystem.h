@@ -1,0 +1,18 @@
+#pragma once
+
+#include "psystem/effects/acceleration.h"
+#include "psystem/effects/converge.h"
+#include "psystem/effects/jitter.h"
+#include "psystem/effects/limitPlane.h"
+#include "psystem/effects/radiusConverge.h"
+#include "psystem/effects/turn.h"
+#include "psystem/transitions/alpha.h"
+#include "psystem/transitions/color.h"
+#include "psystem/transitions/scale.h"
+#include "psystem/transitions/texture.h"
+#include "psystem/manager.h"
+#include "psystem/particle.h"
+#include "psystem/spawnInfo.h"
+#include "psystem/system.h"
+#include "psystem/texture.h"
+#include "psystem/transition.h"

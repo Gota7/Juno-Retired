@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../jsystem.h"
+#include "../psystem.h"
 #include "scenario.h"
 #include <map>
 #include <memory>
@@ -15,6 +16,7 @@ struct GGame
     std::unique_ptr<JShader> skyboxShader;
     std::unique_ptr<JLightDirectional> lightDirectional;
     std::unique_ptr<JUniformBuffer> matrices;
+    std::unique_ptr<PManager> particleMgr;
 
     // Initialize the game.
     GGame();

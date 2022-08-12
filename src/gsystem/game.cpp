@@ -37,6 +37,10 @@ GGame::GGame()
     matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STATIC_DRAW);
     matrices->ConnectToShader(*shader, "Matrices");
 
+    // Particle manager.
+    particleMgr = std::make_unique<PManager>(5, 64);
+    particleMgr->AddSystem("GravityTest", glm::vec3(0.0f), nullptr);
+
 }
 
 std::map<int, GScenarioEntry> GGame::GetScenarioList(std::string level)
@@ -77,6 +81,10 @@ void GGame::LoadLevelScenario(std::string level, int scenario)
 void GGame::Render()
 {
 
+    // Update logic.
+    particleMgr->Update();
+    //std::cout << particleMgr->systems.size() << " " << particleMgr->particles.size() << std::endl;
+
     // Camera stuff.
     camera->Update();
     glm::mat4 projection = camera->ProjectionMatrix();
@@ -93,5 +101,8 @@ void GGame::Render()
 
     // Scenario.
     scenario->Render();
+
+    // Particles.
+    particleMgr->Render();
 
 }

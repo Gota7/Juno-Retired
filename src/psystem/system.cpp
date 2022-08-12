@@ -1,11 +1,18 @@
 #include "system.h"
 
 #include "manager.h"
+#include <yaml-cpp/yaml.h>
 
-void PSystem::Init(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir)
+PSystemDefinition::PSystemDefinition(PTextureCache& texCache, std::string name)
 {
-    particles.clear();
-    glitterParticles.clear();
+    YAML::Node root = YAML::LoadFile("res/pcl/Definitions/" + name + ".yaml");
+    spawnInfo.Load(texCache, root["SpawnInfo"].as<std::string>());
+}
+
+PSystem::PSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir)
+{
+    particles.reserve(32); // Probably fine for now don't @me.
+    glitterParticles.reserve(16);
     definition = &def;
     stopped = false;
     spawnPaused = false;
@@ -18,7 +25,7 @@ void PSystem::Init(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir)
     startHorizontalDistance = def.spawnInfo.maxDist;
     horizontalSpeed = def.spawnInfo.perpSpeed;
     verticalSpeed = def.spawnInfo.speed;
-    scale = def.spawnInfo.horizontalScaleMultiplier;
+    scale = def.spawnInfo.scale;
     particleLifetime = def.spawnInfo.lifetime;
     spawnPeriod = def.spawnInfo.spawnPeriod;
     alpha = def.spawnInfo.alpha;
@@ -36,7 +43,7 @@ void PSystem::CalcTangents()
     tangent2 = glm::cross(normalDir, tangent);
 }
 
-void PSystem::AddParticles(std::stack<PParticle*>& freeParticles)
+void PSystem::AddParticles(PManager* manager)
 {
 
     // Get spawn count.
@@ -55,11 +62,8 @@ void PSystem::AddParticles(std::stack<PParticle*>& freeParticles)
     // Finally spawn particles.
     for (int i = 0; i < numToSpawn; i++)
     {
-        if (freeParticles.size() == 0) return;
-        PParticle* particle = freeParticles.top();
-        freeParticles.pop();
-        particle->Init(this, i, numToSpawn);
-        particles.push_back(particle);
+        PParticle& particle = manager->particles.emplace_back(this, i, numToSpawn);
+        particles.emplace_back(&particle);
     }
 
 }
@@ -69,7 +73,7 @@ void PSystem::Update(PManager* manager)
     PSpawnInfo& info = definition->spawnInfo;
     if ((info.frames == 0 || age < info.frames)
         && age % spawnPeriod == 0 && !stopped && !spawnPaused)
-        AddParticles(manager->freeParticles);
+        AddParticles(manager);
 
     // TODO: HANDLE TRANSITIONS!!!
 
@@ -81,11 +85,11 @@ void PSystem::Update(PManager* manager)
         // TODO: PROCESS TRANSITIONS!!!
 
         // Update particle.
-        particle->Update(this, manager->freeParticles);
+        particle->Update(this);
         if (particle->age > particle->lifetime)
         {
-            manager->freeParticles.push(particle);
             particles.erase(particles.begin() + i);
+            particle->die = true;
         }
     }
 

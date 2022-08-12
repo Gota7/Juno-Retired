@@ -1,42 +1,41 @@
 #include "manager.h"
 
-PManager::PManager(int numParticles, int numSystems) : numParticles(numParticles), numSystems(numSystems)
+PManager::PManager(int systemsToReserve, int particlesToReserve)
 {
-    allocatedSystems.reset(new PSystem[numSystems]);
-    allocatedParticles.reset(new PParticle[numSystems]);
-    for (int i = 0; i < numParticles; i++)
-    {
-        freeParticles.push(&allocatedParticles.get()[i]);
-    }
-    for (int i = 0; i < numSystems; i++)
-    {
-        freeSystems.push(&allocatedSystems.get()[i]);
-    }
+    systems.reserve(systemsToReserve);
+    particles.reserve(particlesToReserve);
 }
 
-PSystem* PManager::AddSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir)
+PSystem& PManager::AddSystem(std::string name, glm::vec3 pos, glm::vec3* dir)
 {
-    if (freeSystems.size() == 0) return nullptr;
-    PSystem* sys = freeSystems.top();
-    freeSystems.pop();
-    systemsInUse.push_back(sys);
-    sys->Init(def, pos, dir);
-    return sys;
+    if (definitions.find(name) == definitions.end())
+    {
+        definitions[name] = PSystemDefinition(textureCache, name);
+    }
+    return AddSystem(definitions[name], pos, dir);
+}
+
+PSystem& PManager::AddSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir)
+{
+    return systems.emplace_back(def, pos, dir);
 }
 
 void PManager::Update()
 {
-    for (int i = systemsInUse.size() - 1; i >= 0; i--)
+    for (int i = particles.size() - 1; i >= 0; i--)
     {
-        PSystem* sys = systemsInUse[i];
-        if (!sys->paused) sys->Update(this);
-        PSpawnInfo& info = sys->definition->spawnInfo;
-        if ((info.frames != 0 && sys->age > info.frames || sys->stopped)
-            && sys->particles.size() == 0 && sys->glitterParticles.size() == 0)
+        if (particles[i].die) particles.erase(particles.begin() + i);
+    }
+    for (int i = systems.size() - 1; i >= 0; i--)
+    {
+        PSystem& sys = systems[i];
+        if (!sys.paused) sys.Update(this);
+        PSpawnInfo& info = sys.definition->spawnInfo;
+        if ((info.frames != 0 && sys.age > info.frames || sys.stopped)
+            && sys.particles.size() == 0 && sys.glitterParticles.size() == 0)
         {
-            sys->stopped = true;
-            freeSystems.push(sys);
-            systemsInUse.erase(systemsInUse.begin() + i);
+            sys.stopped = true;
+            systems.erase(systems.begin() + i);
         }
     }
 }

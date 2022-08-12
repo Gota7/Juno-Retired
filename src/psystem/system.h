@@ -15,6 +15,13 @@ struct PSystemDefinition
     std::vector<std::shared_ptr<PTransition>> transitions;
     std::shared_ptr<PGlitter> glitter = nullptr;
     std::vector<std::shared_ptr<PEffect>> effects;
+
+    // Don't use this, just to get indices in the manager to not complain even though this will never occur.
+    PSystemDefinition() {}
+
+    // Load a particle definition.
+    PSystemDefinition(PTextureCache& texCache, std::string name);
+
 };
 
 // System.
@@ -38,17 +45,17 @@ struct PSystem
     unsigned int particleLifetime;
     unsigned int spawnPeriod;
     unsigned int alpha;
-    std::vector<PParticle*> particles;
+    std::vector<PParticle*> particles; // Reference particles from manager.
     std::vector<PParticle*> glitterParticles;
 
     // Initialize a system.
-    void Init(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir);
+    PSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir);
 
     // Calculate tangents.
     void CalcTangents();
 
     // Add particles.
-    void AddParticles(std::stack<PParticle*>& freeParticles);
+    void AddParticles(PManager* manager);
 
     // Update particles.
     void Update(PManager* manager);
