@@ -105,6 +105,13 @@ void PSystem::Update(PManager* manager)
 
 }
 
-void PSystem::Render()
+void PSystem::Render(PManager* manager, JShader& shader)
 {
+    PSpawnInfo& info = definition->spawnInfo;
+    info.texture.texture->Use();
+    // TODO: TEXTURE SCALE/PARAMETERS!!!
+    for (auto& particle : particles)
+        particle.Render(manager, shader, false);
+
+    // TODO: GLITTER PARTICLES!!!
 }

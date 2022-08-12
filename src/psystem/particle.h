@@ -4,6 +4,7 @@
 #include "texture.h"
 #include <stack>
 
+struct PManager;
 struct PSystem;
 
 // Standard particle.
@@ -21,8 +22,8 @@ struct PParticle
     glm::vec3 color;
     unsigned int altLenInv;
     float lifetimeInv;
-    unsigned int alpha;
-    unsigned int alphaMult;
+    float alpha;
+    float alphaMult;
     PTexture sprite;
 
     // Initialize a particle.
@@ -30,5 +31,8 @@ struct PParticle
 
     // Update a particle.
     void Update(PSystem* system);
+
+    // Render a particle.
+    void Render(PManager* manager, JShader& shader, bool glitter);
 
 };

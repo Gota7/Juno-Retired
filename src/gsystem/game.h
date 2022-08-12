@@ -14,6 +14,7 @@ struct GGame
     std::unique_ptr<JCamera> camera;
     std::unique_ptr<JShader> shader;
     std::unique_ptr<JShader> skyboxShader;
+    std::unique_ptr<JShader> particleShader;
     std::unique_ptr<JLightDirectional> lightDirectional;
     std::unique_ptr<JUniformBuffer> matrices;
     std::unique_ptr<PManager> particleMgr;

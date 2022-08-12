@@ -11,6 +11,7 @@ struct PManager
     std::vector<PSystem> systems; // Vector approach is efficient since memory isn't freed until vector is deleted. It is reused.
     PTextureCache textureCache; // Texture cache.
     std::map<std::string, PSystemDefinition> definitions; // Loaded system definitions.
+    std::unique_ptr<JMesh> mesh; // Particle mesh.
 
     // Construct a new particle manager.
     PManager(int systemsToReserve);
@@ -24,7 +25,7 @@ struct PManager
     // Update the system.
     void Update();
 
-    // Render the system. TODO!!!
-    void Render();
+    // Render the system.
+    void Render(JShader& shader);
 
 };

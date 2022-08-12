@@ -1,8 +1,33 @@
 #include "manager.h"
 
+// Particle mesh data.
+VertexUV particleVertices[] = {
+    VertexUV(glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec2(0.0f, 1.0f)),
+    VertexUV(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
+    VertexUV(glm::vec3( 1.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f)),
+    VertexUV(glm::vec3( 1.0f,  1.0f, 0.0f), glm::vec2(1.0f, 1.0f))
+};
+int particleIndices[] = {
+    0, 1, 2,
+    0, 2, 3
+};
+
 PManager::PManager(int systemsToReserve)
 {
     systems.reserve(systemsToReserve);
+    mesh = std::make_unique<JMesh>(
+        particleVertices,
+        sizeof(particleVertices),
+        GL_STATIC_DRAW,
+        particleIndices,
+        sizeof(particleIndices),
+        GL_STATIC_DRAW,
+        GL_TRIANGLES,
+        sizeof(particleIndices) / sizeof(particleIndices[0]),
+        GL_UNSIGNED_INT,
+        0
+    );
+    VertexUV::SetAttributes();
 }
 
 PSystem& PManager::AddSystem(std::string name, glm::vec3 pos, glm::vec3* dir)
@@ -35,6 +60,13 @@ void PManager::Update()
     }
 }
 
-void PManager::Render()
+void PManager::Render(JShader& shader)
 {
+    shader.Use();
+    shader.SetInt("tex", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glDisable(GL_CULL_FACE);
+    for (auto& system : systems)
+        system.Render(this, shader);
+    glEnable(GL_CULL_FACE);
 }

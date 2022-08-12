@@ -18,8 +18,8 @@ struct convert<glm::vec3> {
       return false;
     }
     rhs.x = node[0].as<float>();
-    rhs.y = node[0].as<float>();
-    rhs.z = node[0].as<float>();
+    rhs.y = node[1].as<float>();
+    rhs.z = node[2].as<float>();
     return true;
   }
 };
@@ -69,13 +69,13 @@ void PSpawnInfo::Load(PTextureCache& texCache, std::string name)
     minAngularSpeed = root["MinAngularSpeed"].as<float>();
     maxAngularSpeed = root["MaxAngularSpeed"].as<float>();
     spawnTime = root["SpawnTime"].as<float>();
-    scaleRandomness = root["ScaleRandomness"].as<unsigned int>();
+    scaleRandomness = root["ScaleRandomness"].as<float>();
     lifetime = root["Lifetime"].as<float>();
     lifetimeRandomness = root["LifetimeRandomness"].as<float>();
-    speedRandomness = root["SpeedRandomness"].as<unsigned int>();
+    speedRandomness = root["SpeedRandomness"].as<float>();
     spawnPeriod = root["SpawnPeriod"].as<float>();
-    alpha = root["Alpha"].as<unsigned int>();
-    speedFalloff = root["SpeedFalloff"].as<unsigned int>();
+    alpha = root["Alpha"].as<float>();
+    speedFalloff = root["SpeedFalloff"].as<float>();
     altLength = root["AltLength"].as<unsigned int>();
     velStretchFactor = root["VelStretchFactor"].as<float>();
     logTexRepeatHorizontal = root["LogTexRepeatHorizontal"].as<unsigned int>();

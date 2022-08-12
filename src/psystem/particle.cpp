@@ -1,5 +1,6 @@
 #include "particle.h"
 
+#include "manager.h"
 #include "system.h"
 
 glm::vec3 RandomNormalizedXY()
@@ -30,9 +31,9 @@ PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->def
         default:
             break;
     }
-    float randHorizontalSpeed = system->horizontalSpeed * (info.speedRandomness + 0xFF - (int)(info.speedRandomness * ((unsigned int)rand() >> 24) >> 7)) / 0x100;
-    float randVerticalSpeed = system->verticalSpeed * (info.speedRandomness + 0xFF - (int)(info.speedRandomness * ((unsigned int)rand() >> 24) >> 7)) / 0x100;
-    glm::vec3 offsetDir;
+    float randHorizontalSpeed = system->horizontalSpeed + ((rand() % 2000) / 1000.0f - 1.0f) * info.speedRandomness;
+    float randVerticalSpeed = system->verticalSpeed + ((rand() % 2000) / 1000.0f - 1.0f) * info.speedRandomness;
+    glm::vec3 offsetDir = glm::vec3(0.0f);
     if ((int)(offset.x * 0x1000) == 0
         && (int)(offset.y * 0x1000) == 0
         && (int)(offset.z * 0x1000) == 0)
@@ -43,7 +44,7 @@ PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->def
     vel = system->dir * randVerticalSpeed + offsetDir * randHorizontalSpeed;
     pos = system->pos;
 
-    scale = system->scale * (info.scaleRandomness + 0xFF - (int)(info.scaleRandomness * ((unsigned int)rand() >> 24) >> 7)) / 0x100;
+    scale = system->scale + ((rand() % 2000) / 1000.0f - 1.0f) * info.scaleRandomness;
     scaleMult = 1.0f;
 
     // TODO: COLOR TRANSITION STUFF!
@@ -74,10 +75,19 @@ void PParticle::Update(PSystem* system)
     // TODO: EFFECTS!!!
 
     angle += angleSpeed;
-    vel = vel * (float)(info.speedFalloff + 0x180) / (float)0x200 + velInc;
+    //vel = vel * (float)(info.speedFalloff + 0x180) / (float)0x200 + velInc;
     offset += vel * system->vel;
+    pos += vel;
 
     // TODO: GLITTER!!!
 
     age += (float)JFrame::deltaTime;
+}
+
+void PParticle::Render(PManager* manager, JShader& shader, bool glitter)
+{
+    glm::mat4 mat = glm::scale(glm::translate(glm::mat4(1.0), pos), glm::vec3(1.0, 1.0, 1.0) * scale);
+    shader.SetMatrix("model", glm::value_ptr(mat));
+    shader.SetVec4("color", glm::value_ptr(glm::vec4(color, alpha)));
+    manager->mesh->Render();
 }

@@ -21,6 +21,10 @@ GGame::GGame()
     shaderList.push_back(std::pair("res/shd/skyboxVert.glsl", GL_VERTEX_SHADER));
     shaderList.push_back(std::pair("res/shd/skyboxFrag.glsl", GL_FRAGMENT_SHADER));
     skyboxShader = std::make_unique<JShader>(shaderList);
+    shaderList.clear();
+    shaderList.push_back(std::pair("res/shd/particleVert.glsl", GL_VERTEX_SHADER));
+    shaderList.push_back(std::pair("res/shd/particleFrag.glsl", GL_FRAGMENT_SHADER));
+    particleShader = std::make_unique<JShader>(shaderList);
 
     // Camera setup.
     camera = std::make_unique<JFreeCam>();
@@ -33,13 +37,14 @@ GGame::GGame()
     lightDirectional->ambient = glm::vec3(1.0f, 0.501f, 0.188f) * 0.45f;
     lightDirectional->SetVars(*shader);
 
-    // Uniform buffer setup.
-    matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STATIC_DRAW);
-    matrices->ConnectToShader(*shader, "Matrices");
-
     // Particle manager.
     particleMgr = std::make_unique<PManager>(5);
     particleMgr->AddSystem("GravityTest", glm::vec3(0.0f), nullptr);
+
+    // Uniform buffer setup.
+    matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STATIC_DRAW);
+    matrices->ConnectToShader(*shader, "Matrices");
+    matrices->ConnectToShader(*particleShader, "Matrices");
 
 }
 
@@ -103,6 +108,6 @@ void GGame::Render()
     scenario->Render();
 
     // Particles.
-    particleMgr->Render();
+    particleMgr->Render(*particleShader);
 
 }

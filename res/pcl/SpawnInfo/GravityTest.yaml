@@ -7,13 +7,13 @@ FollowSystem: false
 AllNegativeAxis: false
 HorizontalIf3d: false
 SelfDestruct: true
-SpawnRate: 10
+SpawnRate: 1
 MaxDist: 104
 Direction: [ 0, -1, 0 ]
-Color: [ 1, 1, 1 ]
+Color: [ 0.8, 0.2, 0.8 ]
 PerpSpeed: 0
-Speed: 0
-Scale: 4.757813
+Speed: 0.01
+Scale: 0.1
 HorizontalScaleMultiplier: 1
 MinAngularSpeed: 0
 MaxAngularSpeed: 0
@@ -21,10 +21,10 @@ SpawnTime: 0
 ScaleRandomness: 0
 Lifetime: 1
 LifetimeRandomness: 0.5
-SpeedRandomness: 50
+SpeedRandomness: 0
 SpawnPeriod: 1
-Alpha: 27
-SpeedFalloff: 30
+Alpha: 0.5
+SpeedFalloff: 0
 AltLength: 4
 VelStretchFactor: 0
 LogTexRepeatHorizontal: 2

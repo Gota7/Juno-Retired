@@ -45,7 +45,7 @@ struct PSystem
     float particleLifetime;
     float spawnPeriod;
     float lastSpawnPeriod;
-    unsigned int alpha;
+    float alpha;
     std::vector<PParticle> particles;
     std::vector<PParticle> glitterParticles;
 
@@ -61,7 +61,7 @@ struct PSystem
     // Update particles.
     void Update(PManager* manager);
 
-    // Render particles. TODO!!!
-    void Render();
+    // Render particles.
+    void Render(PManager* manager, JShader& shader);
 
 };
