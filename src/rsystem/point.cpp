@@ -1,5 +1,10 @@
 #include "point.h"
 
+RGravityPoint::RGravityPoint(glm::vec3 pos) : pos(pos)
+{
+    UpdateMtxIdentity();
+}
+
 void RGravityPoint::UpdateMtx(const glm::mat4& mtx)
 {
     posTranslated = mtx * glm::vec4(pos, 1.0);
@@ -24,4 +29,12 @@ bool RGravityPoint::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, floa
     if (outDist) *outDist = mag;
     return true;
 
+}
+
+glm::vec3 RGravityPoint::RandomInRange()
+{
+    float min = offset;
+    float max = range;
+    if (max < min) max = 1000.0f; // Some arbitrary high number.
+    return posTranslated + glm::normalize(glm::vec3(rand() % 1000 - 500, rand() % 1000 - 500, rand() % 1000 - 500)) * ((rand() % 1000) / 1000.0f * (max - min) + min);
 }

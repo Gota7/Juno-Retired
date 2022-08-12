@@ -39,7 +39,8 @@ GGame::GGame()
 
     // Particle manager.
     particleMgr = std::make_unique<PManager>(5);
-    particleMgr->AddSystem("GravityTest", glm::vec3(0.0f), nullptr);
+    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityPoint>(glm::vec3(0.0f)));
+    system.gravity->range = 2.0f;
 
     // Uniform buffer setup.
     matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STATIC_DRAW);

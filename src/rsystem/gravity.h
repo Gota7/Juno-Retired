@@ -31,6 +31,12 @@ struct RGravity
         return false;
     }
 
+    // Get a random position in range.
+    virtual glm::vec3 RandomInRange()
+    {
+        return glm::vec3(0.0f);
+    }
+
     // Calculate the gravity direction. True only if gravity applies.
     bool CalcGravity(const glm::vec3& pos, glm::vec3* outDir, float* outMag);
 

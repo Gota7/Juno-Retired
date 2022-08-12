@@ -110,6 +110,7 @@ void PSystem::Render(PManager* manager, JShader& shader)
     PSpawnInfo& info = definition->spawnInfo;
     info.texture.texture->Use();
     // TODO: TEXTURE SCALE/PARAMETERS!!!
+    shader.SetInt("drawMode", info.drawMode);
     for (auto& particle : particles)
         particle.Render(manager, shader, false);
 

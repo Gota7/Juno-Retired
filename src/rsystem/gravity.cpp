@@ -10,13 +10,13 @@ bool RGravity::CalcGravity(const glm::vec3& pos, glm::vec3* outDir, float* outMa
     dist -= offset;
 
     // Galaxy does something weird here, but I'll just set magnitude to distance.
-    *outMag = glm::abs(dist);
+    if (outMag) *outMag = glm::abs(dist);
 
     // Invert gravity.
     if (inverted) dir = -dir;
 
     // Finished.
-    *outDir = dir;
+    if (outDir) *outDir = dir;
     return true;
 
 }

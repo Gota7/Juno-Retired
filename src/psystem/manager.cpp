@@ -44,6 +44,20 @@ PSystem& PManager::AddSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* d
     return systems.emplace_back(def, pos, dir);
 }
 
+PSystemGravity& PManager::AddSystemGravity(std::string name, std::unique_ptr<RGravity> gravity)
+{
+    if (definitions.find(name) == definitions.end())
+    {
+        definitions[name] = PSystemDefinition(textureCache, name);
+    }
+    return AddSystemGravity(definitions[name], std::move(gravity));
+}
+
+PSystemGravity& PManager::AddSystemGravity(PSystemDefinition& def, std::unique_ptr<RGravity> gravity)
+{
+    return gravitySystems.emplace_back(def, std::move(gravity));
+}
+
 void PManager::Update()
 {
     for (int i = systems.size() - 1; i >= 0; i--)
@@ -58,6 +72,18 @@ void PManager::Update()
             systems.erase(systems.begin() + i);
         }
     }
+    for (int i = gravitySystems.size() - 1; i >= 0; i--)
+    {
+        PSystem& sys = gravitySystems[i];
+        if (!sys.paused) sys.Update(this);
+        PSpawnInfo& info = sys.definition->spawnInfo;
+        if ((info.spawnTime != 0 && sys.age > info.spawnTime || sys.stopped)
+            && sys.particles.size() == 0 && sys.glitterParticles.size() == 0)
+        {
+            sys.stopped = true;
+            gravitySystems.erase(gravitySystems.begin() + i);
+        }
+    }
 }
 
 void PManager::Render(JShader& shader)
@@ -67,6 +93,8 @@ void PManager::Render(JShader& shader)
     glActiveTexture(GL_TEXTURE0);
     glDisable(GL_CULL_FACE);
     for (auto& system : systems)
+        system.Render(this, shader);
+    for (auto& system : gravitySystems)
         system.Render(this, shader);
     glEnable(GL_CULL_FACE);
 }

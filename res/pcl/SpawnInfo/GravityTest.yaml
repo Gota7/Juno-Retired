@@ -7,28 +7,28 @@ FollowSystem: false
 AllNegativeAxis: false
 HorizontalIf3d: false
 SelfDestruct: true
-SpawnRate: 1
+SpawnRate: 30
 MaxDist: 104
 Direction: [ 0, -1, 0 ]
 Color: [ 0.8, 0.2, 0.8 ]
 PerpSpeed: 0
-Speed: 0.01
-Scale: 0.1
+Speed: 0.002
+Scale: 0.025
 HorizontalScaleMultiplier: 1
 MinAngularSpeed: 0
 MaxAngularSpeed: 0
 SpawnTime: 0
 ScaleRandomness: 0
-Lifetime: 1
-LifetimeRandomness: 0.5
+Lifetime: 2
+LifetimeRandomness: 0
 SpeedRandomness: 0
-SpawnPeriod: 1
-Alpha: 0.5
+SpawnPeriod: 0.5
+Alpha: 1
 SpeedFalloff: 0
 AltLength: 4
 VelStretchFactor: 0
 LogTexRepeatHorizontal: 2
 LogTexRepeatVertical: 2
-Texture: "res/tex/BlankWhiteCircle.png"
+Texture: "res/tex/BlankWhiteSquare.png"
 RepeatX: Clamp
 RepeatY: Clamp

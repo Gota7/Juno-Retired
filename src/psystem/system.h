@@ -56,10 +56,10 @@ struct PSystem
     void CalcTangents();
 
     // Add particles.
-    void AddParticles(PManager* manager);
+    virtual void AddParticles(PManager* manager);
 
     // Update particles.
-    void Update(PManager* manager);
+    virtual void Update(PManager* manager);
 
     // Render particles.
     void Render(PManager* manager, JShader& shader);
