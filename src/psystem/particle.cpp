@@ -55,7 +55,7 @@ PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->def
     // TODO: RANDOM ANGLE SPEED IF ROTATING!
     angleSpeed = 0;
 
-    lifetime = (system->particleLifetime * (0xFF - ((int)(info.lifetimeRandomness * ((unsigned int)rand() >> 24)) >> 8)) >> 8) + 1;
+    lifetime = system->particleLifetime + ((rand() % 2000) / 1000.0f - 1.0f) * info.lifetimeRandomness;
     age = 0;
 
     // TODO: TEXTURE SEQUENCE!
@@ -63,7 +63,6 @@ PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->def
 
     altLenInv = 0x10000 / (info.altLength != 0 ? info.altLength : 1);
     lifetimeInv = 0x10000 / (lifetime != 0 ? lifetime : 1);
-    die = false;
 }
 
 void PParticle::Update(PSystem* system)
@@ -80,5 +79,5 @@ void PParticle::Update(PSystem* system)
 
     // TODO: GLITTER!!!
 
-    age++;
+    age += (float)JFrame::deltaTime;
 }

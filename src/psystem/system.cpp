@@ -28,6 +28,7 @@ PSystem::PSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir)
     scale = def.spawnInfo.scale;
     particleLifetime = def.spawnInfo.lifetime;
     spawnPeriod = def.spawnInfo.spawnPeriod;
+    lastSpawnPeriod = 0;
     alpha = def.spawnInfo.alpha;
 }
 
@@ -62,8 +63,7 @@ void PSystem::AddParticles(PManager* manager)
     // Finally spawn particles.
     for (int i = 0; i < numToSpawn; i++)
     {
-        PParticle& particle = manager->particles.emplace_back(this, i, numToSpawn);
-        particles.emplace_back(&particle);
+        particles.emplace_back(this, i, numToSpawn);
     }
 
 }
@@ -71,8 +71,14 @@ void PSystem::AddParticles(PManager* manager)
 void PSystem::Update(PManager* manager)
 {
     PSpawnInfo& info = definition->spawnInfo;
-    if ((info.frames == 0 || age < info.frames)
-        && age % spawnPeriod == 0 && !stopped && !spawnPaused)
+    bool passedSpawnPeriod = false;
+    if (JFrame::currentFrame - lastSpawnPeriod > spawnPeriod)
+    {
+        passedSpawnPeriod = true;
+        lastSpawnPeriod = JFrame::currentFrame;
+    }
+    if ((info.spawnTime == 0 || age < info.spawnTime)
+        && passedSpawnPeriod && !stopped && !spawnPaused)
         AddParticles(manager);
 
     // TODO: HANDLE TRANSITIONS!!!
@@ -80,23 +86,22 @@ void PSystem::Update(PManager* manager)
     // Update particles.
     for (int i = particles.size() - 1; i >= 0; i--)
     {
-        PParticle* particle = particles[i];
+        PParticle& particle = particles[i];
 
         // TODO: PROCESS TRANSITIONS!!!
 
         // Update particle.
-        particle->Update(this);
-        if (particle->age > particle->lifetime)
+        particle.Update(this);
+        if (particle.age > particle.lifetime)
         {
             particles.erase(particles.begin() + i);
-            particle->die = true;
         }
     }
 
     // TODO: HANDLE GLITTER!!!
 
     // Increment age.
-    age++;
+    age += (float)JFrame::deltaTime;
 
 }
 

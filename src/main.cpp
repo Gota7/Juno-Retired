@@ -9,7 +9,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-//#define VSYNC 1
+#define VSYNC 1
 
 std::unique_ptr<JFramebuffer> framebuffer;
 std::unique_ptr<JShader> framebufferShader;

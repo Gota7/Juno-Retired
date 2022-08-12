@@ -38,7 +38,7 @@ GGame::GGame()
     matrices->ConnectToShader(*shader, "Matrices");
 
     // Particle manager.
-    particleMgr = std::make_unique<PManager>(5, 64);
+    particleMgr = std::make_unique<PManager>(5);
     particleMgr->AddSystem("GravityTest", glm::vec3(0.0f), nullptr);
 
 }
@@ -83,7 +83,7 @@ void GGame::Render()
 
     // Update logic.
     particleMgr->Update();
-    //std::cout << particleMgr->systems.size() << " " << particleMgr->particles.size() << std::endl;
+    //std::cout << particleMgr->systems.size() << " " << particleMgr->systems[0].particles.size() << std::endl;
 
     // Camera stuff.
     camera->Update();

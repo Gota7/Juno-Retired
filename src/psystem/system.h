@@ -33,7 +33,7 @@ struct PSystem
     bool paused;
     glm::vec3 pos;
     glm::vec3 vel;
-    int age;
+    float age;
     int rateTracker;
     glm::vec3 dir;
     glm::vec3 tangent;
@@ -42,11 +42,12 @@ struct PSystem
     float horizontalSpeed;
     float verticalSpeed;
     float scale;
-    unsigned int particleLifetime;
-    unsigned int spawnPeriod;
+    float particleLifetime;
+    float spawnPeriod;
+    float lastSpawnPeriod;
     unsigned int alpha;
-    std::vector<PParticle*> particles; // Reference particles from manager.
-    std::vector<PParticle*> glitterParticles;
+    std::vector<PParticle> particles;
+    std::vector<PParticle> glitterParticles;
 
     // Initialize a system.
     PSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir);

@@ -7,7 +7,7 @@ FollowSystem: false
 AllNegativeAxis: false
 HorizontalIf3d: false
 SelfDestruct: true
-SpawnRate: 1
+SpawnRate: 10
 MaxDist: 104
 Direction: [ 0, -1, 0 ]
 Color: [ 1, 1, 1 ]
@@ -17,10 +17,10 @@ Scale: 4.757813
 HorizontalScaleMultiplier: 1
 MinAngularSpeed: 0
 MaxAngularSpeed: 0
-Frames: 0
+SpawnTime: 0
 ScaleRandomness: 0
-Lifetime: 60
-LifetimeRandomness: 120
+Lifetime: 1
+LifetimeRandomness: 0.5
 SpeedRandomness: 50
 SpawnPeriod: 1
 Alpha: 27

@@ -54,12 +54,12 @@ struct PSpawnInfo
     float horizontalScaleMultiplier; // What to multiply the horizontal scale by.
     float minAngularSpeed; // Minimum angular speed.
     float maxAngularSpeed; // Maximum angular speed.
-    unsigned int frames; // How many frames the system can spawn particles for.
+    float spawnTime; // How many seconds the system can spawn particles for. 0 for infinite.
     unsigned int scaleRandomness; // Varies random scale of particles.
-    unsigned int lifetime; // How many frames particles exist for.
-    unsigned int lifetimeRandomness; // Random lifetime of particles.
+    float lifetime; // How many frames particles exist for.
+    float lifetimeRandomness; // Random lifetime of particles.
     unsigned int speedRandomness; // Random speed of particles.
-    unsigned int spawnPeriod; // Just set to frames + 1.
+    float spawnPeriod; // Seconds between spawning frames.
     unsigned int alpha; // How opaque particles are.
     unsigned int speedFalloff; // How fast speed decelerates or accelerates.
     unsigned int altLength; // Alternate number of frames to use for transitions instead of lifetime.

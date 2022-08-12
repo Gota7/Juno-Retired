@@ -68,12 +68,12 @@ void PSpawnInfo::Load(PTextureCache& texCache, std::string name)
     horizontalScaleMultiplier = root["HorizontalScaleMultiplier"].as<float>();
     minAngularSpeed = root["MinAngularSpeed"].as<float>();
     maxAngularSpeed = root["MaxAngularSpeed"].as<float>();
-    frames = root["Frames"].as<unsigned int>();
+    spawnTime = root["SpawnTime"].as<float>();
     scaleRandomness = root["ScaleRandomness"].as<unsigned int>();
-    lifetime = root["Lifetime"].as<unsigned int>();
-    lifetimeRandomness = root["LifetimeRandomness"].as<unsigned int>();
+    lifetime = root["Lifetime"].as<float>();
+    lifetimeRandomness = root["LifetimeRandomness"].as<float>();
     speedRandomness = root["SpeedRandomness"].as<unsigned int>();
-    spawnPeriod = root["SpawnPeriod"].as<unsigned int>();
+    spawnPeriod = root["SpawnPeriod"].as<float>();
     alpha = root["Alpha"].as<unsigned int>();
     speedFalloff = root["SpeedFalloff"].as<unsigned int>();
     altLength = root["AltLength"].as<unsigned int>();
