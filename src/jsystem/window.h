@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <string>
 
 // Settings.
 #define SCR_WIDTH 1024
@@ -11,7 +12,7 @@
 typedef void (*WindowCallback)(GLFWwindow* window);
 
 // Init window.
-GLFWwindow* Window_Init();
+GLFWwindow* Window_Init(std::string title);
 
 // Main window.
 void Window_Main(GLFWwindow* window, WindowCallback callback = nullptr);

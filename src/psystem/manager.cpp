@@ -90,6 +90,7 @@ void PManager::Render(JShader& shader)
 {
     shader.Use();
     shader.SetInt("tex", 0);
+    shader.SetFloat("aspect", JFrame::aspect);
     glActiveTexture(GL_TEXTURE0);
     glDisable(GL_CULL_FACE);
     for (auto& system : systems)

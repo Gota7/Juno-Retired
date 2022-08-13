@@ -9,6 +9,7 @@ unsigned int JFrame::targetFps = 60;
 double JFrame::targetTime = 1.0 / 60;
 int JFrame::fps = 60;
 int JFrame::frameCounter = 0;
+float JFrame::aspect = (float)16 / 9;
 
 #define SUPPORT_BUSY_WAIT_LOOP true
 

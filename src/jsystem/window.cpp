@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-GLFWwindow* Window_Init()
+GLFWwindow* Window_Init(std::string title)
 {
     // glfw: initialize and configure
     // ------------------------------
@@ -21,7 +21,7 @@ GLFWwindow* Window_Init()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Gota's Outer Space Odyssey", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, title.c_str(), NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;

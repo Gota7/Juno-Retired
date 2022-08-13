@@ -13,7 +13,7 @@ Direction: [ 0, -1, 0 ]
 Color: [ 0.8, 0.2, 0.8 ]
 PerpSpeed: 0
 Speed: 0.002
-Scale: 0.025
+Scale: 0.03
 HorizontalScaleMultiplier: 1
 MinAngularSpeed: 0
 MaxAngularSpeed: 0

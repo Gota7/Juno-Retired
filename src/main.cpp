@@ -52,6 +52,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
     framebuffer = std::make_unique<JFramebuffer>(width, height);
+    JFrame::aspect = (float)width / height;
 }
 
 // Main function.
@@ -59,7 +60,7 @@ int main()
 {
 
     // Window init.
-    GLFWwindow* window = Window_Init();
+    GLFWwindow* window = Window_Init("Gota's Galactic Journey");
     if (!window) return -1;
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);

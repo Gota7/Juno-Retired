@@ -13,6 +13,7 @@ struct JFrame
     static double targetTime;
     static int fps;
     static int frameCounter;
+    static float aspect;
 
     // Set FPS. Runs unlimited otherwise.
     static void SetFPS(unsigned int fps);
