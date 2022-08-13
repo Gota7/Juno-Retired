@@ -7,7 +7,7 @@ FollowSystem: false
 AllNegativeAxis: false
 HorizontalIf3d: false
 SelfDestruct: true
-SpawnRate: 30
+SpawnRate: 1000
 MaxDist: 104
 Direction: [ 0, -1, 0 ]
 Color: [ 0.8, 0.2, 0.8 ]
