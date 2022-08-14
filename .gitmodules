@@ -1,0 +1,12 @@
+[submodule "subs/assimp"]
+	path = subs/assimp
+	url = https://github.com/assimp/assimp.git
+	branch = bd64cc88dff17f118ecf32ebcbacaf566f6b6449
+[submodule "subs/yaml-cpp"]
+	path = subs/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp
+	branch = c73ee34704c512ebe915b283645aefa9f424a22f
+[submodule "subs/glfw"]
+	path = subs/glfw
+	url = https://github.com/glfw/glfw
+	branch = c18851f52ec9704eb06464058a600845ec1eada1
