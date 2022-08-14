@@ -17,7 +17,7 @@
 // SAMPLE CODE:
 // jar_mod_context_t modctx;
 // short samplebuff[4096];
-// bool bufferFull = false;
+// bool2 bufferFull = false;
 // int intro_load(void)
 // {
 //     jar_mod_init(&modctx);
@@ -242,8 +242,8 @@ typedef struct jar_mod_tracker_buffer_state_
 extern "C" {
 #endif
 
-bool   jar_mod_init(jar_mod_context_t * modctx);
-bool   jar_mod_setcfg(jar_mod_context_t * modctx, int samplerate, int bits, int stereo, int stereo_separation, int filter);
+bool2   jar_mod_init(jar_mod_context_t * modctx);
+bool2   jar_mod_setcfg(jar_mod_context_t * modctx, int samplerate, int bits, int stereo, int stereo_separation, int filter);
 void   jar_mod_fillbuffer(jar_mod_context_t * modctx, short * outbuffer, unsigned long nbsample, jar_mod_tracker_buffer_state * trkbuf);
 void   jar_mod_unload(jar_mod_context_t * modctx);
 mulong jar_mod_load_file(jar_mod_context_t * modctx, const char* filename);
@@ -263,7 +263,7 @@ void   jar_mod_seek_start(jar_mod_context_t * ctx);
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <stdbool.h>
+//#include <stdbool2.h>
 
 // Effects list
 #define EFFECT_ARPEGGIO              0x0 // Supported
@@ -1054,7 +1054,7 @@ static void workeffect( note * nptr, channel * cptr )
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
-bool jar_mod_init(jar_mod_context_t * modctx)
+bool2 jar_mod_init(jar_mod_context_t * modctx)
 {
     muint i,j;
 
@@ -1081,7 +1081,7 @@ bool jar_mod_init(jar_mod_context_t * modctx)
     return 0;
 }
 
-bool jar_mod_setcfg(jar_mod_context_t * modctx, int samplerate, int bits, int stereo, int stereo_separation, int filter)
+bool2 jar_mod_setcfg(jar_mod_context_t * modctx, int samplerate, int bits, int stereo, int stereo_separation, int filter)
 {
     if( modctx )
     {
@@ -1114,7 +1114,7 @@ bool jar_mod_setcfg(jar_mod_context_t * modctx, int samplerate, int bits, int st
 }
 
 // make certain that mod_data stays in memory while playing
-static bool jar_mod_load( jar_mod_context_t * modctx, void * mod_data, int mod_data_size )
+static bool2 jar_mod_load( jar_mod_context_t * modctx, void * mod_data, int mod_data_size )
 {
     muint i, max;
     unsigned short t;
@@ -1474,7 +1474,7 @@ void jar_mod_fillbuffer( jar_mod_context_t * modctx, short * outbuffer, unsigned
 }
 
 //resets internals for mod context
-static bool jar_mod_reset( jar_mod_context_t * modctx)
+static bool2 jar_mod_reset( jar_mod_context_t * modctx)
 {
     if(modctx)
     {

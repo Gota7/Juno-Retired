@@ -22,9 +22,11 @@ struct RGravityDisk : RGravity
     // Constructor.
     RGravityDisk(glm::vec3 pos, glm::vec3 direction, glm::vec3 sideDirection, float radius, float validDegrees = 360.0f, bool bothSides = true, bool edgeGravity = true);
 
+    // Update parameters after changing some.
+    void UpdateParams();
+
     // Virtual functions.
     virtual void UpdateMtx(const glm::mat4& mtx);
-    void UpdateParams();
     virtual bool CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist);
     virtual glm::vec3 RandomInRange();
 

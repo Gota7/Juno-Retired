@@ -25,26 +25,26 @@ bool RGravity::InRange(float radius)
 {
     if (range < 0.0f)
     {
-		return true;
-	}
-	else
+        return true;
+    }
+    else
     {
-		float distance = offset + range; // Max gravity range.
-		return radius < distance;
-	}
+        float distance = offset + range; // Max gravity range.
+        return radius < distance;
+    }
 }
 
 bool RGravity::InRangeSquared(float radius)
 {
-	if (range < 0.0f)
+    if (range < 0.0f)
     {
-		return true;
-	}
-	else
+        return true;
+    }
+    else
     {
-		float distance = offset + range; // Max gravity range.
-		return radius < distance * distance;
-	}
+        float distance = offset + range; // Max gravity range.
+        return radius < distance * distance;
+    }
 }
 
 void RGravity::UpdateMtxIdentity()

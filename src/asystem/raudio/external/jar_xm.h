@@ -155,12 +155,12 @@ uint8_t jar_xm_get_loop_count(jar_xm_context_t* ctx);
 //** Mute or unmute a channel.
 // * @note Channel numbers go from 1 to jar_xm_get_number_of_channels(...).
 // * @return whether the channel was muted.
-bool jar_xm_mute_channel(jar_xm_context_t* ctx, uint16_t, bool);
+bool2 jar_xm_mute_channel(jar_xm_context_t* ctx, uint16_t, bool2);
 
 //** Mute or unmute an instrument.
 // * @note Instrument numbers go from 1 to jar_xm_get_number_of_instruments(...).
 // * @return whether the instrument was muted.
-bool jar_xm_mute_instrument(jar_xm_context_t* ctx, uint16_t, bool);
+bool2 jar_xm_mute_instrument(jar_xm_context_t* ctx, uint16_t, bool2);
 
 //** Get the module name as a NUL-terminated string.
 const char* jar_xm_get_module_name(jar_xm_context_t* ctx);
@@ -296,9 +296,9 @@ struct jar_xm_envelope_s {
     uint8_t sustain_point;
     uint8_t loop_start_point;
     uint8_t loop_end_point;
-    bool enabled;
-    bool sustain_enabled;
-    bool loop_enabled;
+    bool2 enabled;
+    bool2 sustain_enabled;
+    bool2 loop_enabled;
 };
 typedef struct jar_xm_envelope_s jar_xm_envelope_t;
 
@@ -333,7 +333,7 @@ struct jar_xm_sample_s {
      uint8_t vibrato_rate;
      uint16_t volume_fadeout;
      uint64_t latest_trigger;
-     bool muted;
+     bool2 muted;
 
      jar_xm_sample_t* samples;
  };
@@ -383,14 +383,14 @@ struct jar_xm_sample_s {
      float period;
      float frequency;
      float step;
-     bool ping; /* For ping-pong samples: true is -->, false is <-- */
+     bool2 ping; /* For ping-pong samples: BOOL_TRUE is -->, BOOL_FALSE is <-- */
 
      float volume; /* Ideally between 0 (muted) and 1 (loudest) */
      float panning; /* Between 0 (left) and 1 (right); 0.5 is centered */
 
      uint16_t autovibrato_ticks;
 
-     bool sustained;
+     bool2 sustained;
      float fadeout_volume;
      float volume_envelope_volume;
      float panning_envelope_panning;
@@ -399,7 +399,7 @@ struct jar_xm_sample_s {
 
      float autovibrato_note_offset;
 
-     bool arp_in_progress;
+     bool2 arp_in_progress;
      uint8_t arp_note_offset;
      uint8_t volume_slide_param;
      uint8_t fine_volume_slide_param;
@@ -417,22 +417,22 @@ struct jar_xm_sample_s {
      uint8_t note_delay_param;
      uint8_t pattern_loop_origin; /* Where to restart a E6y loop */
      uint8_t pattern_loop_count; /* How many loop passes have been done */
-     bool vibrato_in_progress;
+     bool2 vibrato_in_progress;
      jar_xm_waveform_type_t vibrato_waveform;
-     bool vibrato_waveform_retrigger; /* True if a new note retriggers the waveform */
+     bool2 vibrato_waveform_retrigger; /* BOOL_TRUE if a new note retriggers the waveform */
      uint8_t vibrato_param;
      uint16_t vibrato_ticks; /* Position in the waveform */
      float vibrato_note_offset;
      jar_xm_waveform_type_t tremolo_waveform;
-     bool tremolo_waveform_retrigger;
+     bool2 tremolo_waveform_retrigger;
      uint8_t tremolo_param;
      uint8_t tremolo_ticks;
      float tremolo_volume;
      uint8_t tremor_param;
-     bool tremor_on;
+     bool2 tremor_on;
 
      uint64_t latest_trigger;
-     bool muted;
+     bool2 muted;
 
      //* These values are updated at the end of each tick, to save a couple of float operations on every generated sample.
      float target_panning;
@@ -471,8 +471,8 @@ struct jar_xm_sample_s {
      float remaining_samples_in_tick;
      uint64_t generated_samples;
 
-     bool position_jump;
-     bool pattern_break;
+     bool2 position_jump;
+     bool2 pattern_break;
      uint8_t jump_dest;
      uint8_t jump_row;
 
@@ -542,7 +542,7 @@ int jar_xm_create_context_safe(jar_xm_context_t** ctxp, const char* moddata, siz
         return 2;
     }
 
-    /* Initialize most of the fields to 0, 0.f, NULL or false depending on type */
+    /* Initialize most of the fields to 0, 0.f, NULL or BOOL_FALSE depending on type */
     memset(mempool, 0, bytes_needed);
 
     ctx = (*ctxp = (jar_xm_context_t *)mempool);
@@ -565,11 +565,11 @@ int jar_xm_create_context_safe(jar_xm_context_t** ctxp, const char* moddata, siz
 
     for(uint8_t i = 0; i < ctx->module.num_channels; ++i) {
         jar_xm_channel_context_t *ch = ctx->channels + i;
-        ch->ping = true;
+        ch->ping = BOOL_TRUE;
         ch->vibrato_waveform = jar_xm_SINE_WAVEFORM;
-        ch->vibrato_waveform_retrigger = true;
+        ch->vibrato_waveform_retrigger = BOOL_TRUE;
         ch->tremolo_waveform = jar_xm_SINE_WAVEFORM;
-        ch->tremolo_waveform_retrigger = true;
+        ch->tremolo_waveform_retrigger = BOOL_TRUE;
         ch->volume = ch->volume_envelope_volume = ch->fadeout_volume = 1.0f;
         ch->panning = ch->panning_envelope_panning = .5f;
         ch->actual_volume = .0f;
@@ -602,14 +602,14 @@ uint8_t jar_xm_get_loop_count(jar_xm_context_t *ctx) {
     return ctx->loop_count;
 }
 
-bool jar_xm_mute_channel(jar_xm_context_t *ctx, uint16_t channel, bool mute) {
-    bool old = ctx->channels[channel - 1].muted;
+bool2 jar_xm_mute_channel(jar_xm_context_t *ctx, uint16_t channel, bool2 mute) {
+    bool2 old = ctx->channels[channel - 1].muted;
     ctx->channels[channel - 1].muted = mute;
     return old;
 }
 
-bool jar_xm_mute_instrument(jar_xm_context_t *ctx, uint16_t instr, bool mute) {
-    bool old = ctx->module.instruments[instr - 1].muted;
+bool2 jar_xm_mute_instrument(jar_xm_context_t *ctx, uint16_t instr, bool2 mute) {
+    bool2 old = ctx->module.instruments[instr - 1].muted;
     ctx->module.instruments[instr - 1].muted = mute;
     return old;
 }
@@ -1179,15 +1179,15 @@ static void jar_xm_tremolo(jar_xm_context_t* ctx, jar_xm_channel_context_t* ch, 
 static void jar_xm_arpeggio(jar_xm_context_t* ctx, jar_xm_channel_context_t* ch, uint8_t param, uint16_t tick) {
     switch(tick % 3) {
     case 0:
-        ch->arp_in_progress = false;
+        ch->arp_in_progress = BOOL_FALSE;
         ch->arp_note_offset = 0;
         break;
     case 2:
-        ch->arp_in_progress = true;
+        ch->arp_in_progress = BOOL_TRUE;
         ch->arp_note_offset = param >> 4;
         break;
     case 1:
-        ch->arp_in_progress = true;
+        ch->arp_in_progress = BOOL_TRUE;
         ch->arp_note_offset = param & 0x0F;
         break;
     }
@@ -1428,10 +1428,10 @@ static void jar_xm_handle_note_and_instrument(jar_xm_context_t* ctx, jar_xm_chan
                 break;
             case jar_xm_PING_PONG_LOOP:
                 if(final_offset >= ch->sample->loop_end) {
-                    ch->ping = false;
+                    ch->ping = BOOL_FALSE;
                     ch->sample_position = (ch->sample->loop_end << 1) - ch->sample_position;
                 } else if(final_offset >= ch->sample->length) {
-                    ch->ping = false;
+                    ch->ping = BOOL_FALSE;
                     ch->sample_position -= ch->sample->length - 1;
                 } else {
                     ch->sample_position = final_offset;
@@ -1445,7 +1445,7 @@ static void jar_xm_handle_note_and_instrument(jar_xm_context_t* ctx, jar_xm_chan
         break;
     case 0xB: /* Bxx: Position jump */
         if(s->effect_param < ctx->module.length) {
-            ctx->position_jump = true;
+            ctx->position_jump = BOOL_TRUE;
             ctx->jump_dest = s->effect_param;
         }
         break;
@@ -1454,7 +1454,7 @@ static void jar_xm_handle_note_and_instrument(jar_xm_context_t* ctx, jar_xm_chan
         break;
     case 0xD: /* Dxx: Pattern break */
         /* Jump after playing this line */
-        ctx->pattern_break = true;
+        ctx->pattern_break = BOOL_TRUE;
         ctx->jump_row = (s->effect_param >> 4) * 10 + (s->effect_param & 0x0F);
         break;
     case 0xE: /* EXy: Extended command */
@@ -1482,10 +1482,10 @@ static void jar_xm_handle_note_and_instrument(jar_xm_context_t* ctx, jar_xm_chan
             if(s->effect_param & 0x0F) {
                 if((s->effect_param & 0x0F) == ch->pattern_loop_count) {   /* Loop is over */
                     ch->pattern_loop_count = 0;
-                    ctx->position_jump = false;
+                    ctx->position_jump = BOOL_FALSE;
                 } else {    /* Jump to the beginning of the loop */
                     ch->pattern_loop_count++;
-                    ctx->position_jump = true;
+                    ctx->position_jump = BOOL_TRUE;
                     ctx->jump_row = ch->pattern_loop_origin;
                     ctx->jump_dest = ctx->current_table_index;
                 }
@@ -1584,7 +1584,7 @@ static void jar_xm_handle_note_and_instrument(jar_xm_context_t* ctx, jar_xm_chan
 static void jar_xm_trigger_note(jar_xm_context_t* ctx, jar_xm_channel_context_t* ch, unsigned int flags) {
     if (!(flags & jar_xm_TRIGGER_KEEP_SAMPLE_POSITION)) {
         ch->sample_position = 0.f;
-        ch->ping = true;
+        ch->ping = BOOL_TRUE;
     };
 
     if (!(flags & jar_xm_TRIGGER_KEEP_VOLUME)) {
@@ -1593,13 +1593,13 @@ static void jar_xm_trigger_note(jar_xm_context_t* ctx, jar_xm_channel_context_t*
         };
     };
     ch->panning = ch->sample->panning;
-    ch->sustained = true;
+    ch->sustained = BOOL_TRUE;
     ch->fadeout_volume = ch->volume_envelope_volume = 1.0f;
     ch->panning_envelope_panning = .5f;
     ch->volume_envelope_frame_count = ch->panning_envelope_frame_count = 0;
     ch->vibrato_note_offset = 0.f;
     ch->tremolo_volume = 0.f;
-    ch->tremor_on = false;
+    ch->tremor_on = BOOL_FALSE;
     ch->autovibrato_ticks = 0;
 
     if(ch->vibrato_waveform_retrigger) { ch->vibrato_ticks = 0; } /* XXX: should the waveform itself also be reset to sine? */
@@ -1620,7 +1620,7 @@ static void jar_xm_cut_note(jar_xm_channel_context_t* ch) {
 }
 
 static void jar_xm_key_off(jar_xm_channel_context_t* ch) {
-    ch->sustained = false; /* Key Off */
+    ch->sustained = BOOL_FALSE; /* Key Off */
     if(ch->instrument == NULL || !ch->instrument->volume_envelope.enabled) { jar_xm_cut_note(ch); } /* If no volume envelope is used, also cut the note */
 }
 
@@ -1628,19 +1628,19 @@ static void jar_xm_row(jar_xm_context_t* ctx) {
     if(ctx->position_jump) {
         ctx->current_table_index = ctx->jump_dest;
         ctx->current_row = ctx->jump_row;
-        ctx->position_jump = false;
-        ctx->pattern_break = false;
+        ctx->position_jump = BOOL_FALSE;
+        ctx->pattern_break = BOOL_FALSE;
         ctx->jump_row = 0;
         jar_xm_post_pattern_change(ctx);
     } else if(ctx->pattern_break) {
         ctx->current_table_index++;
         ctx->current_row = ctx->jump_row;
-        ctx->pattern_break = false;
+        ctx->pattern_break = BOOL_FALSE;
         ctx->jump_row = 0;
         jar_xm_post_pattern_change(ctx);
     }
     jar_xm_pattern_t* cur = ctx->module.patterns + ctx->module.pattern_table[ctx->current_table_index];
-    bool in_a_loop = false;
+    bool2 in_a_loop = BOOL_FALSE;
 
     /* Read notes information for all channels into temporary pattern slot */
     for(uint8_t i = 0; i < ctx->module.num_channels; ++i) {
@@ -1657,7 +1657,7 @@ static void jar_xm_row(jar_xm_context_t* ctx) {
         }
         if(!in_a_loop && ch->pattern_loop_count > 0) {
             // clarify if in a loop or not
-            in_a_loop = true;
+            in_a_loop = BOOL_TRUE;
         }
     }
 
@@ -1728,12 +1728,12 @@ static void jar_xm_tick(jar_xm_context_t* ctx) {
         jar_xm_envelopes(ch);
         jar_xm_autovibrato(ctx, ch);
         if(ch->arp_in_progress && !HAS_ARPEGGIO(ch->current)) {
-            ch->arp_in_progress = false;
+            ch->arp_in_progress = BOOL_FALSE;
             ch->arp_note_offset = 0;
             jar_xm_update_frequency(ctx, ch);
         }
         if(ch->vibrato_in_progress && !HAS_VIBRATO(ch->current)) {
-            ch->vibrato_in_progress = false;
+            ch->vibrato_in_progress = BOOL_FALSE;
             ch->vibrato_note_offset = 0.f;
             jar_xm_update_frequency(ctx, ch);
         }
@@ -1764,7 +1764,7 @@ static void jar_xm_tick(jar_xm_context_t* ctx) {
             ch->vibrato_param = (ch->vibrato_param & 0x0F) | ((ch->current->volume_column & 0x0F) << 4);
             break;
         case 0xB0: // Vibrato
-            ch->vibrato_in_progress = false;
+            ch->vibrato_in_progress = BOOL_FALSE;
             jar_xm_vibrato(ctx, ch, ch->vibrato_param, ch->vibrato_ticks++);
             break;
         case 0xC0: // Set panning
@@ -1797,7 +1797,7 @@ static void jar_xm_tick(jar_xm_context_t* ctx) {
                 switch(arp_offset) {
                 case 2: /* 0 -> x -> 0 -> y -> x -> … */
                     if(ctx->current_tick == 1) {
-                        ch->arp_in_progress = true;
+                        ch->arp_in_progress = BOOL_TRUE;
                         ch->arp_note_offset = ch->current->effect_param >> 4;
                         jar_xm_update_frequency(ctx, ch);
                         break;
@@ -1805,7 +1805,7 @@ static void jar_xm_tick(jar_xm_context_t* ctx) {
                     /* No break here, this is intended */
                 case 1: /* 0 -> 0 -> y -> x -> … */
                     if(ctx->current_tick == 0) {
-                        ch->arp_in_progress = false;
+                        ch->arp_in_progress = BOOL_FALSE;
                         ch->arp_note_offset = 0;
                         jar_xm_update_frequency(ctx, ch);
                         break;
@@ -1833,7 +1833,7 @@ static void jar_xm_tick(jar_xm_context_t* ctx) {
             break;
         case 4: /* 4xy: Vibrato */
             if(ctx->current_tick == 0) break;
-            ch->vibrato_in_progress = true;
+            ch->vibrato_in_progress = BOOL_TRUE;
             jar_xm_vibrato(ctx, ch, ch->vibrato_param, ch->vibrato_ticks++);
             break;
         case 5: /* 5xy: Tone portamento + Volume slide */
@@ -1843,7 +1843,7 @@ static void jar_xm_tick(jar_xm_context_t* ctx) {
             break;
         case 6: /* 6xy: Vibrato + Volume slide */
             if(ctx->current_tick == 0) break;
-            ch->vibrato_in_progress = true;
+            ch->vibrato_in_progress = BOOL_TRUE;
             jar_xm_vibrato(ctx, ch, ch->vibrato_param, ch->vibrato_ticks++);
             jar_xm_volume_slide(ch, ch->volume_slide_param);
             break;
@@ -2041,11 +2041,11 @@ static void jar_xm_next_of_sample(jar_xm_context_t* ctx, jar_xm_channel_context_
             };
             ch->sample_position += ch->step;
             if(ch->sample_position >= ch->sample->loop_end) {
-                ch->ping = false;
+                ch->ping = BOOL_FALSE;
                 ch->sample_position = (ch->sample->loop_end << 1) - ch->sample_position;
             };
             if(ch->sample_position >= ch->sample->length) {
-                ch->ping = false;
+                ch->ping = BOOL_FALSE;
                 ch->sample_position -= ch->sample->length - 1;
             };
         } else {
@@ -2061,11 +2061,11 @@ static void jar_xm_next_of_sample(jar_xm_context_t* ctx, jar_xm_channel_context_
             };
             ch->sample_position -= ch->step;
             if(ch->sample_position <= ch->sample->loop_start) {
-                ch->ping = true;
+                ch->ping = BOOL_TRUE;
                 ch->sample_position = (ch->sample->loop_start << 1) - ch->sample_position;
             };
             if (ch->sample_position <= .0f) {
-                ch->ping = true;
+                ch->ping = BOOL_TRUE;
                 ch->sample_position = .0f;
             };
         };

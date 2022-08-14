@@ -25,8 +25,8 @@ bool RGravityPoint::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, floa
     if (!InRange(mag)) return false;
 
     // Update vectors.
-    if (outDir) *outDir = dir;
-    if (outDist) *outDist = mag;
+    *outDir = dir;
+    *outDist = mag;
     return true;
 
 }

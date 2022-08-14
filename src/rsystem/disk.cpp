@@ -6,16 +6,6 @@ RGravityDisk::RGravityDisk(glm::vec3 pos, glm::vec3 direction, glm::vec3 sideDir
     UpdateMtxIdentity();
 }
 
-void RGravityDisk::UpdateMtx(const glm::mat4& mtx)
-{
-    posTranslated = mtx * glm::vec4(pos, 1.0f);
-    directionTranslated = mtx * glm::vec4(direction, 0.0f);
-    sideDirectionTranslated = mtx * glm::vec4(sideDirectionOrtho, 0.0f);
-    float len = glm::length(sideDirectionTranslated);
-    sideDirectionTranslated = glm::normalize(sideDirectionTranslated);
-    worldRadius = radius * len;
-}
-
 void RGravityDisk::UpdateParams()
 {
     float theta = glm::radians(validDegrees * 0.5f);
@@ -24,6 +14,16 @@ void RGravityDisk::UpdateParams()
     glm::vec3 orthoNormal = direction * -len + sideDirection;
     glm::mat4 tmpMat = glm::rotate(glm::mat4(1.0f), theta, direction);
     sideDirectionOrtho = tmpMat * glm::vec4(orthoNormal, 1.0f);
+}
+
+void RGravityDisk::UpdateMtx(const glm::mat4& mtx)
+{
+    posTranslated = mtx * glm::vec4(pos, 1.0f);
+    directionTranslated = mtx * glm::vec4(direction, 0.0f);
+    sideDirectionTranslated = mtx * glm::vec4(sideDirectionOrtho, 0.0f);
+    float len = glm::length(sideDirectionTranslated);
+    sideDirectionTranslated = glm::normalize(sideDirectionTranslated);
+    worldRadius = radius * len;
 }
 
 bool RGravityDisk::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist)
@@ -35,7 +35,7 @@ bool RGravityDisk::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float
 
     // Wrong side.
     if (dot < 0.0f && !bothSides) return false;
-    
+
     // Degree is valid.
     glm::vec3 tmp = dirToPos - directionTranslated * dot;
     float len = glm::length(tmp);
@@ -69,8 +69,8 @@ bool RGravityDisk::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float
 
     // Clean up.
     if (!InRange(dist)) return false;
-    if (outDir) *outDir = gravity;
-    if (outDist) *outDist = dist;
+    *outDir = gravity;
+    *outDist = dist;
     return true;
 
 }
