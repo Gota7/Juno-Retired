@@ -36,13 +36,13 @@ struct RGravityParallel : RGravity
     glm::mat4 boxMtxTranslated; // Is generated.
 
     // Make a spherical range.
-    RGravityParallel(glm::vec3 pos, glm::vec3 direction, RGravityParallelDistanceTypeEnum distanceType, float baseDistance);
+    RGravityParallel(glm::vec3 pos, glm::vec3 direction, float baseDistance);
 
     // Make a box range.
     RGravityParallel(glm::vec3 pos, glm::vec3 direction, RGravityParallelDistanceTypeEnum distanceType, glm::mat4 boxMtx);
 
     // Make a cylindrical range.
-    RGravityParallel(glm::vec3 pos, glm::vec3 direction, RGravityParallelDistanceTypeEnum distanceType, float cylinderRadius, float cylinderHeight);
+    RGravityParallel(glm::vec3 pos, glm::vec3 direction, float cylinderRadius, float cylinderHeight);
 
     // Spherical range.
     bool IsInSphericalRange(const glm::vec3& pos, float* outDist);
