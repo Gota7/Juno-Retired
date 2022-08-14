@@ -10,3 +10,11 @@
 	path = subs/glfw
 	url = https://github.com/glfw/glfw
 	branch = c18851f52ec9704eb06464058a600845ec1eada1
+[submodule "subs/pugixml"]
+	path = subs/pugixml
+	url = https://github.com/zeux/pugixml
+	branch = 27bc68ab458df6d8652763ea31059a11bcaf3f7d
+[submodule "subs/glm"]
+	path = subs/glm
+	url = https://github.com/g-truc/glm
+	branch = cc98465e3508535ba8c7f6208df934c156a018dc
