@@ -88,8 +88,8 @@ bool RGravityParallel::IsInBoxRange(const glm::vec3& pos, float* outDist)
 bool RGravityParallel::IsInCylindricalRange(const glm::vec3& pos, float* outDist)
 {
     glm::vec3 dirToPoint = pos - posTranslated; // Direction to point in field.
-    float depth = glm::dot(dirToPoint, direction);
-    dirToPoint = direction * -depth + dirToPoint;
+    float depth = glm::dot(dirToPoint, directionTranslated);
+    dirToPoint = directionTranslated * -depth + dirToPoint;
     if (depth < 0.0f || depth > cylinderHeight) return false;
     float mag = glm::length(dirToPoint);
     if (mag > cylinderRadius) return false;
@@ -132,8 +132,27 @@ bool RGravityParallel::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, f
 
 glm::vec3 RGravityParallel::RandomInRange()
 {
-    float min = offset;
-    float max = range;
-    if (max < min) max = 1000.0f; // Some arbitrary high number.
-    return posTranslated + glm::normalize(glm::vec3(rand() % 1000 - 500, rand() % 1000 - 500, rand() % 1000 - 500)) * ((rand() % 1000) / 1000.0f * (max - min) + min);
+    if (rangeType == PARALLEL_RANGE_SPHERE)
+    {
+        float min = offset;
+        float max = range;
+        if (max < min) max = 1000.0f; // Some arbitrary high number.
+        return posTranslated + glm::normalize(glm::vec3(JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f))) * JRandom::RandomInRange(min, max);
+    }
+    else if (rangeType == PARALLEL_RANGE_CYLINDER)
+    {
+        float theta = JRandom::RandomInRange(0.0f, glm::two_pi<float>());
+        float mag = JRandom::RandomInRange(0, cylinderRadius);
+        glm::vec3 dst(glm::cos(theta) * mag, JRandom::RandomInRange(0, cylinderHeight), glm::sin(theta) * mag);
+        glm::mat4 tmp = glm::translate(glm::mat4(1.0f), posTranslated);
+        return tmp * glm::vec4(dst, 1.0f);
+    }
+    else if (rangeType == PARALLEL_RANGE_BOX)
+    {
+        return glm::vec3(0.0f);
+    }
+    else
+    {
+        return glm::vec3(0.0f);
+    }
 }

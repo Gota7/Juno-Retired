@@ -36,5 +36,5 @@ glm::vec3 RGravityPoint::RandomInRange()
     float min = offset;
     float max = range;
     if (max < min) max = 1000.0f; // Some arbitrary high number.
-    return posTranslated + glm::normalize(glm::vec3(rand() % 1000 - 500, rand() % 1000 - 500, rand() % 1000 - 500)) * ((rand() % 1000) / 1000.0f * (max - min) + min);
+    return posTranslated + glm::normalize(glm::vec3(JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f))) * JRandom::RandomInRange(min, max);
 }

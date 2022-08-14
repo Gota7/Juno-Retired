@@ -15,6 +15,7 @@
 #include "jsystem/material.h"
 #include "jsystem/mesh.h"
 #include "jsystem/model.h"
+#include "jsystem/rand.h"
 #include "jsystem/shader.h"
 #include "jsystem/texture.h"
 #include "jsystem/window.h"
