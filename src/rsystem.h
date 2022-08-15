@@ -7,4 +7,5 @@
 #include "rsystem/parallel.h"
 #include "rsystem/point.h"
 #include "rsystem/segment.h"
+#include "rsystem/torus.h"
 #include "rsystem/wire.h"
