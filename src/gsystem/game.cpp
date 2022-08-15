@@ -41,10 +41,7 @@ GGame::GGame()
     particleMgr = std::make_unique<PManager>(5);
     //auto& system = particleMgr->AddSystemGravity("GrvityTest", make_unique<RGravityParallel>(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f), 1.0f, 3.0f));
     std::vector<glm::vec3> points;
-    points.push_back(glm::vec3(0.0f));
-    points.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
-    points.push_back(glm::vec3(2.5f, 0.5f, 0.0f));
-    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityWire>(points));
+    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravitySegment>(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 90.0f, false, false));
     system.gravity->range = 3.0f;
     //system.gravity->offset = 1.5f;
 
