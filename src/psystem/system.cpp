@@ -1,6 +1,9 @@
 #include "system.h"
 
 #include "manager.h"
+#if WIN32
+    #define YAML_CPP_STATIC_DEFINE
+#endif
 #include <yaml-cpp/yaml.h>
 
 PSystemDefinition::PSystemDefinition(PTextureCache& texCache, std::string name)

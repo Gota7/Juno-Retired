@@ -1,5 +1,8 @@
 #include "spawnInfo.h"
 
+#if WIN32
+    #define YAML_CPP_STATIC_DEFINE
+#endif
 #include <yaml-cpp/yaml.h>
 
 namespace YAML {
