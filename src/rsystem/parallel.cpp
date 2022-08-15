@@ -149,7 +149,8 @@ glm::vec3 RGravityParallel::RandomInRange()
     }
     else if (rangeType == PARALLEL_RANGE_BOX)
     {
-        return glm::vec3(0.0f);
+        glm::vec3 tmp(JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f));
+        return glm::vec4(tmp, 1.0f) * boxMtxTranslated;
     }
     else
     {

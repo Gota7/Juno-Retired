@@ -37,10 +37,11 @@ GGame::GGame()
     lightDirectional->ambient = glm::vec3(1.0f, 0.501f, 0.188f) * 0.45f;
     lightDirectional->SetVars(*shader);
 
-    // Particle manager.
+    // Particle manager. TODO: FINISH CYLINDER GRAVITY!!!
     particleMgr = std::make_unique<PManager>(5);
     //auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityDisk>(glm::vec3(0.0f, -2.7f, -4.2f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 5.5f));
-    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityParallel>(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f), 1.0f, 3.0f));
+    //auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityParallel>(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f), 1.0f, 3.0f));
+    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityParallel>(glm::vec3(0.0f), glm::vec3(1.0f, -1.0f, 0.0f), PARALLEL_DISTANCE_DEFAULT, glm::rotate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 2.0f, 1.0f)), 45.0f, glm::vec3(1.0f, 0.0f, 0.0f))));
     system.gravity->range = 3.0f;
     //system.gravity->offset = 1.5f;
 
