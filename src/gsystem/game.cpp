@@ -41,7 +41,7 @@ GGame::GGame()
     particleMgr = std::make_unique<PManager>(5);
     //auto& system = particleMgr->AddSystemGravity("GrvityTest", make_unique<RGravityParallel>(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f), 1.0f, 3.0f));
     std::vector<glm::vec3> points;
-    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityTorus>(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 2.0f, 2.0f, TORUS_TYPE_BOTH, true));
+    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityCone>(glm::mat4(1.0f), 0.0f, false));
     system.gravity->range = 5.0f;
     //system.gravity->offset = 1.5f;
 
