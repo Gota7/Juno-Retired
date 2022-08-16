@@ -89,7 +89,7 @@ bool RGravityParallel::IsInCylindricalRange(const glm::vec3& pos, float* outDist
 {
     glm::vec3 dirToPoint = pos - posTranslated; // Direction to point in field.
     float depth = glm::dot(dirToPoint, directionTranslated);
-    dirToPoint = directionTranslated * -depth + dirToPoint;
+    dirToPoint = directionTranslated + dirToPoint * -depth;
     if (depth < 0.0f || depth > cylinderHeight) return false;
     float mag = glm::length(dirToPoint);
     if (mag > cylinderRadius) return false;
@@ -106,6 +106,24 @@ bool RGravityParallel::IsInRange(const glm::vec3& pos, float* outDist)
         case PARALLEL_RANGE_CYLINDER: return IsInCylindricalRange(pos, outDist);
     }
     return false;
+}
+
+glm::mat4 RGravityParallel::MakeMtxUp(glm::vec3 up, glm::vec3 pos)
+{
+    glm::mat4 mat(1.0f);
+    int maxElemIndex = 0;
+    if (glm::abs(up.y) > glm::abs(up.x) && glm::abs(up.y) > glm::abs(up.z)) maxElemIndex = 1;
+    if (glm::abs(up.z) > glm::abs(up.x) && glm::abs(up.z) > glm::abs(up.y)) maxElemIndex = 2;
+    glm::vec3 front = maxElemIndex == 2 ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.0f);
+    glm::vec3 upNorm = glm::normalize(up);
+    glm::vec3 side = glm::cross(up, front);
+    side = glm::normalize(side);
+    glm::vec3 frontNorm = glm::cross(side, upNorm);
+    mat[0] = glm::vec4(side, 0.0f);
+    mat[1] = glm::vec4(upNorm, 0.0f);
+    mat[2] = glm::vec4(frontNorm, 0.0f);
+    mat[3] = glm::vec4(pos, 1.0f);
+    return mat;
 }
 
 void RGravityParallel::UpdateMtx(const glm::mat4& mtx)
@@ -144,8 +162,7 @@ glm::vec3 RGravityParallel::RandomInRange()
         float theta = JRandom::RandomInRange(0.0f, glm::two_pi<float>());
         float mag = JRandom::RandomInRange(0, cylinderRadius);
         glm::vec3 dst(glm::cos(theta) * mag, JRandom::RandomInRange(0, cylinderHeight), glm::sin(theta) * mag);
-        glm::mat4 tmp = glm::translate(glm::mat4(1.0f), posTranslated);
-        return tmp * glm::vec4(dst, 1.0f);
+        return MakeMtxUp(directionTranslated, posTranslated) * glm::vec4(dst, 1.0f);
     }
     else if (rangeType == PARALLEL_RANGE_BOX)
     {

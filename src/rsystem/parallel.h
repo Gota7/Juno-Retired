@@ -56,6 +56,9 @@ struct RGravityParallel : RGravity
     // Check if it's in range.
     bool IsInRange(const glm::vec3& pos, float* outDist);
 
+    // Make matrix up for a cylinder randomization.
+    glm::mat4 MakeMtxUp(glm::vec3 up, glm::vec3 pos);
+
     // Virtual functions.
     virtual void UpdateMtx(const glm::mat4& mtx);
     virtual bool CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist);
