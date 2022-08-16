@@ -1,8 +1,8 @@
-SkyboxLeft: res/tex/Skybox/left.png
-SkyboxRight: res/tex/Skybox/right.png
-SkyboxTop: res/tex/Skybox/top.png
-SkyboxBottom: res/tex/Skybox/bottom.png
-SkyboxFront: res/tex/Skybox/front.png
-SkyboxBack: res/tex/Skybox/back.png
+SkyboxLeft: res/tex/Skybox/Vaporwave/left.png
+SkyboxRight: res/tex/Skybox/Vaporwave/right.png
+SkyboxTop: res/tex/Skybox/Vaporwave/top.png
+SkyboxBottom: res/tex/Skybox/Vaporwave/bottom.png
+SkyboxFront: res/tex/Skybox/Vaporwave/front.png
+SkyboxBack: res/tex/Skybox/Vaporwave/back.png
 Planets:
   - [res/mdl/GardenPlanet/diskgardenplanet.dae, res/mdl/GardenPlanet/diskgardenplanet.dae, [0.00249999994, 0, 0, 0, 0, 0.00249999994, 0, 0, 0, 0, 0.00249999994, 0, 3, -3, -5, 1]]

@@ -1,0 +1,8 @@
+1. In sphere material open base image file.
+2. For the following camera rotations (degrees) use F12 to take picture and Alt+Shift+S to save image:
+Front: (90, 0, 0)
+Left: (90, 0, 90)
+Back: (90, 0, 180)
+Right: (90, 0, 270)
+Bottom: (0, 0, 0)
+Top: (180, 0, 0)
