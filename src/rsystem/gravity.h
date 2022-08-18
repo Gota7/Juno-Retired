@@ -21,6 +21,7 @@ struct RGravity
     RGravityType type = GRAVITY_NORMAL_SHADOW; // What the gravity field effects.
     bool active = true; // Gravity field will only work if active.
     bool inverted = false; // If to invert the gravity.
+    bool managed = false; // If added by a gravity manager.
 
     // Update internal position to be in world space.
     virtual void UpdateMtx(const glm::mat4& mtx) {}
