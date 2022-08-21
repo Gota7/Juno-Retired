@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../rsystem.h"
+#include "../gravity.h"
 #include "system.h"
 
 // Special system type for gravity tests.

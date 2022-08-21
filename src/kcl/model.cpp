@@ -104,7 +104,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
     std::reverse(dots.begin(), dots.end());
 
     // Order directions appropriately. Probably not the most optimal but I really don't know how to do this.
-    std::vector<glm::vec3&> dirs;
+    std::vector<glm::vec3> dirs;
     if (dots[0] == vD0) dirs.push_back(d0);
     else if (dots[0] == vD1) dirs.push_back(d1);
     else if (dots[0] == vD2) dirs.push_back(d2);

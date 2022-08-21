@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../rsystem.h"
+#include "../gravity.h"
 #include "particle.h"
 #include "system.h"
 #include "systemGravity.h"

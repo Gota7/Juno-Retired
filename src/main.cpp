@@ -2,8 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "asystem.h"
-#include "gsystem.h"
+#include "audio.h"
+#include "game.h"
 #include "jsystem.h"
 
 #define STB_IMAGE_IMPLEMENTATION

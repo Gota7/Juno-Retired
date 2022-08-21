@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../jsystem.h"
-#include "../psystem.h"
+#include "../particle.h"
 #include "scenario.h"
 #include <map>
 #include <memory>
