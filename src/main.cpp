@@ -113,9 +113,11 @@ int main()
 void window_draw(GLFWwindow* window)
 {
 
+#ifndef __APPLE__
     // Use framebuffer.
     framebuffer->Bind();
     glEnable(GL_DEPTH_TEST);
+#endif
 
     // Clear background.
     glClearColor(0.7f, 0.7f, 1.0f, 1.0f);
@@ -124,6 +126,7 @@ void window_draw(GLFWwindow* window)
     // Draw game.
     game->Render();
 
+#ifndef __APPLE__
     // Draw framebuffer.
     glBindFramebuffer(GL_FRAMEBUFFER, EMPTY_FRAMEBUFFER);
     glDisable(GL_DEPTH_TEST);
@@ -133,6 +136,7 @@ void window_draw(GLFWwindow* window)
     glActiveTexture(GL_TEXTURE0);
     framebuffer->texture.Use();
     quadMesh->Render();
+#endif
 
     // Finally update frame.
     JFrame::Update();
