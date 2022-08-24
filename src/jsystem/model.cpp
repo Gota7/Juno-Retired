@@ -1,37 +1,45 @@
 #include "model.h"
 #include <glm/gtc/type_ptr.hpp>
 
-JModel::JModel(std::vector<std::unique_ptr<JMesh>>& meshes, std::vector<std::string> textureNames, std::vector<std::unique_ptr<JMaterialTex>>& materials, JShader& shader, glm::mat4 matrix) :
+JModel::JModel(std::vector<std::unique_ptr<JMesh>>& meshes, std::vector<std::string> textureNames, std::vector<std::unique_ptr<JMaterial>>& materials, JShader& shader, glm::mat4 matrix) :
 matrix(matrix),
 meshes(std::move(meshes)),
 materials(std::move(materials)),
 shader(shader)
 {
     shader.Use();
-    for (auto& tex : textureNames)
+    if (textureNames.size() > 0)
     {
-        AddTexture(tex);
-    }
-    for (auto& mat : this->materials) {
-        mat->diffuse = textureNameToTextureIndex[mat->diffuseName];
-        mat->specular = textureNameToTextureIndex[mat->specularName];
+        for (auto& tex : textureNames)
+        {
+            AddTexture(tex);
+        }
+        for (auto& mat : this->materials) {
+            JMaterialTex* m = static_cast<JMaterialTex*>(mat.get());
+            m->diffuse = textureNameToTextureIndex[m->diffuseName];
+            m->specular = textureNameToTextureIndex[m->specularName];
+        }
     }
 }
 
-JModel::JModel(std::vector<std::unique_ptr<JMesh>>& meshes, ModelCubemapTextures textureNames, std::vector<std::unique_ptr<JMaterialTex>>& materials, JShader& shader, glm::mat4 matrix) :
+JModel::JModel(std::vector<std::unique_ptr<JMesh>>& meshes, ModelCubemapTextures textureNames, std::vector<std::unique_ptr<JMaterial>>& materials, JShader& shader, glm::mat4 matrix) :
 matrix(matrix),
 meshes(std::move(meshes)),
 materials(std::move(materials)),
 shader(shader)
 {
     shader.Use();
-    for (auto& tex : textureNames)
+    if (textureNames.size() > 0)
     {
-        AddTexture(std::get<0>(tex), std::get<1>(tex), std::get<2>(tex), std::get<3>(tex), std::get<4>(tex), std::get<5>(tex));
-    }
-    for (auto& mat : this->materials) {
-        mat->diffuse = textureNameToTextureIndex[mat->diffuseName];
-        mat->specular = textureNameToTextureIndex[mat->specularName];
+        for (auto& tex : textureNames)
+        {
+            AddTexture(std::get<0>(tex), std::get<1>(tex), std::get<2>(tex), std::get<3>(tex), std::get<4>(tex), std::get<5>(tex));
+        }
+        for (auto& mat : this->materials) {
+            JMaterialTex* m = static_cast<JMaterialTex*>(mat.get());
+            m->diffuse = textureNameToTextureIndex[m->diffuseName];
+            m->specular = textureNameToTextureIndex[m->specularName];
+        }
     }
 }
 
@@ -79,8 +87,9 @@ JModel::JModel(std::string path, JShader& shader, glm::mat4 matrix) : shader(sha
         materials.push_back(std::make_unique<JMaterialTex>(diffuseName, specularName));
     }
     for (auto& mat : this->materials) {
-        mat->diffuse = textureNameToTextureIndex[mat->diffuseName];
-        mat->specular = textureNameToTextureIndex[mat->specularName];
+        JMaterialTex* m = static_cast<JMaterialTex*>(mat.get());
+        m->diffuse = textureNameToTextureIndex[m->diffuseName];
+        m->specular = textureNameToTextureIndex[m->specularName];
     }
 
     // Import root node.

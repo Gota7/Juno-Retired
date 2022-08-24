@@ -1,5 +1,6 @@
 #include "scenario.h"
 #include <fstream>
+#include <memory>
 #include <sstream>
 #if WIN32
     #define YAML_CPP_STATIC_DEFINE
@@ -80,7 +81,7 @@ void GScenario::Save(std::string yaml)
 
     // Save skybox.
     root << YAML::BeginMap;
-    std::stringstream skyboxLine(skybox->model->materials[0]->diffuseName);
+    std::stringstream skyboxLine(static_cast<JMaterialTex*>(skybox->model->materials[0].get())->diffuseName);
     std::string skyboxOut;
     root << YAML::Key << "SkyboxLeft";
     std::getline(skyboxLine, skyboxOut, ';');

@@ -6,12 +6,12 @@
 constexpr float FLOOR_TO_WALL_THRESHOLD = glm::radians(67.976f); // TODO: CONVERT THESE TO NON-DOT PRODUCTS!
 constexpr float WALL_TO_CEILING_THRESHOLD = glm::radians(180.0f - 36.889f);
 
-KModel::KModel(std::string path, glm::mat4 matrix)
+KModel::KModel(std::string path, glm::mat4 matrix) : matrix(matrix)
 {
 
     // Initial setup.
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph);
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
@@ -20,7 +20,32 @@ KModel::KModel(std::string path, glm::mat4 matrix)
 
     // Import root node.
     ImportNode(scene, scene->mRootNode);
+    pointIndices.clear();
+    vectorIndices.clear(); // These are only used for construction.
+    invMatrix = glm::inverse(matrix);
 
+}
+
+unsigned int KModel::GetOrAddPoint(glm::vec3 pt)
+{
+    size_t hash = ((std::hash<float>{}(pt.x) * 31 + std::hash<float>{}(pt.y)) * 31 + std::hash<float>{}(pt.z)) * 31;
+    if (pointIndices.find(hash) == pointIndices.end())
+    {
+        pointIndices[hash] = points.size();
+        points.push_back(pt);
+    }
+    return pointIndices[hash];
+}
+
+unsigned int KModel::GetOrAddVec(glm::vec3 vec)
+{
+    size_t hash = ((std::hash<float>{}(vec.x) * 31 + std::hash<float>{}(vec.y)) * 31 + std::hash<float>{}(vec.z)) * 31;
+    if (vectorIndices.find(hash) == vectorIndices.end())
+    {
+        vectorIndices[hash] = vectors.size();
+        vectors.push_back(vec);
+    }
+    return vectorIndices[hash];
 }
 
 void KModel::ImportNode(const aiScene* scene, aiNode* node)
@@ -44,7 +69,97 @@ void KModel::ImportNode(const aiScene* scene, aiNode* node)
 void KModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
 {
 
-    // TODO!!!
+    // Just iterate over triangles.
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+        aiFace* face = &mesh->mFaces[i]; // This is legal, we asked assimp to triangulate.
+        glm::vec3 p1(mesh->mVertices[face->mIndices[0]].x, mesh->mVertices[face->mIndices[0]].y, mesh->mVertices[face->mIndices[0]].z);
+        glm::vec3 p2(mesh->mVertices[face->mIndices[1]].x, mesh->mVertices[face->mIndices[1]].y, mesh->mVertices[face->mIndices[1]].z);
+        glm::vec3 p3(mesh->mVertices[face->mIndices[2]].x, mesh->mVertices[face->mIndices[2]].y, mesh->mVertices[face->mIndices[2]].z);
+        KModelTriangle tri;
+        tri.terrainType = mesh->mMaterialIndex;
+        tri.originPointIndex = GetOrAddPoint(p1);
+        glm::vec3 v0 = p1 - p3;
+        glm::vec3 v1 = p2 - p3;
+        glm::vec3 n = glm::normalize(glm::cross(v0, v1));
+        tri.normalVectorIndex = GetOrAddVec(n);
+        glm::vec3 d0 = glm::normalize(glm::cross(p1 - p3, n));
+        glm::vec3 d1 = glm::normalize(glm::cross(p2 - p1, n));
+        glm::vec3 d2 = glm::normalize(glm::cross(p3 - p2, n));
+        tri.direction0VectorIndex = GetOrAddVec(d0);
+        tri.direction1VectorIndex = GetOrAddVec(d1);
+        tri.direction2VectorIndex = GetOrAddVec(d2);
+        tri.length = glm::dot(p2 - p1, d2);
+        if (matToTriangleMeshes.find(mesh->mMaterialIndex) == matToTriangleMeshes.end())
+        {
+            matToTriangleMeshes[mesh->mMaterialIndex] = std::vector<unsigned int>();
+        }
+        matToTriangleMeshes[mesh->mMaterialIndex].push_back(triangles.size());
+        numMaterials = glm::max(numMaterials, mesh->mMaterialIndex + 1);
+        triangles.push_back(tri);
+    }
+
+}
+
+std::unique_ptr<JModel> KModel::ToJModel(JShader& shader)
+{
+
+    // Create all of the meshes. Doesn't have to be efficient, this is for debug purposes.
+    std::vector<std::unique_ptr<JMesh>> meshes;
+    std::vector<std::unique_ptr<JMaterial>> mats;
+    for (unsigned int i = 0; i < numMaterials; i++)
+    {
+        auto& vecs = matToTriangleMeshes[i];
+        std::vector<Vertex> vertices;
+        std::vector<unsigned int> indices;
+        for (auto ind : vecs)
+        {
+            auto& tri = triangles[ind];
+            glm::vec3 dir0 = vectors[tri.direction0VectorIndex];
+            glm::vec3 dir1 = vectors[tri.direction1VectorIndex];
+            glm::vec3 dir2 = vectors[tri.direction2VectorIndex];
+            glm::vec3 n = vectors[tri.normalVectorIndex];
+            glm::vec3 crossB = glm::cross(n, dir1);
+            glm::vec3 crossA = glm::cross(n, dir0);
+            float dotB = glm::dot(crossB, dir2);
+            float dotA = glm::dot(crossA, dir2);
+            glm::vec3 p1 = points[tri.originPointIndex];
+            glm::vec3 p2 = p1 + crossB * (dotB != 0.0f ? tri.length / dotB : 0.0f);
+            glm::vec3 p3 = p1 + crossA * (dotA != 0.0f ? tri.length / dotA : 0.0f);
+            indices.push_back(vertices.size());
+            vertices.push_back(Vertex(p1));
+            indices.push_back(vertices.size());
+            vertices.push_back(Vertex(p2));
+            indices.push_back(vertices.size());
+            vertices.push_back(Vertex(p3));
+        }
+        mats.push_back(std::make_unique<JMaterialSolid>());
+        JMaterialSolid* mat = static_cast<JMaterialSolid*>(mats[mats.size() - 1].get());
+        glm::vec3 color((255 - (39 * i)) / 255.0f, (255 - (49 * i)) / 255.0f, (41 * i) / 255.0f);
+        mat->ambient = color;
+        mat->diffuse = color;
+        mat->specular = glm::vec3(0.0f);
+        meshes.push_back(std::make_unique<JMesh>(
+            &vertices[0],
+            vertices.size() * sizeof(vertices[0]),
+            GL_STATIC_DRAW,
+            &indices[0],
+            indices.size() * sizeof(indices[0]),
+            GL_STATIC_DRAW,
+            GL_TRIANGLES,
+            indices.size(),
+            GL_UNSIGNED_INT,
+            i
+        ));
+        Vertex::SetAttributes();
+    }
+    return std::make_unique<JModel>(
+        meshes,
+        std::vector<std::string>(),
+        mats,
+        shader,
+        matrix
+    );
 
 }
 

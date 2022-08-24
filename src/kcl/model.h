@@ -38,17 +38,30 @@ struct KModel
     std::vector<glm::vec3> vectors; // Direction vectors. ALL DIRECTIONS SHOULD BE NORMALIZED!
     std::vector<KModelTriangle> triangles; // Actual triangles that make up the model.
     // TODO: OCTREE!
+    std::map<size_t, unsigned int> pointIndices;
+    std::map<size_t, unsigned int> vectorIndices;
+    std::map<unsigned int, std::vector<unsigned int>> matToTriangleMeshes; // Convert a material index to a collection of triangles.
+    unsigned int numMaterials;
     glm::mat4 matrix;
     glm::mat4 invMatrix;
 
     // Create a new collision model.
     KModel(std::string path, glm::mat4 matrix = glm::mat4(1.0f));
 
+    // Get or add a point.
+    unsigned int GetOrAddPoint(glm::vec3 pt);
+
+    // Get or add a vector.
+    unsigned int GetOrAddVec(glm::vec3 vec);
+
     // Import a node.
     void ImportNode(const aiScene* scene, aiNode* node);
 
     // Import a mesh.
     void ImportMesh(const aiScene* scene, aiMesh* mesh);
+
+    // Convert to JModel for convenience.
+    std::unique_ptr<JModel> ToJModel(JShader& shader);
 
     // Calculate penetration of a sphere relative to collision coordinates. Returns if it succeeds.
     bool CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float radius, const glm::vec3& gravDir, KModelPenetrationInfo* outInfo);

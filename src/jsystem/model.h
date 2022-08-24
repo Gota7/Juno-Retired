@@ -26,16 +26,16 @@ struct JModel
     glm::mat4 matrix = glm::mat4(1.0f);
     std::vector<std::unique_ptr<JMesh>> meshes;
     std::vector<std::unique_ptr<JTexture>> textures;
-    std::vector<std::unique_ptr<JMaterialTex>> materials;
+    std::vector<std::unique_ptr<JMaterial>> materials;
     JShader& shader;
     std::map<std::string, int> textureNameToTextureIndex; // Maps texture names to texture IDs.
     std::string relativeDirectory; // Used for loading textures from proper place.
 
     // Create a model from a singular mesh. Note that vertex attributes have to manually be set for each one.
-    JModel(std::vector<std::unique_ptr<JMesh>>& meshes, std::vector<std::string> textureNames, std::vector<std::unique_ptr<JMaterialTex>>& materials, JShader& shader, glm::mat4 matrix = glm::mat4(1.0f));
+    JModel(std::vector<std::unique_ptr<JMesh>>& meshes, std::vector<std::string> textureNames, std::vector<std::unique_ptr<JMaterial>>& materials, JShader& shader, glm::mat4 matrix = glm::mat4(1.0f));
 
     // Create a model from a singular mesh for a skybox. Note that vertex attributes have to manually be set for each one.
-    JModel(std::vector<std::unique_ptr<JMesh>>& meshes, ModelCubemapTextures textureNames, std::vector<std::unique_ptr<JMaterialTex>>& materials, JShader& shader, glm::mat4 matrix = glm::mat4(1.0f));
+    JModel(std::vector<std::unique_ptr<JMesh>>& meshes, ModelCubemapTextures textureNames, std::vector<std::unique_ptr<JMaterial>>& materials, JShader& shader, glm::mat4 matrix = glm::mat4(1.0f));
 
     // Create from a model.
     JModel(std::string path, JShader& shader, glm::mat4 matrix = glm::mat4(1.0f));

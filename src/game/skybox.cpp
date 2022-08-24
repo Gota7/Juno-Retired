@@ -46,7 +46,7 @@ GSkybox::GSkybox(GScenario* scenario, ModelCubemapTextures textures)
             GL_UNSIGNED_INT,
             0
         ));
-        std::vector<std::unique_ptr<JMaterialTex>> materials;
+        std::vector<std::unique_ptr<JMaterial>> materials;
         materials.push_back(std::make_unique<JMaterialTex>(combinedNames, "res/tex/null.png"));
         scenario->modelGroup.models[combinedNames] = std::make_unique<JModel> (
             meshes,

@@ -1,4 +1,5 @@
 #include "game.h"
+#include "../kcl.h"
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
@@ -25,6 +26,10 @@ GGame::GGame()
     shaderList.push_back(std::pair("res/shd/particleVert.glsl", GL_VERTEX_SHADER));
     shaderList.push_back(std::pair("res/shd/particleFrag.glsl", GL_FRAGMENT_SHADER));
     particleShader = std::make_unique<JShader>(shaderList);
+    shaderList.clear();
+    shaderList.push_back(std::pair("res/shd/kclVert.glsl", GL_VERTEX_SHADER));
+    shaderList.push_back(std::pair("res/shd/kclFrag.glsl", GL_FRAGMENT_SHADER));
+    kclShader = std::make_unique<JShader>(shaderList);
 
     // Camera setup.
     camera = std::make_unique<JFreeCam>();
@@ -47,6 +52,10 @@ GGame::GGame()
     matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STATIC_DRAW);
     matrices->ConnectToShader(*shader, "Matrices");
     matrices->ConnectToShader(*particleShader, "Matrices");
+    matrices->ConnectToShader(*kclShader, "Matrices");
+
+    KModel kcl("res/mdl/GardenPlanet/diskgardenplanet.dae", glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, -3.0f, -5.0f)), glm::vec3(1.0f, 1.0f, 1.0f) * 0.0025f));
+    kclTest = kcl.ToJModel(*kclShader);
 
 }
 
@@ -89,7 +98,7 @@ void GGame::Render()
 {
 
     // Update logic.
-    particleMgr->Update();
+    //particleMgr->Update();
     //std::cout << particleMgr->systems.size() << " " << particleMgr->systems[0].particles.size() << std::endl;
 
     // Camera stuff.
@@ -107,9 +116,12 @@ void GGame::Render()
     scenario->skybox->model->shader.SetMatrix("view", glm::value_ptr(glm::mat4(glm::mat3(view))));
 
     // Scenario.
-    scenario->Render();
+    //scenario->Render();
+
+    // Test.
+    kclTest->Render();
 
     // Particles.
-    particleMgr->Render(*particleShader);
+    //particleMgr->Render(*particleShader);
 
 }
