@@ -26,14 +26,7 @@ struct convert<glm::vec3> {
     return true;
   }
 };
-YAML::Emitter& operator << (YAML::Emitter& out, const glm::vec3& v) {
-	out << YAML::Flow << YAML::BeginSeq;
-    out << v.x;
-    out << v.y;
-    out << v.z;
-    out << YAML::EndSeq;
-	return out;
-}
+YAML::Emitter& operator << (YAML::Emitter& out, const glm::vec3& v);
 }
 
 void PSpawnInfo::Load(PTextureCache& texCache, std::string name)

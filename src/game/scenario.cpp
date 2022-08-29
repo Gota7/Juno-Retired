@@ -48,6 +48,34 @@ YAML::Emitter& operator << (YAML::Emitter& out, const glm::mat4& v) {
     out << YAML::EndSeq;
 	return out;
 }
+template<>
+struct convert<glm::vec3> {
+  static Node encode(const glm::vec3& rhs) {
+    Node node;
+    node.push_back(rhs.x);
+    node.push_back(rhs.y);
+    node.push_back(rhs.z);
+    return node;
+  }
+
+  static bool decode(const Node& node, glm::vec3& rhs) {
+    if(!node.IsSequence() || node.size() != 3) {
+      return false;
+    }
+    rhs.x = node[0].as<float>();
+    rhs.y = node[1].as<float>();
+    rhs.z = node[2].as<float>();
+    return true;
+  }
+};
+YAML::Emitter& operator << (YAML::Emitter& out, const glm::vec3& v) {
+	out << YAML::Flow << YAML::BeginSeq;
+    out << v.x;
+    out << v.y;
+    out << v.z;
+    out << YAML::EndSeq;
+	return out;
+}
 }
 
 void GScenario::Load(std::string yaml)
@@ -66,6 +94,50 @@ void GScenario::Load(std::string yaml)
     for (YAML::Node planet : planets)
     {
         this->planets.push_back(std::make_unique<GPlanet>(this, planet[0].as<std::string>(), planet[1].as<std::string>(), planet[2].as<glm::mat4>()));
+    }
+
+    // Colliders.
+    YAML::Node colliders = root["Colliders"];
+    for (YAML::Node col : colliders)
+    {
+        // TODO!!!
+    }
+
+    // Gravities.
+    YAML::Node gravities = root["Gravity"];
+    for (YAML::Node grav : gravities)
+    {
+        std::string type = grav["Type"].as<std::string>();
+        bool found = true;
+        if (type == "Disk")
+        {
+            gravMgr.AddGravity(std::make_unique<RGravityDisk>(
+                grav["Pos"].as<glm::vec3>(),
+                grav["Dir"].as<glm::vec3>(),
+                grav["SideDir"].as<glm::vec3>(),
+                grav["Radius"].as<float>(),
+                grav["ValidDegrees"].IsDefined() ? grav["ValidDegrees"].as<float>() : 360.0f,
+                grav["BothSides"].IsDefined() ? grav["BothSides"].as<bool>() : true,
+                grav["EdgeGravity"].IsDefined() ? grav["EdgeGravity"].as<bool>() : true
+            ), grav["Priority"].IsDefined() ? grav["Priority"].as<unsigned int>() : 0);
+        }
+        else
+        {
+            found = false;
+        }
+        if (found)
+        {
+            auto& last = gravMgr.gravities[gravMgr.gravities.size() - 1];
+            if (grav["Active"].IsDefined()) last->active = grav["Active"].as<bool>();
+            if (grav["Inverted"].IsDefined()) last->inverted = grav["Inverted"].as<bool>();
+            if (grav["Offset"].IsDefined()) last->offset = grav["Offset"].as<float>();
+            if (grav["Range"].IsDefined()) last->range = grav["Range"].as<float>();
+            if (grav["Strength"].IsDefined()) last->strength = grav["Strength"].as<float>();
+            if (grav["Type"].IsDefined())
+            {
+                // TODO!!!
+            }
+        }
     }
 
 }

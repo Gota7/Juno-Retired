@@ -42,10 +42,10 @@ GGame::GGame()
     lightDirectional->ambient = glm::vec3(1.0f, 0.501f, 0.188f) * 0.45f;
     lightDirectional->SetVars(*shader);
 
-    // Particle manager. TODO: FINISH CYLINDER GRAVITY!!!
+    // Particle manager.
     particleMgr = std::make_unique<PManager>(5);
-    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityParallel>(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f), 1.0f, 3.0f));
-    system.gravity->range = 5.0f;
+    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityDisk>(glm::vec3(0.0f, -2.7f, -4.2f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 5.5f));
+    system.gravity->range = 20.0f;
     //system.gravity->offset = 1.5f;
 
     // Uniform buffer setup.
@@ -98,8 +98,7 @@ void GGame::Render()
 {
 
     // Update logic.
-    //particleMgr->Update();
-    //std::cout << particleMgr->systems.size() << " " << particleMgr->systems[0].particles.size() << std::endl;
+    particleMgr->Update();
 
     // Camera stuff.
     camera->Update();
@@ -116,12 +115,12 @@ void GGame::Render()
     scenario->skybox->model->shader.SetMatrix("view", glm::value_ptr(glm::mat4(glm::mat3(view))));
 
     // Scenario.
-    //scenario->Render();
+    scenario->Render();
 
     // Test.
-    kclTest->Render();
+    // kclTest->Render();
 
     // Particles.
-    //particleMgr->Render(*particleShader);
+    particleMgr->Render(*particleShader);
 
 }
