@@ -20,4 +20,5 @@ struct JFrame
 
     // Update time.
     static void Update();
+
 };

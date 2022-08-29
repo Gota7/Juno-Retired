@@ -15,9 +15,11 @@ std::unique_ptr<KMesh> KTreeNodeParent::AddMesh(std::unique_ptr<KMesh> mesh)
     glm::vec3 pos, size;
     float saLeft, saRight;
     std::unique_ptr<KMesh> recall;
-    KUtil::CombinedBoxRange(mesh->pos - mesh->range, mesh->range * 2.0f, left->boxPos, left->boxSize, &pos, &size);
+    pos = mesh->Position();
+    glm::vec3 range = mesh->Range();
+    KUtil::CombinedBoxRange(pos - range, range * 2.0f, left->boxPos, left->boxSize, &pos, &size);
     saLeft = KUtil::SurfaceArea(size);
-    KUtil::CombinedBoxRange(mesh->pos - mesh->range, mesh->range * 2.0f, right->boxPos, right->boxSize, &pos, &size);
+    KUtil::CombinedBoxRange(pos - range, range * 2.0f, right->boxPos, right->boxSize, &pos, &size);
     saRight = KUtil::SurfaceArea(size);
     if (saLeft < saRight)
     {
@@ -45,8 +47,10 @@ void KTreeNodeParent::FindIntersections(const glm::vec3& pos, std::vector<KMesh*
 
 KTreeNodeLeaf::KTreeNodeLeaf(std::unique_ptr<KMesh> mesh)
 {
-    boxPos = mesh->pos - mesh->range;
-    boxSize = mesh->range * 2.0f;
+    glm::vec3 pos = mesh->Position();
+    glm::vec3 range = mesh->Range();
+    boxPos = pos - range;
+    boxSize = range * 2.0f;
     this->mesh = std::move(mesh);
 }
 

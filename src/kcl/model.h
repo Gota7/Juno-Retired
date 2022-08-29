@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../jsystem.h"
+#include "mesh.h"
+#include "octree.h"
 
 // Model triangles.
 // See https://www.youtube.com/watch?v=6hUK1Wbajt4&list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&index=5
@@ -32,18 +34,19 @@ struct KModelPenetrationInfo
 };
 
 // JKCL model file format.
-struct KModel
+struct KModel : KMesh
 {
     std::vector<glm::vec3> points; // Collection of origin points.
     std::vector<glm::vec3> vectors; // Direction vectors. ALL DIRECTIONS SHOULD BE NORMALIZED!
     std::vector<KModelTriangle> triangles; // Actual triangles that make up the model.
-    // TODO: OCTREE!
-    std::map<size_t, unsigned int> pointIndices;
-    std::map<size_t, unsigned int> vectorIndices;
+    KOctree octree; // For quick collision lookup.
+    std::map<size_t, unsigned int> pointIndices; // Used during construction to optimize points.
+    std::map<size_t, unsigned int> vectorIndices; // Used during construction to optimize vectors.
+    std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3>> triangleData; // Used during construction for octree generation.
     std::map<unsigned int, std::vector<unsigned int>> matToTriangleMeshes; // Convert a material index to a collection of triangles.
-    unsigned int numMaterials;
-    glm::mat4 matrix;
-    glm::mat4 invMatrix;
+    unsigned int numMaterials; // Number of materials in the model. Used to convert to JModel.
+    glm::mat4 matrix; // General matrix.
+    glm::mat4 invMatrix; // Inverse matrix.
 
     // Create a new collision model.
     KModel(std::string path, glm::mat4 matrix = glm::mat4(1.0f));
@@ -67,6 +70,11 @@ struct KModel
     bool CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float radius, const glm::vec3& gravDir, KModelPenetrationInfo* outInfo);
 
     // Make a sphere stop colliding with the mesh. Make sure to only pass one floor collision at a time.
-    static void Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo> penetrations);
+    static void Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& penetrations);
+
+    // V-functions.
+    virtual glm::vec3 Position();
+    virtual glm::vec3 Range();
+    virtual void Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir);
 
 };

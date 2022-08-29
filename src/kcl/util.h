@@ -15,4 +15,10 @@ struct KUtil
     // Surface area of a box.
     static float SurfaceArea(const glm::vec3& size);
 
+    // Square an item.
+    static inline constexpr auto Square(auto val)
+    {
+        return val * val;
+    }
+
 };

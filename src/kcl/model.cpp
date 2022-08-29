@@ -1,4 +1,5 @@
 #include "model.h"
+#include "util.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -20,8 +21,10 @@ KModel::KModel(std::string path, glm::mat4 matrix) : matrix(matrix)
 
     // Import root node.
     ImportNode(scene, scene->mRootNode);
+    octree = KOctree(triangleData, 15, 1.0f);
     pointIndices.clear();
-    vectorIndices.clear(); // These are only used for construction.
+    vectorIndices.clear();
+    triangleData.clear(); // These are only used for construction.
     invMatrix = glm::inverse(matrix);
 
 }
@@ -97,6 +100,7 @@ void KModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
         matToTriangleMeshes[mesh->mMaterialIndex].push_back(triangles.size());
         numMaterials = glm::max(numMaterials, mesh->mMaterialIndex + 1);
         triangles.push_back(tri);
+        triangleData.push_back({ p1, p2, p3, n });
     }
 
 }
@@ -135,7 +139,7 @@ std::unique_ptr<JModel> KModel::ToJModel(JShader& shader)
         }
         mats.push_back(std::make_unique<JMaterialSolid>());
         JMaterialSolid* mat = static_cast<JMaterialSolid*>(mats[mats.size() - 1].get());
-        glm::vec3 color((255 - (39 * i)) / 255.0f, (255 - (49 * i)) / 255.0f, (41 * i) / 255.0f);
+        glm::vec3 color((255 - (39 * i)) % 255 / 255.0f, (255 - (49 * i)) % 255 / 255.0f, (41 * i) % 255 / 255.0f);
         mat->ambient = color;
         mat->diffuse = color;
         mat->specular = glm::vec3(0.0f);
@@ -241,7 +245,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
         {
 
             // The closest edge is the one with the biggest dot product with the direction. I mean what did you expect.
-            float distEdgeToSphere = glm::sqrt(glm::pow(dots[0], 2.0f) + glm::pow(vN, 2.0f));
+            float distEdgeToSphere = glm::sqrt(KUtil::Square(dots[0]) + KUtil::Square(vN));
             if (distEdgeToSphere >= radius) return false; // Too far from the edge to collide.
             vh = dots[0]; // Wow so easy!
 
@@ -254,14 +258,14 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
             float& a1 = dots[1];
             float& aN = vN;
             float c = glm::dot(dirs[0], dirs[1]);
-            if (glm::pow(a1 - a0 * c, 2.0f) / (1 - glm::pow(c, 2.0f)) + glm::pow(a0, 2.0f) + glm::pow(aN, 2.0f) < glm::pow(radius, 2.0f)) return false; // Formula is here: https://youtu.be/6hUK1Wbajt4?list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&t=352
+            if (KUtil::Square(a1 - a0 * c) / (1 - KUtil::Square(c)) + KUtil::Square(a0) + KUtil::Square(aN) < KUtil::Square(radius)) return false; // Formula is here: https://youtu.be/6hUK1Wbajt4?list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&t=352
             vh = glm::sqrt(
-                glm::pow(dots[1] - dots[0] * glm::dot(dirs[0], dirs[1]), 2.0f)
-                / (1 - glm::pow(glm::dot(dirs[0], dirs[1]), 2.0f))
-                    + glm::pow(dots[1], 2.0f)
+                KUtil::Square(dots[1] - dots[0] * glm::dot(dirs[0], dirs[1]))
+                / (1 - KUtil::Square(glm::dot(dirs[0], dirs[1])))
+                    + KUtil::Square(dots[1])
             ); // What in the actual fuck.
         }
-        outInfo->penetration = normalDir * (glm::sqrt(glm::pow(radius, 2.0f) - glm::pow(vh, 2.0f)) - vN);
+        outInfo->penetration = normalDir * (glm::sqrt(KUtil::Square(radius) - KUtil::Square(vh)) - vN);
         outInfo->faceCollision = false;
         return true;
 
@@ -274,7 +278,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
 
 }
 
-void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo> penetrations)
+void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& penetrations)
 {
 
     // First get the aggregate vector.
@@ -304,4 +308,44 @@ void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo> pene
         if (bounds.z > maxBounds.z) maxBounds.z = bounds.z;
         pos += minBounds + maxBounds; // Just add the bounds together to transform the sphere back. Sphere is already in world coordinates.
     }
+}
+
+glm::vec3 KModel::Position()
+{
+    return glm::vec3(matrix * glm::vec4(0.0f)); // Get new origin point.
+}
+
+glm::vec3 KModel::Range()
+{
+    return glm::vec3(1000.0f, 1000.0f, 1000.0f); // Idk very temporary.
+}
+
+void KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
+{
+
+    // Search for triangles.
+    std::vector<unsigned int> tris;
+    octree.GetTriangles(pos, radius, tris);
+
+    // Interact with the triangles.
+    std::vector<KModelPenetrationInfo> pens;
+    bool hasFloor = false;
+    for (auto tri : tris)
+    {
+        KModelPenetrationInfo pen;
+        if (CalcPenetration(triangles[tri], pos, radius, gravDir, &pen))
+        {
+            if (pen.type == PENETRATION_FLOOR)
+            {
+                if (!hasFloor) pens.push_back(pen); // We should only allow one floor collision.
+                hasFloor = true;
+            }
+            else
+            {
+                pens.push_back(pen);
+            }
+        }
+    }
+    Unpenetrate(pos, pens); // Actually take care of making them not penetrated.
+
 }
