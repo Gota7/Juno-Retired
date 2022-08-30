@@ -14,6 +14,7 @@ layout (std140) uniform Matrices
 uniform mat4 model;
 
 // Out to fragment.
+out vec4 EyeSpacePos;
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
@@ -22,7 +23,8 @@ out vec2 TexCoords;
 void main()
 {
     FragPos = vec3(model * vec4(aPos, 1.0));
-    gl_Position = projection * view * vec4(FragPos, 1.0);
+    EyeSpacePos = view * vec4(FragPos, 1.0);
+    gl_Position = projection * EyeSpacePos;
     Normal = mat3(transpose(inverse(model))) * aNormal; // Note: Do the matrix creation before hand on CPU, inverse is expensive for shaders!
     TexCoords = aTexCoords;
 }

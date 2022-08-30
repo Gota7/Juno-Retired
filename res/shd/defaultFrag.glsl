@@ -34,7 +34,17 @@ struct LightSpot {
     float outerCutOff;
 };
 
+struct Fog {
+    vec3 color;
+    float start;
+    float end;
+    float density;
+    int type;
+    bool enabled;
+};
+
 // In vals.
+in vec4 EyeSpacePos;
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoords;
@@ -48,6 +58,7 @@ uniform LightDirectional lightDirectional;
 uniform LightSpot lightSpot;
 uniform Material material;
 uniform vec3 viewPos;
+uniform Fog fog;
 
 // calculates the color when using a directional light.
 vec4 CalcDirLight(LightDirectional light, vec3 normal, vec3 viewDir)
@@ -125,6 +136,28 @@ vec4 CalcSpotLight(LightSpot light, vec3 normal, vec3 fragPos, vec3 viewDir)
     return (ambient + diffuse + specular);
 }
 
+// Calculate fog.
+float getFogFactor(float fogCoordinate)
+{
+	float result = 0.0;
+	if (fog.type == 0)
+	{
+		float fogLength = fog.end - fog.start;
+		result = (fog.end - fogCoordinate) / fogLength;
+	}
+	else if (fog.type == 1)
+    {
+		result = exp(-fog.density * fogCoordinate);
+	}
+	else if (fog.type == 2)
+    {
+		result = exp(-pow(fog.density * fogCoordinate, 2.0));
+	}
+	
+	result = 1.0 - clamp(result, 0.0, 1.0);
+	return result;
+}
+
 // Main method.
 void main()
 {
@@ -134,6 +167,14 @@ void main()
     vec4 result = CalcDirLight(lightDirectional, norm, viewDir);
     result += CalcPointLight(lightPoint, norm, FragPos, viewDir);
     result += CalcSpotLight(lightSpot, norm, FragPos, viewDir);
-    FragColor = result;
+    if (fog.enabled)
+    {
+        float fogCoordinate = abs(EyeSpacePos.z / EyeSpacePos.w);
+        FragColor = mix(result, vec4(fog.color, 1.0), getFogFactor(fogCoordinate));
+    }
+    else
+    {
+        FragColor = result;
+    }
     //FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

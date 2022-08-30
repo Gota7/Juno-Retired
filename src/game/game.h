@@ -19,7 +19,6 @@ struct GGame
     std::unique_ptr<JLightDirectional> lightDirectional;
     std::unique_ptr<JUniformBuffer> matrices;
     std::unique_ptr<PManager> particleMgr;
-    std::unique_ptr<JModel> kclTest; // For testing.
 
     // Initialize the game.
     GGame();

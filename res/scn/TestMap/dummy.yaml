@@ -1,3 +1,4 @@
+Fog: [[0.800000012, 0, 1], 1, 100, 0.0199999996, Exp]
 SkyboxLeft: res/tex/Skybox/Vaporwave/left.png
 SkyboxRight: res/tex/Skybox/Vaporwave/right.png
 SkyboxTop: res/tex/Skybox/Vaporwave/top.png
@@ -7,13 +8,11 @@ SkyboxBack: res/tex/Skybox/Vaporwave/back.png
 Planets:
   - [res/mdl/GardenPlanet/diskgardenplanet.dae, res/mdl/GardenPlanet/diskgardenplanet.dae, [0.00249999994, 0, 0, 0, 0, 0.00249999994, 0, 0, 0, 0, 0.00249999994, 0, 3, -3, -5, 1]]
 Colliders:
-  - TODO!!!
+  - [Model, res/mdl/GardenPlanet/diskgardenplanet.dae, [0.00249999994, 0, 0, 0, 0, 0.00249999994, 0, 0, 0, 0, 0.00249999994, 0, 3, -3, -5, 1], false]
 Gravity:
   - Type: Disk
-    Pos: [ 0, 0, 0 ]
-    Dir: [ 0, 0, 0 ]
-    SideDir: [ 0, 0, 0 ]
-    Radius: 3.5
-    ValidDegrees: 360.0
-    BothSides: true
-    EdgeGravity: true
+    Pos: [0, -2.70000005, -4.19999981]
+    Dir: [0, 1, 0]
+    SideDir: [0, 0, 1]
+    Radius: 5.5
+    Range: 20

@@ -44,8 +44,8 @@ GGame::GGame()
 
     // Particle manager.
     particleMgr = std::make_unique<PManager>(5);
-    auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityDisk>(glm::vec3(0.0f, -2.7f, -4.2f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 5.5f));
-    system.gravity->range = 20.0f;
+    //auto& system = particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityDisk>(glm::vec3(0.0f, -2.7f, -4.2f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 5.5f));
+    //system.gravity->range = 20.0f;
     //system.gravity->offset = 1.5f;
 
     // Uniform buffer setup.
@@ -53,9 +53,6 @@ GGame::GGame()
     matrices->ConnectToShader(*shader, "Matrices");
     matrices->ConnectToShader(*particleShader, "Matrices");
     matrices->ConnectToShader(*kclShader, "Matrices");
-
-    KModel kcl("res/mdl/GardenPlanet/diskgardenplanet.dae", glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, -3.0f, -5.0f)), glm::vec3(1.0f, 1.0f, 1.0f) * 0.0025f));
-    kclTest = kcl.ToJModel(*kclShader);
 
 }
 
@@ -88,7 +85,7 @@ void GGame::LoadLevelScenario(std::string level, int scenario)
     auto list = GetScenarioList(level);
     if (list.find(scenario) != list.end())
     {
-        this->scenario = std::make_unique<GScenario>(*shader, *skyboxShader);
+        this->scenario = std::make_unique<GScenario>(*shader, *skyboxShader, *kclShader);
         std::cout << "INFO: Loading level \"" << level << "\" scenario " << scenario << ": \"" + list[scenario].title << "\"" << std::endl;
         this->scenario->Load("res/scn/" + level + "/" + list[scenario].yaml);
     }
@@ -116,9 +113,6 @@ void GGame::Render()
 
     // Scenario.
     scenario->Render();
-
-    // Test.
-    // kclTest->Render();
 
     // Particles.
     particleMgr->Render(*particleShader);
