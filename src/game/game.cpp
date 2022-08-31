@@ -96,6 +96,7 @@ void GGame::Render()
 
     // Update logic.
     particleMgr->Update();
+    scenario->Update();
 
     // Camera stuff.
     camera->Update();

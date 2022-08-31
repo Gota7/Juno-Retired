@@ -153,7 +153,7 @@ float getFogFactor(float fogCoordinate)
     {
 		result = exp(-pow(fog.density * fogCoordinate, 2.0));
 	}
-	
+
 	result = 1.0 - clamp(result, 0.0, 1.0);
 	return result;
 }

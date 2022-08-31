@@ -3,6 +3,7 @@
 #include "../gravity.h"
 #include "../jsystem.h"
 #include "../kcl.h"
+#include "actor/base.h"
 #include "modelGroup.h"
 #include "planet.h"
 #include "skybox.h"
@@ -62,6 +63,8 @@ struct GScenario
     KTree colliders; // For collisions.
     std::vector<GScenarioCollider> colliderInfo; // For editor since it would be expensive to unravel loaded collisions with small memory hit.
     RManager gravMgr; // Gravity manager.
+    std::vector<std::unique_ptr<GActorBase>> actors; // Actors to use.
+    bool paused = false; // Pause the scenario.
 
     // Temporary constructor.
     GScenario(JShader& defShader, JShader& skyboxShader, JShader& kclShader) : defShader(defShader), skyboxShader(skyboxShader), kclShader(kclShader), colliders(std::vector<std::unique_ptr<KMesh>>()) {}
@@ -74,5 +77,8 @@ struct GScenario
 
     // Render the scenario.
     void Render();
+
+    // Update the scenario.
+    void Update();
 
 };

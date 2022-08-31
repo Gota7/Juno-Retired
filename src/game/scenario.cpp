@@ -386,4 +386,22 @@ void GScenario::Render()
         model->Render();
     }
 
+    // Actors.
+    for (int i = actors.size() - 1; i >= 0; i--)
+    {
+        if (!actors[i]->Render()) actors[i]->Kill(i);
+    }
+
+}
+
+void GScenario::Update()
+{
+    if (paused) return;
+
+    // Actors.
+    for (int i = actors.size() - 1; i >= 0; i--)
+    {
+        if (!actors[i]->Update()) actors[i]->Kill(i);
+    }
+
 }
