@@ -381,6 +381,17 @@ void GScenario::Save(std::string yaml)
         }
         root << YAML::EndMap;
     }
+    root << YAML::EndSeq;
+
+    // Save actors.
+    root << YAML::Key << "Actors";
+    root << YAML::Value << YAML::BeginSeq;
+    for (auto& actor : actorSpawnInfo)
+    {
+        root << YAML::Flow << YAML::BeginSeq;
+        root << actor.actorID << actor.vecs << actor.floats << actor.strings;
+        root << YAML::EndSeq;
+    }
     root << YAML::EndSeq << YAML::EndMap;
 
     // Save YAML.
