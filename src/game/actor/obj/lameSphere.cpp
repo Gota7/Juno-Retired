@@ -4,3 +4,9 @@ GActorLameSphere::GActorLameSphere(const GSpawnInfo& info) : GActor(info.scenari
 {
     body.pos = info.vecs[0];
 }
+
+bool GActorLameSphere::BeforeUpdate()
+{
+    body.vel = grav * 0.05f; // Set constant speed to gravity.
+    return true;
+}

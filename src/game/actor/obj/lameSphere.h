@@ -10,4 +10,7 @@ struct GActorLameSphere : GActor
     // Spawn the sphere.
     GActorLameSphere(const GSpawnInfo& info);
 
+    // Vfunctions.
+    virtual bool BeforeUpdate();
+
 };

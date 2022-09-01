@@ -7,6 +7,8 @@
 #endif
 #include <yaml-cpp/yaml.h>
 
+#include "actor/spawnTable.h"
+
 namespace YAML {
 template<>
 struct convert<glm::mat4> {
@@ -265,6 +267,26 @@ void GScenario::Load(std::string yaml)
                 }
             }
         }
+    }
+
+    // Load actor infos.
+    YAML::Node actors = root["Actors"];
+    for (auto& actor : this->actors)
+    {
+        actor->Kill();
+    }
+    this->actors.clear();
+    actorSpawnInfo.clear();
+    for (YAML::Node actor : actors)
+    {
+        GSpawnInfo spwn(*this);
+        spwn.actorID = actor[0].as<std::string>();
+        spwn.vecs = actor[1].as<std::vector<glm::vec3>>();
+        spwn.floats = actor[2].as<std::vector<float>>();
+        spwn.strings = actor[3].as<std::vector<std::string>>();
+        actorSpawnInfo.push_back(spwn);
+        auto spawned = GSpawnTable::Spawn(spwn);
+        if (spawned) this->actors.push_back(std::move(spawned));
     }
 
 }

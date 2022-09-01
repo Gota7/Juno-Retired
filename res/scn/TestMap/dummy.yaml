@@ -16,3 +16,5 @@ Gravity:
     SideDir: [0, 0, 1]
     Radius: 5.5
     Range: 20
+Actors:
+  - [ LameSphere, [[0, 0, 0]], [1], [] ]

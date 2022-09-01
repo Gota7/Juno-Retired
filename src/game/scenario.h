@@ -4,6 +4,7 @@
 #include "../jsystem.h"
 #include "../kcl.h"
 #include "actor/base.h"
+#include "actor/spawnInfo.h"
 #include "modelGroup.h"
 #include "planet.h"
 #include "skybox.h"
@@ -64,6 +65,7 @@ struct GScenario
     std::vector<GScenarioCollider> colliderInfo; // For editor since it would be expensive to unravel loaded collisions with small memory hit.
     RManager gravMgr; // Gravity manager.
     std::vector<std::unique_ptr<GActorBase>> actors; // Actors to use.
+    std::vector<GSpawnInfo> actorSpawnInfo; // Actors to spawn.
     bool paused = false; // Pause the scenario.
 
     // Temporary constructor.
