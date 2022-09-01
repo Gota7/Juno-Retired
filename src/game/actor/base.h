@@ -27,6 +27,9 @@ struct GActorBase
     virtual bool Update() { return true; }
 
     // Kill the actor.
-    virtual void Kill(unsigned int i);
+    virtual void Kill() {}
+
+    // Destructor.
+    ~GActorBase() { CleanupResources(); }
 
 };

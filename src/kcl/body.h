@@ -22,7 +22,7 @@ struct KBody
     // Respond to collision.
     void RespondToCollision(KTree& tree, const glm::vec3& gravDir);
 
-    // Update the body.
+    // Update the body. Call this one only.
     void Update(KTree& tree, const glm::vec3& gravDir, float dt);
 
 };

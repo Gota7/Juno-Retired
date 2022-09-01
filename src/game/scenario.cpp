@@ -387,10 +387,15 @@ void GScenario::Render()
     }
 
     // Actors.
-    for (int i = actors.size() - 1; i >= 0; i--)
+    for (auto& actor : actors)
     {
-        if (!actors[i]->Render()) actors[i]->Kill(i);
+        if (!actor->Render())
+        {
+            actor->Kill();
+            actor.reset();
+        }
     }
+    actors.erase(std::remove(actors.begin(), actors.end(), nullptr), actors.end());
 
 }
 
@@ -399,9 +404,14 @@ void GScenario::Update()
     if (paused) return;
 
     // Actors.
-    for (int i = actors.size() - 1; i >= 0; i--)
+    for (auto& actor : actors)
     {
-        if (!actors[i]->Update()) actors[i]->Kill(i);
+        if (!actor->Update())
+        {
+            actor->Kill();
+            actor.reset();
+        }
     }
+    actors.erase(std::remove(actors.begin(), actors.end(), nullptr), actors.end());
 
 }
