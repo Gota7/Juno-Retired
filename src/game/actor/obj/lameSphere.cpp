@@ -1,8 +1,14 @@
 #include "lameSphere.h"
 
-GActorLameSphere::GActorLameSphere(const GSpawnInfo& info) : GActor(info.scenario, info.actorID, info.floats[0])
+std::unique_ptr<GActorBase> GActorLameSphere::Spawn(const GSpawnInfo& info)
 {
-    body.pos = info.vecs[0];
+    if (!GActor::VerifyArgs(info, 1, 1, 0)) return nullptr;
+    return std::make_unique<GActorLameSphere>(info.scenario, info.actorID, info.vecs[0], info.floats[0]);
+}
+
+GActorLameSphere::GActorLameSphere(GScenario& scenario, std::string actorID, glm::vec3 pos, float radius) : GActor(scenario, actorID, radius)
+{
+    body.pos = pos;
 }
 
 bool GActorLameSphere::BeforeUpdate()

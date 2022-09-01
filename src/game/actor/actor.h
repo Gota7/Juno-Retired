@@ -3,6 +3,7 @@
 #include "../../kcl.h"
 #include "../../jsystem.h"
 #include "base.h"
+#include "spawnInfo.h"
 
 // An actual actor.
 struct GActor : GActorBase
@@ -17,5 +18,8 @@ struct GActor : GActorBase
     virtual bool BeforeUpdate() { return true; }
     virtual bool Update();
     virtual bool AfterUpdate() { return true; }
+
+    // Verify arguments.
+    static bool VerifyArgs(const GSpawnInfo& info, unsigned int minNumVecs, unsigned int minNumFloats, unsigned int minNumStrings);
 
 };

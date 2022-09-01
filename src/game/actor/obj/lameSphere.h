@@ -8,7 +8,10 @@ struct GActorLameSphere : GActor
 {
 
     // Spawn the sphere.
-    GActorLameSphere(const GSpawnInfo& info);
+    static std::unique_ptr<GActorBase> Spawn(const GSpawnInfo& info);
+
+    // Make a sphere.
+    GActorLameSphere(GScenario& scenario, std::string actorID, glm::vec3 pos, float radius);
 
     // Vfunctions.
     virtual bool BeforeUpdate();
