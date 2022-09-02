@@ -20,6 +20,6 @@ struct GActor : GActorBase
     virtual bool AfterUpdate() { return true; }
 
     // Verify arguments.
-    static bool VerifyArgs(const GSpawnInfo& info, unsigned int minNumVecs, unsigned int minNumFloats, unsigned int minNumStrings);
+    static bool VerifyArgs(const GSpawnInfo& info, unsigned int minVecs, unsigned int minFloats, unsigned int minStrings);
 
 };

@@ -286,7 +286,10 @@ void GScenario::Load(std::string yaml)
         spwn.strings = actor[3].as<std::vector<std::string>>();
         actorSpawnInfo.push_back(spwn);
         auto spawned = GSpawnTable::Spawn(spwn);
-        if (spawned) this->actors.push_back(std::move(spawned));
+        if (spawned)
+        {
+            if (spawned->LoadResources()) this->actors.push_back(std::move(spawned));
+        }
     }
 
 }

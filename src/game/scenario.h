@@ -9,6 +9,8 @@
 #include "planet.h"
 #include "skybox.h"
 
+struct GGame;
+
 // Scenario entry.
 struct GScenarioEntry
 {
@@ -53,6 +55,7 @@ struct GScenarioCollider
 // Actual layout of a level.
 struct GScenario
 {
+    GGame& game; // Parent game.
     GModelGroup modelGroup; // Model group.
     JShader& defShader; // Default shader.
     JShader& skyboxShader; // Skybox shader.
@@ -69,7 +72,7 @@ struct GScenario
     bool paused = false; // Pause the scenario.
 
     // Temporary constructor.
-    GScenario(JShader& defShader, JShader& skyboxShader, JShader& kclShader) : defShader(defShader), skyboxShader(skyboxShader), kclShader(kclShader), colliders(std::vector<std::unique_ptr<KMesh>>()) {}
+    GScenario(GGame& game, JShader& defShader, JShader& skyboxShader, JShader& kclShader) : game(game), defShader(defShader), skyboxShader(skyboxShader), kclShader(kclShader), colliders(std::vector<std::unique_ptr<KMesh>>()) {}
 
     // Load a scenario.
     void Load(std::string yaml);

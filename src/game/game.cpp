@@ -85,7 +85,7 @@ void GGame::LoadLevelScenario(std::string level, int scenario)
     auto list = GetScenarioList(level);
     if (list.find(scenario) != list.end())
     {
-        this->scenario = std::make_unique<GScenario>(*shader, *skyboxShader, *kclShader);
+        this->scenario = std::make_unique<GScenario>(*this, *shader, *skyboxShader, *kclShader);
         std::cout << "INFO: Loading level \"" << level << "\" scenario " << scenario << ": \"" + list[scenario].title << "\"" << std::endl;
         this->scenario->Load("res/scn/" + level + "/" + list[scenario].yaml);
     }

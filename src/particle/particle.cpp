@@ -5,12 +5,12 @@
 
 glm::vec3 RandomNormalizedXY()
 {
-    return glm::normalize(glm::vec3(rand() >> 8, rand() >> 8, 0));
+    return glm::normalize(glm::vec3(JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f), 0));
 }
 
 glm::vec3 RandomNormalized()
 {
-    return glm::normalize(glm::vec3(rand() >> 8, rand() >> 8, rand() >> 8));
+    return glm::normalize(glm::vec3(JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f)));
 }
 
 PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->definition->spawnInfo.texture)
@@ -42,7 +42,7 @@ PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->def
         offsetDir = glm::normalize(offset);
 
     vel = system->dir * randVerticalSpeed + offsetDir * randHorizontalSpeed;
-    pos = system->pos;
+    pos = system->pos + offset;
 
     scale = system->scale + ((rand() % 2000) / 1000.0f - 1.0f) * info.scaleRandomness;
     scaleMult = 1.0f;
@@ -69,7 +69,7 @@ PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->def
 void PParticle::Update(PSystem* system)
 {
     PSpawnInfo& info = system->definition->spawnInfo;
-    if (info.followSystem) pos = system->pos;
+    if (info.followSystem) pos = system->pos + offset;
 
     glm::vec3 velInc = glm::vec3(0.0f);
     // TODO: EFFECTS!!!
