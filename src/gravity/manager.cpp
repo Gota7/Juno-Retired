@@ -20,7 +20,7 @@ bool RManager::CalcGravity(const glm::vec3& pos, RGravityType type, glm::vec3* o
     glm::vec3 totalGravity(0.0f);
     bool foundGravity = false;
     float largestMag = -1.0f;
-    unsigned int maxPri = 0;
+    long long maxPri = -1;
     for (auto& gravity : gravities)
     {
         if (gravity->priority < maxPri) break;

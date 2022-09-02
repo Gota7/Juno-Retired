@@ -4,8 +4,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-constexpr float FLOOR_TO_WALL_THRESHOLD = glm::radians(67.976f); // TODO: CONVERT THESE TO NON-DOT PRODUCTS!
-constexpr float WALL_TO_CEILING_THRESHOLD = glm::radians(180.0f - 36.889f);
+constexpr float FLOOR_TO_WALL_THRESHOLD = 0.375f; // Floors should generally be facing in the same direction as up but not too much.
+constexpr float WALL_TO_CEILING_THRESHOLD = -0.8f; // Have to be similar in the opposite direction for ceiling.
 
 KModel::KModel(std::string path, glm::mat4 matrix) : matrix(matrix)
 {
@@ -198,11 +198,11 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
     glm::vec3 normalDir = matrix * glm::vec4(n, 0.0f); // Shouldn't need to normalize?
     glm::vec3 upDir = -gravDir;
     float angle = glm::dot(normalDir, upDir); // Normally divide by ||normalDir|| * ||upDir|| but that should be one.
-    if (angle >= FLOOR_TO_WALL_THRESHOLD)
+    if (angle >= WALL_TO_CEILING_THRESHOLD)
     {
-        if (angle >= WALL_TO_CEILING_THRESHOLD)
+        if (angle >= FLOOR_TO_WALL_THRESHOLD)
         {
-            outInfo->type = PENETRATION_CEILING;
+            outInfo->type = PENETRATION_FLOOR;
         }
         else
         {
@@ -211,7 +211,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
     }
     else
     {
-        outInfo->type = PENETRATION_FLOOR;
+        outInfo->type = PENETRATION_CEILING;
     }
 
     // Figure out to do face, edge, or vertex test. First the components are orded by size.

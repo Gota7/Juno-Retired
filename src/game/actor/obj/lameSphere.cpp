@@ -26,7 +26,7 @@ bool GActorLameSphere::LoadResources()
 
 bool GActorLameSphere::BeforeUpdate()
 {
-    body.vel = grav * 0.05f; // Set constant speed to gravity.
+    body.vel = grav * 0.5f + glm::vec3(0.1f, 0.0f, 0.0f); // Set constant speed to gravity and more.
     system->pos = body.pos;
     return true;
 }
