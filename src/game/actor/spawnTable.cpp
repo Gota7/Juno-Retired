@@ -2,9 +2,7 @@
 
 #include "obj/lameSphere.h"
 
-using SpawnFunc = std::unique_ptr<GActorBase>(*)(const GSpawnInfo&);
-
-std::map<std::string, SpawnFunc> ACTOR_SPAWN_TABLE =
+std::map<std::string, SpawnFunc> GSpawnTable::ACTOR_SPAWN_TABLE =
 {
     { "LameSphere", GActorLameSphere::Spawn }
 };

@@ -1,6 +1,7 @@
 #include "octree.h"
 #include "util.h"
 
+// Maximum boxes allowed at the base of the octree instead of the usual 8 for children.
 const unsigned int MAX_BASE_OCTREE_COUNT = 128;
 
 KOctree::KOctree(std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3>>& triangleData, unsigned int maxTriangles, float minWidth) : maxTriangles(maxTriangles), minWidth(minWidth)
@@ -25,10 +26,10 @@ KOctree::KOctree(std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::ve
 
     // Prevent 2d boxes.
     if (max.x == 0) max.x = glm::max(max.y, max.z);
-    if (max.y == 0) max.x = glm::max(max.x, max.z);
-    if (max.z == 0) max.x = glm::max(max.x, max.y);
+    if (max.y == 0) max.y = glm::max(max.x, max.z);
+    if (max.z == 0) max.z = glm::max(max.x, max.y);
 
-    // Dimensions.
+    // Dimensions. Has to be a power of 2.
     width.x = glm::exp2(glm::ceil(glm::log2(glm::max(max.x - min.x, minWidth))));
     width.y = glm::exp2(glm::ceil(glm::log2(glm::max(max.y - min.y, minWidth))));
     width.z = glm::exp2(glm::ceil(glm::log2(glm::max(max.z - min.z, minWidth))));
@@ -54,7 +55,7 @@ KOctree::KOctree(std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::ve
         {
             for (int i = 0; i < nX; i++)
             {
-                children.push_back(std::make_unique<KOctree>((base + glm::vec3(i, j, k)) * baseWidth, baseWidth, triangles, triangleData, maxTriangles, minWidth));
+                children.push_back(std::make_unique<KOctree>(base + glm::vec3(i, j, k) * baseWidth, baseWidth, triangles, triangleData, maxTriangles, minWidth));
             }
         }
     }
@@ -64,7 +65,7 @@ KOctree::KOctree(std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::ve
 KOctree::KOctree(glm::vec3 base, float width, std::vector<unsigned int> triangles, std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3>>& triangleData, unsigned int maxTriangles, float minWidth) : maxTriangles(maxTriangles), minWidth(minWidth)
 {
     glm::vec3 center = base + glm::vec3(width, width, width) / 2.0f;
-    this->width = glm::vec3(width, width, width) / 2.0f; // Original is just 0/2 which is 0, probably a bug.
+    this->width = glm::vec3(width, width, width);
     baseWidth = glm::min(this->width.x, this->width.y, this->width.z);
     this->base = base;
     for (auto& tri : triangles)
@@ -87,7 +88,7 @@ KOctree::KOctree(glm::vec3 base, float width, std::vector<unsigned int> triangle
                 }
             }
         }
-        triangles.clear();
+        this->triangles.clear();
         isLeaf = false;
     }
 }

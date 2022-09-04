@@ -21,7 +21,7 @@ KModel::KModel(std::string path, glm::mat4 matrix) : matrix(matrix)
 
     // Import root node.
     ImportNode(scene, scene->mRootNode);
-    octree = KOctree(triangleData, 15, 1.0f);
+    octree = KOctree(triangleData, 15, 0.1f);
     pointIndices.clear();
     vectorIndices.clear();
     triangleData.clear(); // These are only used for construction.
@@ -172,10 +172,11 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
 
     // Transform sphere to collider coordinates.
     glm::vec3 newPos = invMatrix * glm::vec4(pos, 1.0f);
+    radius = glm::length(invMatrix * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f)) * radius;
 
     // Get initial variables.
     // EDIT: I think it is best to not have references here as dereferencing for a lot of math is not a good idea.
-    glm::vec3 p = vectors[tri.originPointIndex];
+    glm::vec3 p = points[tri.originPointIndex];
     glm::vec3 n = vectors[tri.normalVectorIndex];
     glm::vec3 d0 = vectors[tri.direction0VectorIndex];
     glm::vec3 d1 = vectors[tri.direction1VectorIndex];
@@ -324,8 +325,9 @@ void KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
 {
 
     // Search for triangles.
+    glm::vec3 transPos = invMatrix * glm::vec4(pos, 1.0f);
     std::vector<unsigned int> tris;
-    octree.GetTriangles(pos, radius, tris);
+    octree.GetTriangles(transPos, glm::length(invMatrix * glm::vec4(1.0f, 0.0f, 0.0, 0.0f)) * radius, tris);
 
     // Interact with the triangles.
     std::vector<KModelPenetrationInfo> pens;
@@ -346,6 +348,7 @@ void KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
             }
         }
     }
+    //std::cout << pens.size() << std::endl;
     Unpenetrate(pos, pens); // Actually take care of making them not penetrated.
 
 }
