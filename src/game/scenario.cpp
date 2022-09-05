@@ -238,6 +238,58 @@ void GScenario::Load(std::string yaml)
                 grav["EdgeGravity"].IsDefined() ? grav["EdgeGravity"].as<bool>() : true
             ), grav["Priority"].IsDefined() ? grav["Priority"].as<unsigned int>() : 0);
         }
+        else if (type == "Parallel")
+        {
+            std::string rangeType = grav["RangeType"].as<std::string>();
+            if (rangeType == "Sphere")
+            {
+                gravMgr.AddGravity(std::make_unique<RGravityParallel>(
+                    grav["Pos"].as<glm::vec3>(),
+                    grav["Dir"].as<glm::vec3>(),
+                    grav["BaseDist"].as<float>()
+                ));
+            }
+            else if (rangeType == "Box")
+            {
+                RGravityParallelDistanceTypeEnum type = PARALLEL_DISTANCE_DEFAULT;
+                std::string distType;
+                if (grav["DistType"].IsDefined())
+                {
+                    distType = grav["DistType"].as<std::string>();
+                    if (distType == "X")
+                    {
+                        type = PARALLEL_DISTANCE_X;
+                    }
+                    else if (distType == "Y")
+                    {
+                        type = PARALLEL_DISTANCE_Y;
+                    }
+                    else if (distType == "Z")
+                    {
+                        type = PARALLEL_DISTANCE_Z;
+                    }
+                }
+                gravMgr.AddGravity(std::make_unique<RGravityParallel>(
+                    grav["Pos"].as<glm::vec3>(),
+                    grav["Dir"].as<glm::vec3>(),
+                    type,
+                    grav["Mtx"].as<glm::mat4>()
+                ));
+            }
+            else if (rangeType == "Cylinder")
+            {
+                gravMgr.AddGravity(std::make_unique<RGravityParallel>(
+                    grav["Pos"].as<glm::vec3>(),
+                    grav["Dir"].as<glm::vec3>(),
+                    grav["CylinderRadius"].as<float>(),
+                    grav["CylinderHeight"].as<float>()
+                ));
+            }
+            else
+            {
+                found = false;
+            }
+        }
         else
         {
             found = false;

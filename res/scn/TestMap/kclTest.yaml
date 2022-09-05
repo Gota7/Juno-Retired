@@ -9,11 +9,11 @@ Planets:
 Colliders:
   - [Model, res/mdl/KclTest/KclTest.dae, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], false]
 Gravity:
-  - Type: Disk
-    Pos: [0, -2.70000005, -4.19999981]
+  - Type: Parallel
+    RangeType: Box
+    Pos: [0, 0, 0]
     Dir: [0, 1, 0]
-    SideDir: [0, 0, 1]
-    Radius: 5.5
-    Range: 20
+    Mtx: [5, 0, 0, 0, 0, 5, 0, 0, 0, 0, 5, 0, 0, 0, 0, 5]
+    Range: 5
 Actors:
   - [LameSphere, [[0.1, 2.5, 0.5]], [], []]
