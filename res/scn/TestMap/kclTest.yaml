@@ -1,0 +1,19 @@
+SkyboxLeft: res/tex/Skybox/Vaporwave/left.png
+SkyboxRight: res/tex/Skybox/Vaporwave/right.png
+SkyboxTop: res/tex/Skybox/Vaporwave/top.png
+SkyboxBottom: res/tex/Skybox/Vaporwave/bottom.png
+SkyboxFront: res/tex/Skybox/Vaporwave/front.png
+SkyboxBack: res/tex/Skybox/Vaporwave/back.png
+Planets:
+  - [res/mdl/KclTest/KclTest.dae, res/mdl/KclTest/KclTest.dae, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]]
+Colliders:
+  - [Model, res/mdl/KclTest/KclTest.dae, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], false]
+Gravity:
+  - Type: Disk
+    Pos: [0, -2.70000005, -4.19999981]
+    Dir: [0, 1, 0]
+    SideDir: [0, 0, 1]
+    Radius: 5.5
+    Range: 20
+Actors:
+  - [LameSphere, [[0.1, 2.5, 0.5]], [], []]
