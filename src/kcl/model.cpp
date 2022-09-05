@@ -172,7 +172,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
 
     // Transform sphere to collider coordinates.
     glm::vec3 newPos = invMatrix * glm::vec4(pos, 1.0f);
-    radius = glm::length(invMatrix * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f)) * radius;
+    radius = glm::length(invMatrix[0]) * radius;
 
     // Get initial variables.
     // EDIT: I think it is best to not have references here as dereferencing for a lot of math is not a good idea.
@@ -193,7 +193,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
 
     // Ok, we know the sphere is in the prism formed by the triangle, but is it in range of the normal?
     float vN = glm::dot(v, n);
-    if (vN >= radius || vN < -0.005f) return false; // Out of range!
+    if (vN >= radius || vN < -5.0f) return false; // Out of range!
 
     // Get if floor, wall, or ceiling.
     glm::vec3 normalDir = matrix * glm::vec4(n, 0.0f); // Shouldn't need to normalize?
@@ -236,7 +236,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
     else if (dots[2] == vD2) dirs.push_back(d2);
 
     // We can skip directly to pass face test if all components are <= 0. More work needs to be done if this is not the case.
-    if (vD0 > 0 && vD1 > 0 && vD2 > 0)
+    if (vD0 > 0 || vD1 > 0 || vD2 > 0)
     {
         bool edgeTest = dots[0] * glm::dot(dirs[0], dirs[1]) > dots[1];
         float vh;
@@ -282,7 +282,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
 void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& penetrations)
 {
 
-    // First get the aggregate vector.
+    // First get the aggregate vector. TODO: THESE ONLY WORK ASSUMING Y IS THE UP VECTOR! WE NEED TO USE AN ORTHONORMAL BASIS FROM GRAVITY FOR PROPER VECS!
     if (penetrations.size() == 0) return;
     glm::vec3 minBounds(0.0f);
     glm::vec3 maxBounds(0.0f); // We must cap at origin since we don't want a min to be positive and the other way around.
@@ -295,7 +295,8 @@ void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& pen
                 bounds += glm::vec3(0.0f, pen.penetration.y, 0.0f); // Vertical component only.
                 break;
             case PENETRATION_WALL:
-                bounds += glm::vec3(pen.penetration.x, 0.0f, pen.penetration.z); // Horizontal component only.
+                if (pen.faceCollision) bounds += glm::vec3(pen.penetration.x, 0.0f, pen.penetration.z); // Horizontal component only.
+                else bounds += pen.penetration;
                 break;
             case PENETRATION_CEILING:
                 bounds += pen.penetration; // Use all for ceiling.
@@ -307,8 +308,8 @@ void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& pen
         if (bounds.x > maxBounds.x) maxBounds.x = bounds.x;
         if (bounds.y > maxBounds.y) maxBounds.y = bounds.y;
         if (bounds.z > maxBounds.z) maxBounds.z = bounds.z;
-        pos += minBounds + maxBounds; // Just add the bounds together to transform the sphere back. Sphere is already in world coordinates.
     }
+    pos += minBounds + maxBounds; // Just add the bounds together to transform the sphere back. Sphere is already in world coordinates.
 }
 
 glm::vec3 KModel::Position()
