@@ -259,7 +259,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
             float& a1 = dots[1];
             float& aN = vN;
             float c = glm::dot(dirs[0], dirs[1]);
-            if (KUtil::Square(a1 - a0 * c) / (1 - KUtil::Square(c)) + KUtil::Square(a0) + KUtil::Square(aN) < KUtil::Square(radius)) return false; // Formula is here: https://youtu.be/6hUK1Wbajt4?list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&t=352
+            if (KUtil::Square(a1 - a0 * c) / (1 - KUtil::Square(c)) + KUtil::Square(a0) + KUtil::Square(aN) >= KUtil::Square(radius)) return false; // Formula is here: https://youtu.be/6hUK1Wbajt4?list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&t=352
             vh = glm::sqrt(
                 KUtil::Square(dots[1] - dots[0] * glm::dot(dirs[0], dirs[1]))
                 / (1 - KUtil::Square(glm::dot(dirs[0], dirs[1])))
