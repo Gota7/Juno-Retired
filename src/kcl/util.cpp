@@ -26,3 +26,23 @@ float KUtil::SurfaceArea(const glm::vec3& size)
 {
     return size.x * size.y * 2.0f + size.x * size.z * 2.0f + size.y * size.z * 2.0f;
 }
+
+// Algorithm by pants64ds.
+glm::vec3 KUtil::OrthoNormal(const glm::vec3& v)
+{
+    float xx = KUtil::Square(v.x);
+    float yy = KUtil::Square(v.y);
+    float zz = KUtil::Square(v.z);
+    if (xx < yy)
+    {
+        if (xx < zz)
+        {
+            return glm::normalize(glm::vec3(0.0f, v.z, -v.y));
+        }
+    }
+    else if (yy < zz)
+    {
+        return glm::normalize(glm::vec3(-v.z, 0.0f, v.x));
+    }
+    return glm::normalize(glm::vec3(v.y, -v.x, 0.0f));
+}

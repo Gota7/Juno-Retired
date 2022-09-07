@@ -172,7 +172,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
 
     // Transform sphere to collider coordinates.
     glm::vec3 newPos = invMatrix * glm::vec4(pos, 1.0f);
-    radius = glm::length(invMatrix[0]) * radius;
+    radius = KUtil::ScaleFloat(invMatrix, radius);
 
     // Get initial variables.
     // EDIT: I think it is best to not have references here as dereferencing for a lot of math is not a good idea.
@@ -328,7 +328,7 @@ void KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
     // Search for triangles.
     glm::vec3 transPos = invMatrix * glm::vec4(pos, 1.0f);
     std::vector<unsigned int> tris;
-    octree.GetTriangles(transPos, glm::length(invMatrix * glm::vec4(1.0f, 0.0f, 0.0, 0.0f)) * radius, tris);
+    octree.GetTriangles(transPos, KUtil::ScaleFloat(invMatrix, radius), tris);
 
     // Interact with the triangles.
     std::vector<KModelPenetrationInfo> pens;

@@ -21,4 +21,13 @@ struct KUtil
         return val * val;
     }
 
+    // Get an orthonormal vector.
+    static glm::vec3 OrthoNormal(const glm::vec3& v);
+
+    // Scale a float by a matrix.
+    static inline float ScaleFloat(const glm::mat4& mat, float val)
+    {
+        return glm::length(mat[0]) * val; // Just multiply by size of the X axis.
+    }
+
 };
