@@ -167,7 +167,8 @@ std::unique_ptr<JModel> KModel::ToJModel(JShader& shader)
 
 }
 
-bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float radius, const glm::vec3& gravDir, KModelPenetrationInfo* outInfo)
+// See https://www.youtube.com/watch?v=6hUK1Wbajt4&list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&index=6 for bulk of implementation details.
+bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float radius, const glm::vec3& gravDir, KModelPenetrationInfo& outInfo)
 {
 
     // Transform sphere to collider coordinates.
@@ -185,15 +186,19 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
 
     // Get projection of V in each direction. Dot product works since all directions are normal.
     float vD0 = glm::dot(v, d0);
+    if (vD0 >= radius) return false;
     float vD1 = glm::dot(v, d1);
+    if (vD1 >= radius) return false;
     float vD2 = glm::dot(v, d2) - tri.length; // L must be subracted since d2 is L away from P.
+    if (vD2 >= radius) return false;
 
     // If any of these values are not less than R, this means the sphere can not be in range of the triangle in any of the directions.
-    if (vD0 >= radius || vD1 >= radius || vD2 >= radius) return false;
+    // EDIT: Optimization to quit early above, no need to do more dot products if not needed.
+    //if (vD0 >= radius || vD1 >= radius || vD2 >= radius) return false;
 
     // Ok, we know the sphere is in the prism formed by the triangle, but is it in range of the normal?
     float vN = glm::dot(v, n);
-    if (vN >= radius || vN < -5.0f) return false; // Out of range!
+    if (radius - vN < 0.0f) return false; // Out of range!
 
     // Get if floor, wall, or ceiling.
     glm::vec3 normalDir = matrix * glm::vec4(n, 0.0f); // Shouldn't need to normalize?
@@ -203,78 +208,204 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
     {
         if (angle >= FLOOR_TO_WALL_THRESHOLD)
         {
-            outInfo->type = PENETRATION_FLOOR;
+            outInfo.type = PENETRATION_FLOOR;
         }
         else
         {
-            outInfo->type = PENETRATION_WALL;
+            outInfo.type = PENETRATION_WALL;
         }
     }
     else
     {
-        outInfo->type = PENETRATION_CEILING;
+        outInfo.type = PENETRATION_CEILING;
     }
+    outInfo.collisionType = COLLISION_UNDEF;
 
-    // Figure out to do face, edge, or vertex test. First the components are orded by size.
-    std::vector<float> dots;
-    dots.push_back(vD0);
-    dots.push_back(vD1);
-    dots.push_back(vD2);
-    std::sort(dots.begin(), dots.end());
-    std::reverse(dots.begin(), dots.end());
+    // // Figure out to do face, edge, or vertex test. First the components are orded by size.
+    // std::vector<float> dots;
+    // dots.push_back(vD0);
+    // dots.push_back(vD1);
+    // dots.push_back(vD2);
+    // std::sort(dots.begin(), dots.end());
+    // std::reverse(dots.begin(), dots.end());
 
-    // Order directions appropriately. Probably not the most optimal but I really don't know how to do this.
-    std::vector<glm::vec3> dirs;
-    if (dots[0] == vD0) dirs.push_back(d0);
-    else if (dots[0] == vD1) dirs.push_back(d1);
-    else if (dots[0] == vD2) dirs.push_back(d2);
-    if (dots[1] == vD0) dirs.push_back(d0);
-    else if (dots[1] == vD1) dirs.push_back(d1);
-    else if (dots[1] == vD2) dirs.push_back(d2);
-    if (dots[2] == vD0) dirs.push_back(d0);
-    else if (dots[2] == vD1) dirs.push_back(d1);
-    else if (dots[2] == vD2) dirs.push_back(d2);
+    // // Order directions appropriately. Probably not the most optimal but I really don't know how to do this.
+    // std::vector<glm::vec3> dirs;
+    // if (dots[0] == vD0) dirs.push_back(d0);
+    // else if (dots[0] == vD1) dirs.push_back(d1);
+    // else if (dots[0] == vD2) dirs.push_back(d2);
+    // if (dots[1] == vD0) dirs.push_back(d0);
+    // else if (dots[1] == vD1) dirs.push_back(d1);
+    // else if (dots[1] == vD2) dirs.push_back(d2);
+    // if (dots[2] == vD0) dirs.push_back(d0);
+    // else if (dots[2] == vD1) dirs.push_back(d1);
+    // else if (dots[2] == vD2) dirs.push_back(d2);
 
     // We can skip directly to pass face test if all components are <= 0. More work needs to be done if this is not the case.
+    float dist;
     if (vD0 > 0 || vD1 > 0 || vD2 > 0)
     {
-        bool edgeTest = dots[0] * glm::dot(dirs[0], dirs[1]) > dots[1];
-        float vh;
+        // bool edgeTest = dots[0] * glm::dot(dirs[0], dirs[1]) > dots[1];
+        // float vh;
 
-        // Do the edge test.
-        if (edgeTest)
+        // // Do the edge test.
+        // if (edgeTest)
+        // {
+
+        //     // The closest edge is the one with the biggest dot product with the direction. I mean what did you expect.
+        //     float distEdgeToSphere = glm::sqrt(KUtil::Square(dots[0]) + KUtil::Square(vN));
+        //     if (distEdgeToSphere >= radius) return false; // Too far from the edge to collide.
+        //     vh = dots[0]; // Wow so easy!
+
+        // }
+
+        // // Do the vertex test.
+        // else
+        // {
+        //     float& a0 = dots[0];
+        //     float& a1 = dots[1];
+        //     float& aN = vN;
+        //     float c = glm::dot(dirs[0], dirs[1]);
+        //     if (KUtil::Square(a1 - a0 * c) / (1 - KUtil::Square(c)) + KUtil::Square(a0) + KUtil::Square(aN) >= KUtil::Square(radius)) return false; // Formula is here: https://youtu.be/6hUK1Wbajt4?list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&t=352
+        //     vh = glm::sqrt(
+        //         KUtil::Square(dots[1] - dots[0] * glm::dot(dirs[0], dirs[1]))
+        //         / (1 - KUtil::Square(glm::dot(dirs[0], dirs[1])))
+        //             + KUtil::Square(dots[1])
+        //     ); // What in the actual fuck.
+        // }
+        // outInfo->penetration = normalDir * (glm::sqrt(KUtil::Square(radius) - KUtil::Square(vh)) - vN);
+        // outInfo->faceCollision = false;
+        // return true;
+
+        // Ok, so our face test is correct and the edge test works too, but the vertex test is complete wack.
+        // So new approach. See https://github.com/magcius/noclip.website/blob/fe4284a26c7757ffbbe843f695d2bb6014bd96af/src/SuperMarioGalaxy/KCollisionServer.ts#L314
+
+        // Declare vars.
+        float radiusSq = KUtil::Square(radius);
+        float t1;
+        glm::vec3 edge1;
+        glm::vec3 edge2;
+
+        // vD0 is max.
+        if (vD0 >= vD1 && vD0 >= vD2)
         {
-
-            // The closest edge is the one with the biggest dot product with the direction. I mean what did you expect.
-            float distEdgeToSphere = glm::sqrt(KUtil::Square(dots[0]) + KUtil::Square(vN));
-            if (distEdgeToSphere >= radius) return false; // Too far from the edge to collide.
-            vh = dots[0]; // Wow so easy!
-
+            if (vD1 >= vD2) // vD1 2nd.
+            {
+                // Edges are 0 and 1.
+                edge1 = d0;
+                edge2 = d1;
+                t1 = glm::dot(edge1, edge2);
+                if (vD1 >= t1 * vD0) outInfo.collisionType = COLLISION_VERTEX0;
+            }
+            else // vD2 2nd.
+            {
+                // Edges are 2 and 0.
+                edge1 = d2;
+                edge2 = d0;
+                t1 = glm::dot(edge1, edge2);
+                if (vD2 >= t1 * vD0) outInfo.collisionType = COLLISION_VERTEX2;
+            }
+            if (outInfo.collisionType == COLLISION_UNDEF)
+            {
+                //if (vD0 > vN) return false;
+                outInfo.collisionType = COLLISION_EDGE0;
+                dist = radiusSq - KUtil::Square(vD0);
+            }
         }
 
-        // Do the vertex test.
+        // vD1 is max.
+        else if (vD1 >= vD0 && vD1 >= vD2)
+        {
+            if (vD0 >= vD2) // Edges are 0 and 1.
+            {
+                // Edges are 0 and 1.
+                edge1 = d0;
+                edge2 = d1;
+                t1 = glm::dot(edge1, edge2);
+                if (vD0 >= t1 * vD1) outInfo.collisionType = COLLISION_VERTEX0;
+            }
+            else // Edges are 1 and 2.
+            {
+                edge1 = d1;
+                edge2 = d2;
+                t1 = glm::dot(edge1, edge2);
+                if (vD2 >= t1 * vD1) outInfo.collisionType = COLLISION_VERTEX1;
+            }
+            if (outInfo.collisionType == COLLISION_UNDEF)
+            {
+                //if (vD1 > vN) return false;
+                outInfo.collisionType = COLLISION_EDGE1;
+                dist = radiusSq - KUtil::Square(vD1);
+            }
+        }
+
+        // vD2 is max.
         else
         {
-            float& a0 = dots[0];
-            float& a1 = dots[1];
-            float& aN = vN;
-            float c = glm::dot(dirs[0], dirs[1]);
-            if (KUtil::Square(a1 - a0 * c) / (1 - KUtil::Square(c)) + KUtil::Square(a0) + KUtil::Square(aN) >= KUtil::Square(radius)) return false; // Formula is here: https://youtu.be/6hUK1Wbajt4?list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&t=352
-            vh = glm::sqrt(
-                KUtil::Square(dots[1] - dots[0] * glm::dot(dirs[0], dirs[1]))
-                / (1 - KUtil::Square(glm::dot(dirs[0], dirs[1])))
-                    + KUtil::Square(dots[1])
-            ); // What in the actual fuck.
+            if (vD1 >= vD0) // Edges are 1 and 2.
+            {
+                edge1 = d1;
+                edge2 = d2;
+                t1 = glm::dot(edge1, edge2);
+                if (vD1 >= t1 * vD2) outInfo.collisionType = COLLISION_VERTEX1;
+            }
+            else // Edges are 2 and 0.
+            {
+                edge1 = d2;
+                edge2 = d0;
+                t1 = glm::dot(edge1, edge2);
+                if (vD0 >= t1 * vD2) outInfo.collisionType = COLLISION_VERTEX2;
+            }
+            if (outInfo.collisionType == COLLISION_UNDEF)
+            {
+                //if (vD2 > vN) return false;
+                outInfo.collisionType = COLLISION_EDGE2;
+                dist = radiusSq - KUtil::Square(vD2);
+            }
         }
-        outInfo->penetration = normalDir * (glm::sqrt(KUtil::Square(radius) - KUtil::Square(vh)) - vN);
-        outInfo->faceCollision = false;
-        return true;
+
+        // Do vertex.
+        if (outInfo.collisionType == COLLISION_VERTEX0 || outInfo.collisionType == COLLISION_VERTEX1 || outInfo.collisionType == COLLISION_VERTEX2)
+        {
+            float c0, c1;
+            if (outInfo.collisionType == COLLISION_VERTEX0)
+            {
+                c0 = (((t1 * vD1) - vD0)) / (KUtil::Square(t1) - 1.0);
+                c1 = vD1 - (c0 * t1);
+            }
+            else if (outInfo.collisionType == COLLISION_VERTEX1)
+            {
+                c0 = (((t1 * vD2) - vD1)) / (KUtil::Square(t1) - 1.0);
+                c1 = vD2 - (c0 * t1);
+            }
+            else
+            {
+                c0 = (((t1 * vD0) - vD2)) / (KUtil::Square(t1) - 1.0);
+                c1 = vD0 - (c0 * t1);
+            }
+            glm::vec3 tmp = c0 * edge1 + c1 * edge2;
+            float distSq = glm::dot(tmp, tmp);
+            //if (distSq > KUtil::Square(vN) || distSq >= radiusSq) return false;
+            dist = glm::sqrt(radiusSq - distSq) - vN;
+        }
+
+        // Do edge.
+        else
+        {
+            dist = glm::sqrt(dist) - vN;
+        }
 
     }
+    else
+    {
 
-    // Face test was used, p = r - v * n.
-    outInfo->penetration = normalDir * (radius - vN);
-    outInfo->faceCollision = true;
+        // Face test was used, p = r - v * n.
+        dist = radius - vN;
+        outInfo.collisionType = COLLISION_FACE;
+
+    }
+    if (dist < 0.0f || dist > 5.0f) return false;
+    outInfo.penetration = normalDir * dist;
     return true;
 
 }
@@ -295,7 +426,7 @@ void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& pen
                 bounds += glm::vec3(0.0f, pen.penetration.y, 0.0f); // Vertical component only.
                 break;
             case PENETRATION_WALL:
-                if (pen.faceCollision) bounds += glm::vec3(pen.penetration.x, 0.0f, pen.penetration.z); // Horizontal component only.
+                if (pen.collisionType == COLLISION_FACE) bounds += glm::vec3(pen.penetration.x, 0.0f, pen.penetration.z); // Horizontal component only.
                 else bounds += pen.penetration;
                 break;
             case PENETRATION_CEILING:
@@ -332,16 +463,30 @@ void KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
 
     // Interact with the triangles.
     std::vector<KModelPenetrationInfo> pens;
-    bool hasFloor = false;
+    int floorIndex = -1;
+    float maxFloorVec = -INFINITY;
     for (auto tri : tris)
     {
         KModelPenetrationInfo pen;
-        if (CalcPenetration(triangles[tri], pos, radius, gravDir, &pen))
+        if (CalcPenetration(triangles[tri], pos, radius, gravDir, pen))
         {
             if (pen.type == PENETRATION_FLOOR)
             {
-                if (!hasFloor) pens.push_back(pen); // We should only allow one floor collision.
-                hasFloor = true;
+                if (floorIndex == -1)
+                {
+                    floorIndex = pens.size();
+                    pens.push_back(pen); // We should only allow one floor collision.
+                    maxFloorVec = glm::dot(pen.penetration, pen.penetration);
+                }
+                else
+                {
+                    float newDot = glm::dot(pen.penetration, pen.penetration);
+                    if (newDot > maxFloorVec)
+                    {
+                        maxFloorVec = newDot;
+                        pens[floorIndex] = pen;
+                    }
+                }
             }
             else
             {

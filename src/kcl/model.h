@@ -25,12 +25,25 @@ enum KPenetrationType
     PENETRATION_CEILING
 };
 
+// Collision type.
+enum KModelTriangleCollisionType
+{
+    COLLISION_UNDEF,
+    COLLISION_FACE,
+    COLLISION_EDGE0,
+    COLLISION_EDGE1,
+    COLLISION_EDGE2,
+    COLLISION_VERTEX0,
+    COLLISION_VERTEX1,
+    COLLISION_VERTEX2
+};
+
 // Collider information.
 struct KModelPenetrationInfo
 {
     glm::vec3 penetration;
     KPenetrationType type;
-    bool faceCollision;
+    KModelTriangleCollisionType collisionType;
 };
 
 // JKCL model file format.
@@ -67,7 +80,7 @@ struct KModel : KMesh
     std::unique_ptr<JModel> ToJModel(JShader& shader);
 
     // Calculate penetration of a sphere relative to collision coordinates. Returns if it succeeds.
-    bool CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float radius, const glm::vec3& gravDir, KModelPenetrationInfo* outInfo);
+    bool CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float radius, const glm::vec3& gravDir, KModelPenetrationInfo& outInfo);
 
     // Make a sphere stop colliding with the mesh. Make sure to only pass one floor collision at a time.
     static void Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& penetrations);
