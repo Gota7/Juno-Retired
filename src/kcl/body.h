@@ -12,6 +12,7 @@ struct KBody
     glm::vec3 velMax = glm::vec3(10.0f, 10.0f, 10.0f);
     float radius;
     bool colliderEnabled = true;
+    bool hitLastFrame = false;
 
     // Create a new body.
     KBody(float radius) : radius(radius) {}

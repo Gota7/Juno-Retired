@@ -11,10 +11,11 @@ void KBody::UpdatePhysics(float dt)
 
 void KBody::RespondToCollision(KTree& tree, const glm::vec3& gravDir)
 {
+    hitLastFrame = false;
     std::vector<KMesh*> meshes = tree.FindIntersections(pos);
     for (auto mesh : meshes)
     {
-        mesh->Uncollide(pos, radius, gravDir);
+        if (mesh->Uncollide(pos, radius, gravDir)) hitLastFrame = true;
     }
 }
 

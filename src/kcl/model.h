@@ -88,6 +88,6 @@ struct KModel : KMesh
     // V-functions.
     virtual glm::vec3 Position();
     virtual glm::vec3 Range();
-    virtual void Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir);
+    virtual bool Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir);
 
 };

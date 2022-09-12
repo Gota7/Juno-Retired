@@ -323,10 +323,6 @@ void GScenario::Load(std::string yaml)
 
     // Load actor infos.
     YAML::Node actors = root["Actors"];
-    for (auto& actor : this->actors)
-    {
-        actor->Kill();
-    }
     this->actors.clear();
     actorSpawnInfo.clear();
     for (YAML::Node actor : actors)
@@ -479,7 +475,6 @@ void GScenario::Render()
     {
         if (!actor->Render())
         {
-            actor->Kill();
             actor.reset();
         }
     }
@@ -496,7 +491,6 @@ void GScenario::Update()
     {
         if (!actor->Update())
         {
-            actor->Kill();
             actor.reset();
         }
     }

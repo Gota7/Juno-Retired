@@ -14,10 +14,10 @@ struct GActorLameSphere : GActor
 
     // Make a sphere.
     GActorLameSphere(GScenario& scenario, std::string actorID, glm::vec3 pos);
-    ~GActorLameSphere();
 
     // Vfunctions.
-    virtual bool LoadResources();
-    virtual bool BeforeUpdate();
+    virtual bool LoadResources() override;
+    virtual bool BeforeUpdate() override;
+    virtual ~GActorLameSphere() override;
 
 };

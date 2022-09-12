@@ -12,7 +12,7 @@ struct KMesh
     // Get the collider range.
     virtual glm::vec3 Range() { return glm::vec3(1.0f, 1.0f, 1.0f); }
 
-    // Uncollide from a mesh.
-    virtual void Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir) {}
+    // Uncollide from a mesh. Returns if an actual collision took place.
+    virtual bool Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir) { return false; }
 
 };

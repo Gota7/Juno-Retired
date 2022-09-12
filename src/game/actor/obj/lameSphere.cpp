@@ -13,11 +13,6 @@ GActorLameSphere::GActorLameSphere(GScenario& scenario, std::string actorID, glm
     body.pos = pos;
 }
 
-GActorLameSphere::~GActorLameSphere()
-{
-    system->stopped = true;
-}
-
 bool GActorLameSphere::LoadResources()
 {
     system = &scenario.game.particleMgr->AddSystem("LameSphere", body.pos, nullptr);
@@ -28,5 +23,11 @@ bool GActorLameSphere::BeforeUpdate()
 {
     body.vel = grav * 0.5f + glm::vec3(0.18f, 0.0f, -0.18f); // Set constant speed to gravity and more.
     system->pos = body.pos;
+    //if (body.hitLastFrame) return false;
     return true;
+}
+
+GActorLameSphere::~GActorLameSphere()
+{
+    system->stopped = true;
 }

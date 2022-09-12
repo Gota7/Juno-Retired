@@ -16,7 +16,7 @@ struct GActor : GActorBase
 
     // Vfunctions.
     virtual bool BeforeUpdate() { return true; }
-    virtual bool Update();
+    virtual bool Update() override;
     virtual bool AfterUpdate() { return true; }
 
     // Verify arguments.

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 // Forward declare.
 struct GScenario;
@@ -17,19 +18,13 @@ struct GActorBase
     // Load resources. True if success.
     virtual bool LoadResources() { return true; }
 
-    // Cleanup resources.
-    virtual void CleanupResources() {}
-
     // Render the actor base. True if success.
     virtual bool Render() { return true; }
 
     // Update the base logic. True if success.
     virtual bool Update() { return true; }
 
-    // Kill the actor.
-    virtual void Kill() {}
-
-    // Destructor.
-    ~GActorBase() { CleanupResources(); }
+    // Virtual destructor.
+    virtual ~GActorBase() {}
 
 };

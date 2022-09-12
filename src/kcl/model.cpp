@@ -453,7 +453,7 @@ glm::vec3 KModel::Range()
     return glm::vec3(1000.0f, 1000.0f, 1000.0f); // Idk very temporary.
 }
 
-void KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
+bool KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
 {
 
     // Search for triangles.
@@ -496,5 +496,6 @@ void KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
     }
     //std::cout << pens.size() << std::endl;
     Unpenetrate(pos, pens); // Actually take care of making them not penetrated.
+    return pens.size() > 0;
 
 }
