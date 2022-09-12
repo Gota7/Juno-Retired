@@ -1,0 +1,34 @@
+#pragma once
+
+enum MenuButtons
+{
+    MENU_BT_UP,
+    MENU_BT_DOWN,
+    MENU_BT_LEFT,
+    MENU_BT_RIGHT,
+    MENU_BT_SELECT,
+    MENU_BT_BACK
+};
+
+enum CameraButtons
+{
+    CAMERA_BT_ORBIT_UPWARDS,
+    CAMERA_BT_ORBIT_DOWNWARDS,
+    CAMERA_BT_ORBIT_LEFT,
+    CAMERA_BT_ORBIT_RIGHT,
+    CAMERA_BT_ZOOM_IN,
+    CAMERA_BT_ZOOM_OUT,
+    CAMERA_BT_RESET,
+};
+
+enum PlayerButtons
+{
+    PLAYER_BT_FORWARD,
+    PLAYER_BT_BACKWARD,
+    PLAYER_BT_LEFT,
+    PLAYER_BT_RIGHT,
+    PLAYER_BT_JUMP,
+    PLAYER_BT_ATTACK,
+    PLAYER_BT_RUN,
+    PLAYER_BT_DUCK
+};

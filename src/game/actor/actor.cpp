@@ -3,7 +3,7 @@
 
 bool GActor::Update()
 {
-    if (!BeforeUpdate()) return false;;
+    if (!BeforeUpdate()) return false;
     scenario.gravMgr.CalcGravity(body.pos, GRAVITY_NORMAL, &grav);
     body.Update(scenario.colliders, grav, (float)JFrame::deltaTime);
     if (!AfterUpdate()) return false;
