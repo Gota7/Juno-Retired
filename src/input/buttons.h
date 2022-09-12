@@ -1,6 +1,6 @@
 #pragma once
 
-enum MenuButtons
+enum IMenuButtons
 {
     MENU_BT_UP,
     MENU_BT_DOWN,
@@ -10,7 +10,7 @@ enum MenuButtons
     MENU_BT_BACK
 };
 
-enum CameraButtons
+enum ICameraButtons
 {
     CAMERA_BT_ORBIT_UPWARDS,
     CAMERA_BT_ORBIT_DOWNWARDS,
@@ -21,7 +21,7 @@ enum CameraButtons
     CAMERA_BT_RESET,
 };
 
-enum PlayerButtons
+enum IPlayerButtons
 {
     PLAYER_BT_FORWARD,
     PLAYER_BT_BACKWARD,
