@@ -12,13 +12,13 @@ struct IDriver
     // Get a list of supported buttons.
     virtual void SupportedButtons(std::vector<int>& supportedButtons) {}
 
-    // Gather current inputs.
-    virtual void GatherCurrInputs() {}
+    // Register frame-wise callbacks needed.
+    virtual void RegisterCallbacks() {}
 
     // Initialize the driver.
     void Init();
 
     // Update the current driver.
-    void Update();
+    virtual void Update();
 
 };

@@ -49,12 +49,12 @@ enum IDriverKeyboardKeys
     KEYBOARD_X = GLFW_KEY_X,
     KEYBOARD_Y = GLFW_KEY_Y,
     KEYBOARD_Z = GLFW_KEY_Z,
-    KEYBOARD_LEFT = GLFW_KEY_LEFT_BRACKET,
+    KEYBOARD_LEFT_BRACKET = GLFW_KEY_LEFT_BRACKET,
     KEYBOARD_BACKSLASH = GLFW_KEY_BACKSLASH,
-    KEYBOARD_RIGHT = GLFW_KEY_RIGHT_BRACKET,
+    KEYBOARD_RIGHT_BRACKET = GLFW_KEY_RIGHT_BRACKET,
     KEYBOARD_GRAVE = GLFW_KEY_GRAVE_ACCENT,
-    KEYBOARD_WORLD = GLFW_KEY_WORLD_1,
-    KEYBOARD_WORLD = GLFW_KEY_WORLD_2,
+    KEYBOARD_WORLD_1 = GLFW_KEY_WORLD_1,
+    KEYBOARD_WORLD_2 = GLFW_KEY_WORLD_2,
     KEYBOARD_ESCAPE = GLFW_KEY_ESCAPE,
     KEYBOARD_ENTER = GLFW_KEY_ENTER,
     KEYBOARD_TAB = GLFW_KEY_TAB,
@@ -172,12 +172,12 @@ static const int IDRIVER_KEYBOARDKEYS_ALL[] = {
     KEYBOARD_X,
     KEYBOARD_Y,
     KEYBOARD_Z,
-    KEYBOARD_LEFT,
+    KEYBOARD_LEFT_BRACKET,
     KEYBOARD_BACKSLASH,
-    KEYBOARD_RIGHT,
+    KEYBOARD_RIGHT_BRACKET,
     KEYBOARD_GRAVE,
-    KEYBOARD_WORLD,
-    KEYBOARD_WORLD,
+    KEYBOARD_WORLD_1,
+    KEYBOARD_WORLD_2,
     KEYBOARD_ESCAPE,
     KEYBOARD_ENTER,
     KEYBOARD_TAB,
@@ -254,12 +254,16 @@ static const int IDRIVER_KEYBOARDKEYS_ALL[] = {
 struct IDriverKeyboard : IDriver
 {
     GLFWwindow* window; // Window.
+    static IDriverKeyboard* globalKeyboard; // Global keyboard.
 
     // Create a new keyboard driver.
     IDriverKeyboard(GLFWwindow* window) : window(window) {}
 
+    // Key press action.
+    static void OnKeyPress(GLFWwindow* window, int key, int scancode, int action, int mods);
+
     // Vfunctions.
     virtual void SupportedButtons(std::vector<int>& supportedButtons) override;
-    virtual void GatherCurrInputs() override;
+    virtual void RegisterCallbacks() override;
 
 };

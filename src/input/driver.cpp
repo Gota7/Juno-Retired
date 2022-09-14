@@ -8,6 +8,7 @@ void IDriver::Init()
     {
         currInputs[button] = 0.0f;
     }
+    RegisterCallbacks();
 }
 
 void IDriver::Update()
@@ -15,8 +16,5 @@ void IDriver::Update()
 
     // Save previous inputs.
     prevInputs = currInputs;
-
-    // Update new current inputs.
-    GatherCurrInputs();
 
 }
