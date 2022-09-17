@@ -5,7 +5,9 @@
 #include <iostream>
 #include <sstream>
 
-GGame::GGame()
+#define SAVE_INPUT_CONFIGS
+
+GGame::GGame(GLFWwindow* window)
 {
 
     // Shader setup.
@@ -53,6 +55,14 @@ GGame::GGame()
     matrices->ConnectToShader(*shader, "Matrices");
     matrices->ConnectToShader(*particleShader, "Matrices");
     matrices->ConnectToShader(*kclShader, "Matrices");
+
+    // Input.
+    input = std::make_unique<IController>(window);
+
+    // Temporarily save initial configs.
+#ifdef SAVE_INPUT_CONFIGS
+    input->menuButtons.SaveConfig("res/con/MenuButtons.conf");
+#endif
 
 }
 

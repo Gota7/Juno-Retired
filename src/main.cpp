@@ -94,7 +94,7 @@ int main()
     framebuffer = std::make_unique<JFramebuffer>(SCR_WIDTH, SCR_HEIGHT);
 
     // Game.
-    game = std::make_unique<GGame>();
+    game = std::make_unique<GGame>(window);
     game->LoadLevelScenario("TestMap", 0);
     //game->particleMgr->AddSystemGravity("GravityTest", std::make_unique<RGravityParallel>(*static_cast<RGravityParallel*>(game->scenario->gravMgr.gravities[0].get())));
     //game->scenario->planets[0]->mat = glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, -3.0f, -5.0f)), glm::vec3(1.0f, 1.0f, 1.0f) * 0.0025f);

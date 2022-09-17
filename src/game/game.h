@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../input.h"
 #include "../jsystem.h"
 #include "../particle.h"
 #include "scenario.h"
@@ -19,9 +20,10 @@ struct GGame
     std::unique_ptr<JLightDirectional> lightDirectional;
     std::unique_ptr<JUniformBuffer> matrices;
     std::unique_ptr<PManager> particleMgr;
+    std::unique_ptr<IController> input;
 
     // Initialize the game.
-    GGame();
+    GGame(GLFWwindow* window);
 
     // Get a scenario list for a level.
     std::map<int, GScenarioEntry> GetScenarioList(std::string level);

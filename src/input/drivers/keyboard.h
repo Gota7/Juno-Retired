@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../driver.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 enum IDriverKeyboardKeys

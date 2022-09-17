@@ -7,7 +7,9 @@ enum IMenuButtons
     MENU_BT_LEFT,
     MENU_BT_RIGHT,
     MENU_BT_SELECT,
-    MENU_BT_BACK
+    MENU_BT_BACK,
+
+    MENU_BT_COUNT
 };
 
 enum ICameraButtons
@@ -19,6 +21,8 @@ enum ICameraButtons
     CAMERA_BT_ZOOM_IN,
     CAMERA_BT_ZOOM_OUT,
     CAMERA_BT_RESET,
+
+    CAMERA_BT_COUNT
 };
 
 enum IPlayerButtons
@@ -30,5 +34,7 @@ enum IPlayerButtons
     PLAYER_BT_JUMP,
     PLAYER_BT_ATTACK,
     PLAYER_BT_RUN,
-    PLAYER_BT_DUCK
+    PLAYER_BT_DUCK,
+
+    PLAYER_BT_COUNT
 };

@@ -3,6 +3,8 @@
 #include "buttons.h"
 #include "drivers/keyboard.h"
 
+#include <array>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
 
@@ -28,11 +30,11 @@ struct IControllerAssignmentInfo
 
 // A controller assignment.
 struct IController;
-template<typename T>
+template<typename T, size_t U>
 struct IControllerAssignment
 {
     IController* controller;
-    std::map<T, IControllerAssignmentInfo> mapping;
+    IControllerAssignmentInfo mapping[U];
     
     // Initialize.
     void Init(IController* controller, std::string defaultConfigPath);
@@ -62,9 +64,9 @@ struct IController
 {
     IDriverKeyboard keyboard;
     std::vector<IDriver*> drivers;
-    IControllerAssignment<IMenuButtons> menuButtons;
-    IControllerAssignment<ICameraButtons> cameraButtons;
-    IControllerAssignment<IPlayerButtons> playerButtons[NUM_PLAYERS];
+    IControllerAssignment<IMenuButtons, MENU_BT_COUNT> menuButtons;
+    IControllerAssignment<ICameraButtons, CAMERA_BT_COUNT> cameraButtons;
+    IControllerAssignment<IPlayerButtons, PLAYER_BT_COUNT> playerButtons[NUM_PLAYERS];
 
     // Make a new controller.
     IController(GLFWwindow* window);
