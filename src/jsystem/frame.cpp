@@ -1,15 +1,15 @@
 #include "frame.h"
 #include <iostream>
 
-double JFrame::currentFrame = 0;
-double JFrame::lastFrame = 0;
-double JFrame::deltaTime = 0;
-double JFrame::lastSecond = 0;
-unsigned int JFrame::targetFps = 60;
-double JFrame::targetTime = 1.0 / 60;
-int JFrame::fps = 60;
-int JFrame::frameCounter = 0;
-float JFrame::aspect = (float)16 / 9;
+double JFrame::currentFrame = 0; // Current time in seconds.
+double JFrame::lastFrame = 0; // Last frame in seconds.
+double JFrame::deltaTime = 0; // Time between last frame and this one.
+double JFrame::lastSecond = 0; // Last frame that was the seconds count.
+unsigned int JFrame::targetFps = 60; // Target frames per seconds.
+double JFrame::targetTime = 1.0 / 60; // Target time for each frame.
+int JFrame::fps = 60; // Current FPS.
+int JFrame::frameCounter = 0; // Frame counter for each second.
+float JFrame::aspect = (float)16 / 9; // Aspect ratio of the game.
 
 #define SUPPORT_BUSY_WAIT_LOOP true
 
