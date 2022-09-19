@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../camera.h"
+#include "../../jsystem.h"
 #include <GLFW/glfw3.h>
 
 // Free cam.
-struct JFreeCam : JCamera
+struct GFreeCam : JCamera
 {
 
     // Pan the camera.
@@ -16,10 +16,7 @@ struct JFreeCam : JCamera
     // Rotate the camera.
     void Rotate(float x, float y);
 
-    // GLFW keys.
-    void GLFWKeys(GLFWwindow* window);
-
-    // GLFW mouse.
-    void GLFWMouse(GLFWwindow* window, double xposIn, double yposIn);
+    // Vfunctions.
+    virtual void Update() override;
 
 };

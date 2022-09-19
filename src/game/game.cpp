@@ -1,5 +1,6 @@
 #include "game.h"
 #include "../kcl.h"
+#include "cameras/freeCam.h"
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
@@ -34,7 +35,7 @@ GGame::GGame(GLFWwindow* window)
     kclShader = std::make_unique<JShader>(shaderList);
 
     // Camera setup.
-    camera = std::make_unique<JFreeCam>();
+    camera = std::make_unique<GFreeCam>();
     camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 
     // Light setup.
@@ -110,8 +111,8 @@ void GGame::Render()
 
     // Camera stuff.
     camera->Update();
-    glm::mat4 projection = camera->ProjectionMatrix();
-    glm::mat4 view = camera->ViewMatrix();
+    glm::mat4& projection = camera->projection;
+    glm::mat4& view = camera->view;
     matrices->Bind();
     matrices->SendData(0, glm::value_ptr(projection), sizeof(glm::mat4));
     matrices->SendData(sizeof(glm::mat4), glm::value_ptr(view), sizeof(glm::mat4));

@@ -35,17 +35,6 @@ void window_callback(GLFWwindow* window)
     window_draw(window);
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    static_cast<JFreeCam*>(game->camera.get())->GLFWKeys(window);
-}
-
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
-{
-    static_cast<JFreeCam*>(game->camera.get())->GLFWMouse(window, xposIn, yposIn);
-}
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    static_cast<JFreeCam*>(game->camera.get())->Forward(yoffset);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -63,8 +52,6 @@ int main()
     GLFWwindow* window = Window_Init("Gota's Galactic Journey");
     if (!window) return -1;
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
 #ifndef VSYNC
     glfwSwapInterval(0);
 #endif

@@ -1,5 +1,18 @@
 #pragma once
 
+enum IMouseButtons
+{
+    MOUSE_BT_LEFT,
+    MOUSE_BT_RIGHT,
+    MOUSE_BT_MIDDLE,
+    MOUSE_BT_X_POS,
+    MOUSE_BT_Y_POS,
+    MOUSE_BT_X_MOVE,
+    MOUSE_BT_Y_MOVE,
+
+    MOUSE_BT_COUNT
+};
+
 enum IMenuButtons
 {
     MENU_BT_UP,

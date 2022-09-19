@@ -2,6 +2,7 @@
 
 #include "buttons.h"
 #include "drivers/keyboard.h"
+#include "drivers/mouse.h"
 
 #include <array>
 #include <fstream>
@@ -68,7 +69,9 @@ struct IControllerAssignment
 struct IController
 {
     IDriverKeyboard keyboard;
+    IDriverMouse mouse;
     IDriver* drivers[CONTROLLER_DRIVER_COUNT];
+    IControllerAssignment<IMouseButtons, MOUSE_BT_COUNT> mouseButtons;
     IControllerAssignment<IMenuButtons, MENU_BT_COUNT> menuButtons;
     IControllerAssignment<ICameraButtons, CAMERA_BT_COUNT> cameraButtons;
     IControllerAssignment<IPlayerButtons, PLAYER_BT_COUNT> playerButtons[NUM_PLAYERS];
