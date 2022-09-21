@@ -43,9 +43,29 @@ IController::IController(GLFWwindow* window) : keyboard(window), mouse(window)
     menuButtons.mapping[MENU_BT_BACK].driverNum = CONTROLLER_DRIVER_KEYBOARD;
     menuButtons.mapping[MENU_BT_BACK].buttonNum = KEYBOARD_X;
 
+    // Free cam buttons.
+    freeCamButtons.mapping[FREECAM_BT_FORWARD].driverNum = CONTROLLER_DRIVER_KEYBOARD;
+    freeCamButtons.mapping[FREECAM_BT_FORWARD].buttonNum = KEYBOARD_W;
+    freeCamButtons.mapping[FREECAM_BT_BACKWARD].driverNum = CONTROLLER_DRIVER_KEYBOARD;
+    freeCamButtons.mapping[FREECAM_BT_BACKWARD].buttonNum = KEYBOARD_S;
+    freeCamButtons.mapping[FREECAM_BT_LEFT].driverNum = CONTROLLER_DRIVER_KEYBOARD;
+    freeCamButtons.mapping[FREECAM_BT_LEFT].buttonNum = KEYBOARD_A;
+    freeCamButtons.mapping[FREECAM_BT_RIGHT].driverNum = CONTROLLER_DRIVER_KEYBOARD;
+    freeCamButtons.mapping[FREECAM_BT_RIGHT].buttonNum = KEYBOARD_D;
+    freeCamButtons.mapping[FREECAM_BT_LEFT_RIGHT_AN].driverNum = CONTROLLER_DRIVER_MOUSE;
+    freeCamButtons.mapping[FREECAM_BT_LEFT_RIGHT_AN].buttonNum = MOUSE_X_MOVE_L;
+    // TODO!!!
+    freeCamButtons.mapping[FREECAM_BT_UP].driverNum = CONTROLLER_DRIVER_KEYBOARD;
+    freeCamButtons.mapping[FREECAM_BT_UP].buttonNum = KEYBOARD_SPACE;
+    freeCamButtons.mapping[FREECAM_BT_DOWN].driverNum = CONTROLLER_DRIVER_KEYBOARD;
+    freeCamButtons.mapping[FREECAM_BT_DOWN].buttonNum = KEYBOARD_LEFT_SHIFT;
+    freeCamButtons.mapping[FREECAM_BT_UP_DOWN_AN].driverNum = CONTROLLER_DRIVER_MOUSE;
+    freeCamButtons.mapping[FREECAM_BT_UP_DOWN_AN].buttonNum = MOUSE_Y_MOVE_L;
+
     // Button mapping time.
     mouseButtons.Init(this, "res/con/!@#$%^&.conf"); // This won't be able to be opened.
     menuButtons.Init(this, "res/con/MenuButtons.conf");
+    freeCamButtons.Init(this, "res/con/FreeCamButtons.conf");
     cameraButtons.Init(this, "res/con/CameraButtons.conf");
     for (int i = 0; i < NUM_PLAYERS; i++)
     {
@@ -58,6 +78,8 @@ void IController::Update()
 {
     for (auto driver : drivers)
     {
-        driver->Update();
+        //driver->Update(); TODO: FINISH THINGS FIRST!!!
     }
+    drivers[CONTROLLER_DRIVER_KEYBOARD]->Update();
+    drivers[CONTROLLER_DRIVER_MOUSE]->Update();
 }

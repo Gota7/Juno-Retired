@@ -19,7 +19,15 @@ enum IDriverMousePositions
     MOUSE_X_POS = MOUSE_BUTTON_END,
     MOUSE_Y_POS,
     MOUSE_X_MOVE,
-    MOUSE_Y_MOVE
+    MOUSE_Y_MOVE,
+    MOUSE_X_MOVE_L, // Move with left mouse button down.
+    MOUSE_Y_MOVE_L,
+    MOUSE_X_MOVE_R,
+    MOUSE_Y_MOVE_R,
+    MOUSE_X_MOVE_M,
+    MOUSE_Y_MOVE_M,
+
+    MOUSE_DRIVER_POS_END
 };
 
 // Mouse driver.
@@ -33,6 +41,9 @@ struct IDriverMouse : IDriver
 
     // Button press action.
     static void OnButtonPress(GLFWwindow* window, int button, int action, int mods);
+
+    // Update movement.
+    void UpdateMovement(IDriverMouseButtons mouseButton, float& xPos, float& yPos);
 
     // Vfunctions.
     virtual void SupportedButtons(std::vector<int>& supportedButtons) override;

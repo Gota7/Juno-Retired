@@ -28,24 +28,6 @@ void GFreeCam::Rotate(float x, float y)
     needsMatrixUpdate = true;
 }
 
-// void GFreeCam::Keys()
-// {
-//     // Camera.
-//     float cameraSpeed = static_cast<float>(2.5 * JFrame::deltaTime);
-//     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-//         cameraPos += cameraSpeed * cameraFront;
-//     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-//         cameraPos -= cameraSpeed * cameraFront;
-//     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-//         cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-//     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-//         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-//     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-//         cameraPos += cameraSpeed * cameraUp;
-//     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-//         cameraPos -= cameraSpeed * cameraUp;
-// }
-
 // void GFreeCam::GLFWMouse(GLFWwindow* window, double xposIn, double yposIn)
 // {
 //     static float lastX;
@@ -90,7 +72,42 @@ void GFreeCam::Update()
 {
 
     // Check for simple movement.
-    // TODO!!!
+    float cameraSpeed = static_cast<float>(2.5 * JFrame::deltaTime);
+    if (input->freeCamButtons.ButtonDown(FREECAM_BT_FORWARD))
+    {
+        cameraPos += cameraFront * cameraSpeed;
+        needsMatrixUpdate = true;
+    }
+    if (input->freeCamButtons.ButtonDown(FREECAM_BT_BACKWARD))
+    {
+        cameraPos -= cameraFront * cameraSpeed;
+        needsMatrixUpdate = true;
+    }
+    if (input->freeCamButtons.ButtonDown(FREECAM_BT_LEFT))
+    {
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        needsMatrixUpdate = true;
+    }
+    if (input->freeCamButtons.ButtonDown(FREECAM_BT_RIGHT))
+    {
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        needsMatrixUpdate = true;
+    }
+    if (input->freeCamButtons.ButtonDown(FREECAM_BT_UP))
+    {
+        cameraPos += cameraSpeed * cameraUp;
+        needsMatrixUpdate = true;
+    }
+    if (input->freeCamButtons.ButtonDown(FREECAM_BT_DOWN))
+    {
+        cameraPos -= cameraSpeed * cameraUp;
+        needsMatrixUpdate = true;
+    }
+
+    // Mouse and panning.
+    float xPan = input->freeCamButtons.ButtonDown(FREECAM_BT_LEFT_RIGHT_AN);
+    float yPan = input->freeCamButtons.ButtonDown(FREECAM_BT_UP_DOWN_AN);
+    if (xPan != 0.0f || yPan != 0.0f) Pan(xPan, yPan);
 
     // Update camera.
     JCamera::Update();

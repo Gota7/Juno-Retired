@@ -74,6 +74,7 @@ struct IController
     IControllerAssignment<IMouseButtons, MOUSE_BT_COUNT> mouseButtons;
     IControllerAssignment<IMenuButtons, MENU_BT_COUNT> menuButtons;
     IControllerAssignment<ICameraButtons, CAMERA_BT_COUNT> cameraButtons;
+    IControllerAssignment<IFreeCamButtons, FREECAM_BT_COUNT> freeCamButtons;
     IControllerAssignment<IPlayerButtons, PLAYER_BT_COUNT> playerButtons[NUM_PLAYERS];
 
     // Make a new controller.

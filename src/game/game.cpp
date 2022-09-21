@@ -34,10 +34,6 @@ GGame::GGame(GLFWwindow* window)
     shaderList.push_back(std::pair("res/shd/kclFrag.glsl", GL_FRAGMENT_SHADER));
     kclShader = std::make_unique<JShader>(shaderList);
 
-    // Camera setup.
-    camera = std::make_unique<GFreeCam>();
-    camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-
     // Light setup.
     shader->Use();
     lightDirectional = std::make_unique<JLightDirectional>(glm::vec3(-0.0f, -1.0f, -0.0f));
@@ -64,6 +60,10 @@ GGame::GGame(GLFWwindow* window)
 #ifdef SAVE_INPUT_CONFIGS
     input->menuButtons.SaveConfig("res/con/MenuButtons.conf");
 #endif
+
+    // Camera setup.
+    camera = std::make_unique<GFreeCam>(input.get());
+    camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 
 }
 
@@ -106,6 +106,7 @@ void GGame::Render()
 {
 
     // Update logic.
+    input->Update();
     particleMgr->Update();
     scenario->Update();
 
