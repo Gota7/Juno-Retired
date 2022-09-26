@@ -28,6 +28,20 @@ IController::IController(GLFWwindow* window) : keyboard(window), mouse(window)
     mouseButtons.mapping[MOUSE_BT_X_MOVE].buttonNum = MOUSE_X_MOVE;
     mouseButtons.mapping[MOUSE_BT_Y_MOVE].driverNum = CONTROLLER_DRIVER_MOUSE;
     mouseButtons.mapping[MOUSE_BT_Y_MOVE].buttonNum = MOUSE_Y_MOVE;
+    mouseButtons.mapping[MOUSE_BT_X_MOVE_L].driverNum = CONTROLLER_DRIVER_MOUSE;
+    mouseButtons.mapping[MOUSE_BT_Y_MOVE_L].buttonNum = MOUSE_X_MOVE_L;
+    mouseButtons.mapping[MOUSE_BT_X_MOVE_R].driverNum = CONTROLLER_DRIVER_MOUSE;
+    mouseButtons.mapping[MOUSE_BT_Y_MOVE_R].buttonNum = MOUSE_X_MOVE_R;
+    mouseButtons.mapping[MOUSE_BT_X_MOVE_M].driverNum = CONTROLLER_DRIVER_MOUSE;
+    mouseButtons.mapping[MOUSE_BT_Y_MOVE_M].buttonNum = MOUSE_X_MOVE_M;
+    mouseButtons.mapping[MOUSE_BT_SCROLL_X_POS].driverNum = CONTROLLER_DRIVER_MOUSE;
+    mouseButtons.mapping[MOUSE_BT_SCROLL_X_POS].buttonNum = MOUSE_SCROLL_X_POS;
+    mouseButtons.mapping[MOUSE_BT_SCROLL_Y_POS].driverNum = CONTROLLER_DRIVER_MOUSE;
+    mouseButtons.mapping[MOUSE_BT_SCROLL_Y_POS].buttonNum = MOUSE_SCROLL_Y_POS;
+    mouseButtons.mapping[MOUSE_BT_SCROLL_X_MOVE].driverNum = CONTROLLER_DRIVER_MOUSE;
+    mouseButtons.mapping[MOUSE_BT_SCROLL_X_MOVE].buttonNum = MOUSE_SCROLL_X_MOVE;
+    mouseButtons.mapping[MOUSE_BT_SCROLL_Y_MOVE].driverNum = CONTROLLER_DRIVER_MOUSE;
+    mouseButtons.mapping[MOUSE_BT_SCROLL_Y_MOVE].buttonNum = MOUSE_SCROLL_Y_MOVE;
 
     // Backup configs in case saved doesn't exist.
     menuButtons.mapping[MENU_BT_UP].driverNum = CONTROLLER_DRIVER_KEYBOARD;
@@ -48,19 +62,24 @@ IController::IController(GLFWwindow* window) : keyboard(window), mouse(window)
     freeCamButtons.mapping[FREECAM_BT_FORWARD].buttonNum = KEYBOARD_W;
     freeCamButtons.mapping[FREECAM_BT_BACKWARD].driverNum = CONTROLLER_DRIVER_KEYBOARD;
     freeCamButtons.mapping[FREECAM_BT_BACKWARD].buttonNum = KEYBOARD_S;
+    freeCamButtons.mapping[FREECAM_BT_FORWARD_BACKWARD_AN].driverNum = CONTROLLER_DRIVER_MOUSE;
+    freeCamButtons.mapping[FREECAM_BT_FORWARD_BACKWARD_AN].buttonNum = MOUSE_SCROLL_Y_MOVE;
     freeCamButtons.mapping[FREECAM_BT_LEFT].driverNum = CONTROLLER_DRIVER_KEYBOARD;
     freeCamButtons.mapping[FREECAM_BT_LEFT].buttonNum = KEYBOARD_A;
     freeCamButtons.mapping[FREECAM_BT_RIGHT].driverNum = CONTROLLER_DRIVER_KEYBOARD;
     freeCamButtons.mapping[FREECAM_BT_RIGHT].buttonNum = KEYBOARD_D;
     freeCamButtons.mapping[FREECAM_BT_LEFT_RIGHT_AN].driverNum = CONTROLLER_DRIVER_MOUSE;
     freeCamButtons.mapping[FREECAM_BT_LEFT_RIGHT_AN].buttonNum = MOUSE_X_MOVE_L;
-    // TODO!!!
     freeCamButtons.mapping[FREECAM_BT_UP].driverNum = CONTROLLER_DRIVER_KEYBOARD;
     freeCamButtons.mapping[FREECAM_BT_UP].buttonNum = KEYBOARD_SPACE;
     freeCamButtons.mapping[FREECAM_BT_DOWN].driverNum = CONTROLLER_DRIVER_KEYBOARD;
     freeCamButtons.mapping[FREECAM_BT_DOWN].buttonNum = KEYBOARD_LEFT_SHIFT;
     freeCamButtons.mapping[FREECAM_BT_UP_DOWN_AN].driverNum = CONTROLLER_DRIVER_MOUSE;
     freeCamButtons.mapping[FREECAM_BT_UP_DOWN_AN].buttonNum = MOUSE_Y_MOVE_L;
+    freeCamButtons.mapping[FREECAM_BT_ROT_X_AN].driverNum = CONTROLLER_DRIVER_MOUSE;
+    freeCamButtons.mapping[FREECAM_BT_ROT_X_AN].buttonNum = MOUSE_X_MOVE_R;
+    freeCamButtons.mapping[FREECAM_BT_ROT_Y_AN].driverNum = CONTROLLER_DRIVER_MOUSE;
+    freeCamButtons.mapping[FREECAM_BT_ROT_Y_AN].buttonNum = MOUSE_Y_MOVE_R;
 
     // Button mapping time.
     mouseButtons.Init(this, "res/con/!@#$%^&.conf"); // This won't be able to be opened.

@@ -26,6 +26,10 @@ enum IDriverMousePositions
     MOUSE_Y_MOVE_R,
     MOUSE_X_MOVE_M,
     MOUSE_Y_MOVE_M,
+    MOUSE_SCROLL_X_POS,
+    MOUSE_SCROLL_Y_POS,
+    MOUSE_SCROLL_X_MOVE,
+    MOUSE_SCROLL_Y_MOVE,
 
     MOUSE_DRIVER_POS_END
 };
@@ -41,6 +45,9 @@ struct IDriverMouse : IDriver
 
     // Button press action.
     static void OnButtonPress(GLFWwindow* window, int button, int action, int mods);
+
+    // Scroll wheel action.
+    static void OnSroll(GLFWwindow* window, double xOffset, double yOffset);
 
     // Update movement.
     void UpdateMovement(IDriverMouseButtons mouseButton, float& xPos, float& yPos);

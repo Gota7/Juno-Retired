@@ -15,6 +15,12 @@ void IDriverMouse::OnButtonPress(GLFWwindow* window, int button, int action, int
     }
 }
 
+void IDriverMouse::OnSroll(GLFWwindow* window, double xOffset, double yOffset)
+{
+    globalMouse->currInputs[MOUSE_SCROLL_X_POS] += xOffset;
+    globalMouse->currInputs[MOUSE_SCROLL_Y_POS] += yOffset;
+}
+
 void IDriverMouse::UpdateMovement(IDriverMouseButtons mouseButton, float& xPos, float& yPos)
 {
     if (currInputs[mouseButton] && prevInputs[mouseButton] != 0.0f) // Mouse has been down.
@@ -43,10 +49,13 @@ void IDriverMouse::SupportedButtons(std::vector<int>& supportedButtons)
 void IDriverMouse::RegisterCallbacks()
 {
     glfwSetMouseButtonCallback(window, OnButtonPress);
+    glfwSetScrollCallback(window, OnSroll);
 }
 
 void IDriverMouse::Update()
 {
+    currInputs[MOUSE_SCROLL_X_MOVE] = currInputs[MOUSE_SCROLL_X_POS] - prevInputs[MOUSE_SCROLL_X_POS];
+    currInputs[MOUSE_SCROLL_Y_MOVE] = currInputs[MOUSE_SCROLL_Y_POS] - prevInputs[MOUSE_SCROLL_Y_POS];
     IDriver::Update();
     double xPos, yPos;
     glfwGetCursorPos(window, &xPos, &yPos);

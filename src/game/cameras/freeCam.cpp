@@ -28,46 +28,6 @@ void GFreeCam::Rotate(float x, float y)
     needsMatrixUpdate = true;
 }
 
-// void GFreeCam::GLFWMouse(GLFWwindow* window, double xposIn, double yposIn)
-// {
-//     static float lastX;
-//     static float lastY;
-//     static bool leftWasPressed = false;
-//     static bool rightWasPressed = false;
-//     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-//     {
-//         if (!leftWasPressed)
-//         {
-//             lastX = xposIn;
-//             lastY = yposIn;
-//             leftWasPressed = true;
-//         }
-//         Pan(xposIn - lastX, yposIn - lastY);
-//         lastX = xposIn;
-//         lastY = yposIn;
-//     }
-//     else if (leftWasPressed)
-//     {
-//         leftWasPressed = false;
-//     }
-//     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-//     {
-//         if (!rightWasPressed)
-//         {
-//             lastX = xposIn;
-//             lastY = yposIn;
-//             rightWasPressed = true;
-//         }
-//         Rotate(xposIn - lastX, yposIn - lastY);
-//         lastX = xposIn;
-//         lastY = yposIn;
-//     }
-//     else if (rightWasPressed)
-//     {
-//         rightWasPressed = false;
-//     }
-// }
-
 void GFreeCam::Update()
 {
 
@@ -108,6 +68,15 @@ void GFreeCam::Update()
     float xPan = input->freeCamButtons.ButtonDown(FREECAM_BT_LEFT_RIGHT_AN);
     float yPan = input->freeCamButtons.ButtonDown(FREECAM_BT_UP_DOWN_AN);
     if (xPan != 0.0f || yPan != 0.0f) Pan(xPan, yPan);
+
+    // Mouse and rotation.
+    float xRot = input->freeCamButtons.ButtonDown(FREECAM_BT_ROT_X_AN);
+    float yRot = input->freeCamButtons.ButtonDown(FREECAM_BT_ROT_Y_AN);
+    if (xRot != 0.0f || yRot != 0.0f) Rotate(xRot, yRot);
+
+    // Forward/backward.
+    float forwardBackward = input->freeCamButtons.ButtonDown(FREECAM_BT_FORWARD_BACKWARD_AN);
+    if (forwardBackward != 0.0f) Forward(forwardBackward);
 
     // Update camera.
     JCamera::Update();

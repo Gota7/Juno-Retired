@@ -32,6 +32,7 @@ struct IControllerAssignmentInfo
 {
     int driverNum; // Driver number.
     int buttonNum; // Button of the controller.
+    float scale = 1.0f; // Scale of the input.
 };
 
 // A controller assignment.
@@ -102,7 +103,7 @@ template<typename T, size_t U>
 float IControllerAssignment<T, U>::ButtonDown(T button)
 {
     IControllerAssignmentInfo& info = mapping[(int)button];
-    return controller->drivers[info.driverNum]->currInputs[info.buttonNum];
+    return controller->drivers[info.driverNum]->currInputs[info.buttonNum] * info.scale;
 }
 
 template<typename T, size_t U>
@@ -117,7 +118,7 @@ float IControllerAssignment<T, U>::ButtonPressed(T button)
 {
     IControllerAssignmentInfo& info = mapping[(int)button];
     if (controller->drivers[info.driverNum]->prevInputs[info.buttonNum] != 0.0f) return 0.0f; // Was down previous frame.
-    return controller->drivers[info.driverNum]->currInputs[info.buttonNum];
+    return controller->drivers[info.driverNum]->currInputs[info.buttonNum] * info.scale;
 }
 
 template<typename T, size_t U>
