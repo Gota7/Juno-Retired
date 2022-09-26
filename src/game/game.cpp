@@ -6,8 +6,6 @@
 #include <iostream>
 #include <sstream>
 
-#define SAVE_INPUT_CONFIGS
-
 GGame::GGame(GLFWwindow* window)
 {
 
@@ -55,11 +53,6 @@ GGame::GGame(GLFWwindow* window)
 
     // Input.
     input = std::make_unique<IController>(window);
-
-    // Temporarily save initial configs.
-#ifdef SAVE_INPUT_CONFIGS
-    input->menuButtons.SaveConfig("res/con/MenuButtons.conf");
-#endif
 
     // Camera setup.
     camera = std::make_unique<GFreeCam>(input.get());

@@ -44,6 +44,9 @@ struct IControllerAssignment
     IControllerAssignmentInfo mapping[U];
 
     // Initialize.
+    void Init(IController* controller);
+
+    // Initialize.
     void Init(IController* controller, std::string defaultConfigPath);
 
     // Button down. Has 0-1 floating range.
@@ -81,10 +84,19 @@ struct IController
     // Make a new controller.
     IController(GLFWwindow* window);
 
+    // Reset default inputs.
+    void ResetDefaultInputs();
+
     // Update the controller.
     void Update();
 
 };
+
+template<typename T, size_t U>
+void IControllerAssignment<T, U>::Init(IController* controller)
+{
+    this->controller = controller;
+}
 
 template<typename T, size_t U>
 void IControllerAssignment<T, U>::Init(IController* controller, std::string defaultConfigPath)
@@ -96,6 +108,10 @@ void IControllerAssignment<T, U>::Init(IController* controller, std::string defa
     {
         file.close();
         LoadConfig(defaultConfigPath);
+    }
+    else
+    {
+        SaveConfig(defaultConfigPath);
     }
 }
 
@@ -132,7 +148,28 @@ bool IControllerAssignment<T, U>::ButtonReleased(T button)
 template<typename T, size_t U>
 void IControllerAssignment<T, U>::LoadConfig(std::string path)
 {
-    // TODO!!!
+    std::fstream file;
+    file.open(path, std::ios::in);
+    if (file.is_open())
+    {
+        std::string tp;
+        int assignmentNum = 0;
+        while(std::getline(file, tp))
+        {
+            std::stringstream line(tp);
+            IControllerAssignmentInfo& item = mapping[assignmentNum];
+            std::string tmp;
+            std::getline(line, tmp, ';');
+            item.driverNum = std::stoi(tmp);
+            std::getline(line, tmp, ';');
+            item.buttonNum = std::stoi(tmp);
+            std::getline(line, tmp, ';');
+            item.scale = std::stof(tmp);
+            assignmentNum++;
+        }
+        file.close();
+    }
+    else std::cout << "ERROR: Failed to open " + path + " controls config." << std::endl;
 }
 
 template<typename T, size_t U>
@@ -143,7 +180,7 @@ void IControllerAssignment<T, U>::SaveConfig(std::string path)
     {
         for (unsigned int i = 0; i < U; i++)
         {
-            file << mapping[i].driverNum << ";" << mapping[i].buttonNum << std::endl;
+            file << mapping[i].driverNum << ";" << mapping[i].buttonNum << ";" << mapping[i].scale << std::endl;
         }
     }
     else std::cout << "ERROR: Failed to save " << path << " to disk!" << std::endl;

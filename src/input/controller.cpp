@@ -13,7 +13,25 @@ IController::IController(GLFWwindow* window) : keyboard(window), mouse(window)
     drivers[CONTROLLER_DRIVER_KEYBOARD]->Init();
     drivers[CONTROLLER_DRIVER_MOUSE]->Init();
 
-    // Mouse buttons are not configurable.
+    // Reset default input.
+    ResetDefaultInputs();
+
+    // Button mapping time.
+    mouseButtons.Init(this);
+    menuButtons.Init(this, "res/con/MenuButtons.conf");
+    freeCamButtons.Init(this, "res/con/FreeCamButtons.conf");
+    cameraButtons.Init(this, "res/con/CameraButtons.conf");
+    for (int i = 0; i < NUM_PLAYERS; i++)
+    {
+        playerButtons[i].Init(this, "res/con/PlayerButtons" + std::to_string(i) + ".conf");
+    }
+
+}
+
+void IController::ResetDefaultInputs()
+{
+
+    // Just map mouse input.
     mouseButtons.mapping[MOUSE_BT_LEFT].driverNum = CONTROLLER_DRIVER_MOUSE;
     mouseButtons.mapping[MOUSE_BT_LEFT].buttonNum = MOUSE_LEFT_BUTTON;
     mouseButtons.mapping[MOUSE_BT_RIGHT].driverNum = CONTROLLER_DRIVER_MOUSE;
@@ -43,7 +61,7 @@ IController::IController(GLFWwindow* window) : keyboard(window), mouse(window)
     mouseButtons.mapping[MOUSE_BT_SCROLL_Y_MOVE].driverNum = CONTROLLER_DRIVER_MOUSE;
     mouseButtons.mapping[MOUSE_BT_SCROLL_Y_MOVE].buttonNum = MOUSE_SCROLL_Y_MOVE;
 
-    // Backup configs in case saved doesn't exist.
+    // Menu buttons defaults.
     menuButtons.mapping[MENU_BT_UP].driverNum = CONTROLLER_DRIVER_KEYBOARD;
     menuButtons.mapping[MENU_BT_UP].buttonNum = KEYBOARD_UP;
     menuButtons.mapping[MENU_BT_DOWN].driverNum = CONTROLLER_DRIVER_KEYBOARD;
@@ -57,7 +75,7 @@ IController::IController(GLFWwindow* window) : keyboard(window), mouse(window)
     menuButtons.mapping[MENU_BT_BACK].driverNum = CONTROLLER_DRIVER_KEYBOARD;
     menuButtons.mapping[MENU_BT_BACK].buttonNum = KEYBOARD_X;
 
-    // Free cam buttons.
+    // Free cam button defaults.
     freeCamButtons.mapping[FREECAM_BT_FORWARD].driverNum = CONTROLLER_DRIVER_KEYBOARD;
     freeCamButtons.mapping[FREECAM_BT_FORWARD].buttonNum = KEYBOARD_W;
     freeCamButtons.mapping[FREECAM_BT_BACKWARD].driverNum = CONTROLLER_DRIVER_KEYBOARD;
@@ -80,16 +98,6 @@ IController::IController(GLFWwindow* window) : keyboard(window), mouse(window)
     freeCamButtons.mapping[FREECAM_BT_ROT_X_AN].buttonNum = MOUSE_X_MOVE_R;
     freeCamButtons.mapping[FREECAM_BT_ROT_Y_AN].driverNum = CONTROLLER_DRIVER_MOUSE;
     freeCamButtons.mapping[FREECAM_BT_ROT_Y_AN].buttonNum = MOUSE_Y_MOVE_R;
-
-    // Button mapping time.
-    mouseButtons.Init(this, "res/con/!@#$%^&.conf"); // This won't be able to be opened.
-    menuButtons.Init(this, "res/con/MenuButtons.conf");
-    freeCamButtons.Init(this, "res/con/FreeCamButtons.conf");
-    cameraButtons.Init(this, "res/con/CameraButtons.conf");
-    for (int i = 0; i < NUM_PLAYERS; i++)
-    {
-        playerButtons[i].Init(this, "res/con/PlayerButtons" + std::to_string(i) + ".conf");
-    }
 
 }
 
