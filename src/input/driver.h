@@ -3,6 +3,8 @@
 #include <map>
 #include <vector>
 
+#define NUM_PLAYERS 4
+
 // Driver for handling input events.
 struct IDriver
 {

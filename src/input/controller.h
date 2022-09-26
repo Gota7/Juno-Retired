@@ -12,8 +12,6 @@
 #include <sstream>
 #include <string>
 
-#define NUM_PLAYERS 4
-
 // Controller drivers.
 enum IControllerDrivers
 {
@@ -166,6 +164,7 @@ void IControllerAssignment<T, U>::LoadConfig(std::string path)
             std::getline(line, tmp, ';');
             item.scale = std::stof(tmp);
             assignmentNum++;
+            if (assignmentNum >= U) break; // Safety.
         }
         file.close();
     }
