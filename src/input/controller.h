@@ -1,6 +1,7 @@
 #pragma once
 
 #include "buttons.h"
+#include "drivers/gamepad.h"
 #include "drivers/keyboard.h"
 #include "drivers/mouse.h"
 
@@ -72,6 +73,7 @@ struct IController
 {
     IDriverKeyboard keyboard;
     IDriverMouse mouse;
+    IDriverGamepad gamepads[NUM_PLAYERS];
     IDriver* drivers[CONTROLLER_DRIVER_COUNT];
     IControllerAssignment<IMouseButtons, MOUSE_BT_COUNT> mouseButtons;
     IControllerAssignment<IMenuButtons, MENU_BT_COUNT> menuButtons;

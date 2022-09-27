@@ -1,18 +1,31 @@
 #include "gamepad.h"
 
 IDriverGamepad* IDriverGamepad::globalGamepads[NUM_PLAYERS];
+std::vector<int> jidQueue;
 
 void IDriverGamepad::Init()
 {
     int playerNum = 0;
     for (int jid = GLFW_JOYSTICK_1; jid <= GLFW_JOYSTICK_LAST; jid++)
     {
-        if (globalGamepads[playerNum]->TryConnectJoystick(jid))
+        if (playerNum >= NUM_PLAYERS)
+        {
+            jidQueue.push_back(jid);
+        }
+        else if (globalGamepads[playerNum]->TryConnectJoystick(jid))
         {
             playerNum++;
-            if (playerNum >= NUM_PLAYERS) return;
         }
     }
+}
+
+void IDriverGamepad::SwitchPlayerJoysticks(int playerA, int playerB)
+{
+    if (playerA < 0 || playerB < 0) return;
+    if (playerA >= NUM_PLAYERS || playerB >= NUM_PLAYERS) return;
+    auto tmp = globalGamepads[playerA];
+    globalGamepads[playerA] = globalGamepads[playerB];
+    globalGamepads[playerB] = tmp;
 }
 
 void IDriverGamepad::OnConnectDisconnect(int jid, int event)
@@ -40,14 +53,28 @@ void IDriverGamepad::OnConnectDisconnect(int jid, int event)
     {
 
         // Remove joysticks with JID.
+        int playerNum = 0;
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
-            if (globalGamepads[i]->connected && globalGamepads[i]->jid == jid) globalGamepads[i]->DisconnectJoystick();
+            if (globalGamepads[i]->connected && globalGamepads[i]->jid == jid)
+            {
+                globalGamepads[i]->DisconnectJoystick();
+                playerNum = i;
+            }
+        }
+        for (int i = jidQueue.size() - 1; i >= 0; i--)
+        {
+            if (jidQueue[i] == jid) jidQueue.erase(jidQueue.begin() + i);
         }
 
-        // TODO: REMOVE JID JOYSTICKS FROM AVAILABILITY QUEUE.
-
-        // TODO: SEARCH IF THERE ARE UNOCCUPIED JOYSTICKS AVAILABLE AND USE THEM! SMART IDEA WOULD BE TO HAVE A QUEUE OF AVAILABLE ONES.
+        // Pick top off of availability queue and see if it connects.
+        if (jidQueue.size() > 0)
+        {
+            if (globalGamepads[playerNum]->TryConnectJoystick(jidQueue[0]))
+            {
+                jidQueue.erase(jidQueue.begin());
+            }
+        }
 
     }
 }
@@ -87,7 +114,7 @@ void IDriverGamepad::DisconnectJoystick()
 {
 
     // We need to mark as disconnected and erase any current inputs.
-    // Nonexistant values are inserted to input map when needed so we should be safe to eras.
+    // Nonexistant values are inserted to input map when needed so we should be safe to erase.
     connected = false;
     for (int i = 0; i < axesCount; i++)
     {
@@ -97,6 +124,7 @@ void IDriverGamepad::DisconnectJoystick()
     {
         currInputs.erase(i + BUTTON_START);
     }
+
 }
 
 void IDriverGamepad::RegisterCallbacks()
@@ -106,6 +134,7 @@ void IDriverGamepad::RegisterCallbacks()
 
 void IDriverGamepad::Update()
 {
+    if (!connected) return;
     if (gamepadMode)
     {
         GLFWgamepadstate st;

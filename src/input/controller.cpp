@@ -1,6 +1,6 @@
 #include "controller.h"
 
-IController::IController(GLFWwindow* window) : keyboard(window), mouse(window)
+IController::IController(GLFWwindow* window) : keyboard(window), mouse(window), gamepads{ IDriverGamepad(window), IDriverGamepad(window), IDriverGamepad(window), IDriverGamepad(window) }
 {
 
     // Setup the drivers.
@@ -8,10 +8,18 @@ IController::IController(GLFWwindow* window) : keyboard(window), mouse(window)
     drivers[CONTROLLER_DRIVER_KEYBOARD] = &keyboard;
     IDriverMouse::globalMouse = &mouse;
     drivers[CONTROLLER_DRIVER_MOUSE] = &mouse;
+    for (int i = 0; i < NUM_PLAYERS; i++)
+    {
+        IDriverGamepad::globalGamepads[i] = &gamepads[i];
+        drivers[CONTROLLER_DRIVER_GAMEPAD_1 + i] = &gamepads[i];
+    }
 
-    // Init drivers. TODO: REPLACE WITH LOOP!
-    drivers[CONTROLLER_DRIVER_KEYBOARD]->Init();
-    drivers[CONTROLLER_DRIVER_MOUSE]->Init();
+    // Init drivers.
+    for (int i = 0; i < CONTROLLER_DRIVER_COUNT; i++)
+    {
+        drivers[i]->Init();
+    }
+    IDriverGamepad::Init();
 
     // Reset default input.
     ResetDefaultInputs();
@@ -105,8 +113,6 @@ void IController::Update()
 {
     for (auto driver : drivers)
     {
-        //driver->Update(); TODO: FINISH THINGS FIRST!!!
+        driver->Update();
     }
-    drivers[CONTROLLER_DRIVER_KEYBOARD]->Update();
-    drivers[CONTROLLER_DRIVER_MOUSE]->Update();
 }

@@ -66,7 +66,7 @@ struct IDriverGamepad : IDriver
     static void OnConnectDisconnect(int jid, int event);
 
     // Switch players.
-    void SwitchPlayerJoysticks(int playerA, int playerB);
+    static void SwitchPlayerJoysticks(int playerA, int playerB);
 
     // Try connecting a new joystick.
     bool TryConnectJoystick(int jid);
