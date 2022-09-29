@@ -1,7 +1,11 @@
 #include "turn.h"
 
+#include <tracy/Tracy.hpp>
+
 void PEffectTurn::Process(PParticle& particle, glm::vec3& vel)
 {
+    ZoneScopedN("PEffectTurn::Process");
+
     glm::mat4 turnMat;
     switch (axis)
     {

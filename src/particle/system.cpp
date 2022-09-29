@@ -4,16 +4,21 @@
 #if WIN32
     #define YAML_CPP_STATIC_DEFINE
 #endif
+#include <tracy/Tracy.hpp>
 #include <yaml-cpp/yaml.h>
 
 PSystemDefinition::PSystemDefinition(PTextureCache& texCache, std::string name)
 {
+    ZoneScopedN("PSystemDefinition::PSystemDefinition");
+
     YAML::Node root = YAML::LoadFile("res/pcl/Definitions/" + name + ".yaml");
     spawnInfo.Load(texCache, root["SpawnInfo"].as<std::string>());
 }
 
 PSystem::PSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir)
 {
+    ZoneScopedN("PSystem::PSystem");
+
     particles.reserve(32); // Probably fine for now don't @me.
     glitterParticles.reserve(16);
     definition = &def;
@@ -37,6 +42,8 @@ PSystem::PSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir)
 
 void PSystem::CalcTangents()
 {
+    ZoneScopedN("PSystem::CalcTangents");
+
     glm::vec3 vec = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::vec3 normalDir = glm::normalize(dir);
     if (glm::abs(normalDir.x * 0x1000) == 0
@@ -49,6 +56,7 @@ void PSystem::CalcTangents()
 
 void PSystem::AddParticles(PManager* manager)
 {
+    ZoneScopedN("PSystem::AddParticles");
 
     // Get spawn count.
     PSpawnInfo& info = definition->spawnInfo;
@@ -73,6 +81,8 @@ void PSystem::AddParticles(PManager* manager)
 
 void PSystem::Update(PManager* manager)
 {
+    ZoneScopedN("PSystem::Update");
+
     PSpawnInfo& info = definition->spawnInfo;
     bool passedSpawnPeriod = false;
     if (JFrame::currentFrame - lastSpawnPeriod > spawnPeriod)
@@ -110,6 +120,8 @@ void PSystem::Update(PManager* manager)
 
 void PSystem::Render(PManager* manager, JShader& shader)
 {
+    ZoneScopedN("PSystem::Render");
+
     PSpawnInfo& info = definition->spawnInfo;
     info.texture.texture->Use();
     // TODO: TEXTURE SCALE/PARAMETERS!!!

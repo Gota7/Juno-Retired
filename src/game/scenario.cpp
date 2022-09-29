@@ -2,6 +2,7 @@
 #include <fstream>
 #include <memory>
 #include <sstream>
+#include <tracy/Tracy.hpp>
 #if WIN32
     #define YAML_CPP_STATIC_DEFINE
 #endif
@@ -150,6 +151,8 @@ YAML::Emitter& operator << (YAML::Emitter& out, const GScenarioFog& v) {
 
 void GScenarioFog::Set(JShader& shader)
 {
+    ZoneScopedN("GScenarioFog::Set");
+
     shader.SetBool("fog.enabled", true);
     shader.SetVec3("fog.color", glm::value_ptr(color));
     shader.SetFloat("fog.start", start);
@@ -160,11 +163,14 @@ void GScenarioFog::Set(JShader& shader)
 
 void GScenarioFog::Disable(JShader& shader)
 {
+    ZoneScopedN("GScenarioFog::Disable");
+
     shader.SetBool("fog.enabled", false);
 }
 
 void GScenario::Load(std::string yaml)
 {
+    ZoneScopedN("GScenario::Load");
 
     // Initial setup.
     YAML::Node root = YAML::LoadFile(yaml);
@@ -344,6 +350,7 @@ void GScenario::Load(std::string yaml)
 
 void GScenario::Save(std::string yaml)
 {
+    ZoneScopedN("GScenario::Save");
 
     // Initial setup.
     std::fstream file;
@@ -452,6 +459,7 @@ void GScenario::Save(std::string yaml)
 
 void GScenario::Render()
 {
+    ZoneScopedN("GScenario::Render");
 
     // Draw skybox.
     glDepthFunc(GL_LEQUAL);
@@ -484,6 +492,7 @@ void GScenario::Render()
 
 void GScenario::Update()
 {
+    ZoneScopedN("GScenario::Update");
     if (paused) return;
 
     // Actors.

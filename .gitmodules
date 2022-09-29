@@ -18,3 +18,7 @@
 	path = subs/glm
 	url = https://github.com/g-truc/glm
 	branch = cc98465e3508535ba8c7f6208df934c156a018dc
+[submodule "subs/tracy"]
+	path = subs/tracy
+	url = https://github.com/wolfpld/tracy
+	branch = v0.8.2.1

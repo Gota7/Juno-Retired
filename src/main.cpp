@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyOpenGL.hpp>
 
 #include "audio.h"
 #include "game.h"
@@ -55,6 +57,7 @@ int main()
 #ifndef VSYNC
     glfwSwapInterval(0);
 #endif
+    TracyGpuContext;
     ASystem_Init();
 
     // Setup framebuffer shader.

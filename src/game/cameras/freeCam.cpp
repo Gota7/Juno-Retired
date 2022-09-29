@@ -1,7 +1,11 @@
 #include "freeCam.h"
 
+#include <tracy/Tracy.hpp>
+
 void GFreeCam::Pan(float x, float y)
 {
+    ZoneScopedN("GFreeCam::Pan");
+
     const float panSpeed = 0.015f;
     cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * panSpeed * x;
     //glm::vec3 relativeUp = glm::normalize(glm::cross(glm::cross(cameraFront, cameraUp), cameraFront)); // (A x B) x C = -(C * B)A + (C * A)B.
@@ -12,12 +16,16 @@ void GFreeCam::Pan(float x, float y)
 
 void GFreeCam::Forward(float amount)
 {
+    ZoneScopedN("GFreeCam::Forward");
+
     cameraPos += amount * cameraFront * 0.2f;
     needsMatrixUpdate = true;
 }
 
 void GFreeCam::Rotate(float x, float y)
 {
+    ZoneScopedN("GFreeCam::Rotate");
+
     const float rotSpeed = 0.1f;
     yaw -= x * rotSpeed;
     pitch += y * rotSpeed;
@@ -30,6 +38,7 @@ void GFreeCam::Rotate(float x, float y)
 
 void GFreeCam::Update()
 {
+    ZoneScopedN("GFreeCam::Update");
 
     // Check for simple movement.
     float cameraSpeed = static_cast<float>(2.5 * JFrame::deltaTime);

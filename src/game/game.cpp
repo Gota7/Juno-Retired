@@ -5,9 +5,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <sstream>
+#include <tracy/Tracy.hpp>
 
 GGame::GGame(GLFWwindow* window)
 {
+    ZoneScopedN("GGame::GGame");
 
     // Shader setup.
     glEnable(GL_DEPTH_TEST);
@@ -62,6 +64,8 @@ GGame::GGame(GLFWwindow* window)
 
 std::map<int, GScenarioEntry> GGame::GetScenarioList(std::string level)
 {
+    ZoneScopedN("GGame::GetScenarioList");
+
     std::fstream file;
     std::map<int, GScenarioEntry> ret;
     file.open("res/scn/" + level + "/Scenarios.txt", std::ios::in);
@@ -86,6 +90,8 @@ std::map<int, GScenarioEntry> GGame::GetScenarioList(std::string level)
 
 void GGame::LoadLevelScenario(std::string level, int scenario)
 {
+    ZoneScopedN("GGame::LevelLoadScenario");
+
     auto list = GetScenarioList(level);
     if (list.find(scenario) != list.end())
     {
@@ -97,6 +103,7 @@ void GGame::LoadLevelScenario(std::string level, int scenario)
 
 void GGame::Render()
 {
+    ZoneScopedN("GGame::Render");
 
     // Update logic.
     input->Update();

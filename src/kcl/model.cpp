@@ -3,12 +3,14 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <tracy/Tracy.hpp>
 
 constexpr float FLOOR_TO_WALL_THRESHOLD = 0.375f; // Floors should generally be facing in the same direction as up but not too much.
 constexpr float WALL_TO_CEILING_THRESHOLD = -0.8f; // Have to be similar in the opposite direction for ceiling.
 
 KModel::KModel(std::string path, glm::mat4 matrix) : matrix(matrix)
 {
+    ZoneScopedN("KModel::KModel");
 
     // Initial setup.
     Assimp::Importer import;
@@ -31,6 +33,8 @@ KModel::KModel(std::string path, glm::mat4 matrix) : matrix(matrix)
 
 unsigned int KModel::GetOrAddPoint(glm::vec3 pt)
 {
+    ZoneScopedN("KModel::GetOrAddPoint");
+
     size_t hash = ((std::hash<float>{}(pt.x) * 31 + std::hash<float>{}(pt.y)) * 31 + std::hash<float>{}(pt.z)) * 31;
     if (pointIndices.find(hash) == pointIndices.end())
     {
@@ -42,6 +46,8 @@ unsigned int KModel::GetOrAddPoint(glm::vec3 pt)
 
 unsigned int KModel::GetOrAddVec(glm::vec3 vec)
 {
+    ZoneScopedN("KModel::GetOrAddVec");
+
     size_t hash = ((std::hash<float>{}(vec.x) * 31 + std::hash<float>{}(vec.y)) * 31 + std::hash<float>{}(vec.z)) * 31;
     if (vectorIndices.find(hash) == vectorIndices.end())
     {
@@ -53,6 +59,7 @@ unsigned int KModel::GetOrAddVec(glm::vec3 vec)
 
 void KModel::ImportNode(const aiScene* scene, aiNode* node)
 {
+    ZoneScopedN("KModel::ImportNode");
 
     // Import all meshes.
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -71,6 +78,7 @@ void KModel::ImportNode(const aiScene* scene, aiNode* node)
 
 void KModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
 {
+    ZoneScopedN("KModel::ImportMesh");
 
     // Just iterate over triangles.
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -107,6 +115,7 @@ void KModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
 
 std::unique_ptr<JModel> KModel::ToJModel(JShader& shader)
 {
+    ZoneScopedN("KModel::ToJModel");
 
     // Create all of the meshes. Doesn't have to be efficient, this is for debug purposes.
     std::vector<std::unique_ptr<JMesh>> meshes;
@@ -170,6 +179,7 @@ std::unique_ptr<JModel> KModel::ToJModel(JShader& shader)
 // See https://www.youtube.com/watch?v=6hUK1Wbajt4&list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&index=6 for bulk of implementation details.
 bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float radius, const glm::vec3& gravDir, KModelPenetrationInfo& outInfo)
 {
+    ZoneScopedN("KModel::CalcPenetration");
 
     // Transform sphere to collider coordinates.
     glm::vec3 newPos = invMatrix * glm::vec4(pos, 1.0f);
@@ -412,6 +422,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
 
 void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& penetrations)
 {
+    ZoneScopedN("KModel::Unpenetrate");
 
     // First get the aggregate vector. TODO: THESE ONLY WORK ASSUMING Y IS THE UP VECTOR! WE NEED TO USE AN ORTHONORMAL BASIS FROM GRAVITY FOR PROPER VECS!
     if (penetrations.size() == 0) return;
@@ -445,16 +456,21 @@ void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& pen
 
 glm::vec3 KModel::Position()
 {
+    ZoneScopedN("KModel::Position");
+
     return glm::vec3(matrix * glm::vec4(0.0f)); // Get new origin point.
 }
 
 glm::vec3 KModel::Range()
 {
+    ZoneScopedN("KModel::Range");
+
     return glm::vec3(1000.0f, 1000.0f, 1000.0f); // Idk very temporary.
 }
 
 bool KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
 {
+    ZoneScopedN("KModel::Uncollide");
 
     // Search for triangles.
     glm::vec3 transPos = invMatrix * glm::vec4(pos, 1.0f);

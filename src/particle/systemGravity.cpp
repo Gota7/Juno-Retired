@@ -1,12 +1,17 @@
 #include "systemGravity.h"
 
+#include <tracy/Tracy.hpp>
+
 PSystemGravity::PSystemGravity(PSystemDefinition& def, std::unique_ptr<RGravity> gravity) : PSystem(def, glm::vec3(0.0f), nullptr)
 {
+    ZoneScopedN("PSystemGravity::PSystemGravity");
+
     this->gravity = std::move(gravity);
 }
 
 void PSystemGravity::AddParticles(PManager* manager)
 {
+    ZoneScopedN("PSystemGravity::AddParticles");
 
     // Get spawn count.
     PSpawnInfo& info = definition->spawnInfo;

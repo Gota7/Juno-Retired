@@ -1,10 +1,14 @@
 #include "gamepad.h"
 
+#include <tracy/Tracy.hpp>
+
 IDriverGamepad* IDriverGamepad::globalGamepads[NUM_PLAYERS];
 std::vector<int> jidQueue;
 
 void IDriverGamepad::Init()
 {
+    ZoneScopedN("IDriverGamepad::Init");
+
     int playerNum = 0;
     for (int jid = GLFW_JOYSTICK_1; jid <= GLFW_JOYSTICK_LAST; jid++)
     {
@@ -21,6 +25,8 @@ void IDriverGamepad::Init()
 
 void IDriverGamepad::SwitchPlayerJoysticks(int playerA, int playerB)
 {
+    ZoneScopedN("IDriverGamepad::SwitchPlayerJoysticks");
+
     if (playerA < 0 || playerB < 0) return;
     if (playerA >= NUM_PLAYERS || playerB >= NUM_PLAYERS) return;
     auto tmp = globalGamepads[playerA];
@@ -30,6 +36,8 @@ void IDriverGamepad::SwitchPlayerJoysticks(int playerA, int playerB)
 
 void IDriverGamepad::OnConnectDisconnect(int jid, int event)
 {
+    ZoneScopedN("IDriverGamepad::OnConnectDisconnect");
+
     if (event == GLFW_CONNECTED)
     {
 
@@ -81,6 +89,8 @@ void IDriverGamepad::OnConnectDisconnect(int jid, int event)
 
 bool IDriverGamepad::TryConnectJoystick(int jid)
 {
+    ZoneScopedN("IDriverGamepad::TryConnectJoystick");
+
     if (connected || !glfwJoystickPresent(jid)) return false;
     if (glfwJoystickIsGamepad(jid))
     {
@@ -112,6 +122,7 @@ bool IDriverGamepad::TryConnectJoystick(int jid)
 
 void IDriverGamepad::DisconnectJoystick()
 {
+    ZoneScopedN("IDriverGamepad::DisconnectJoystick");
 
     // We need to mark as disconnected and erase any current inputs.
     // Nonexistant values are inserted to input map when needed so we should be safe to erase.
@@ -129,11 +140,15 @@ void IDriverGamepad::DisconnectJoystick()
 
 void IDriverGamepad::RegisterCallbacks()
 {
+    ZoneScopedN("IDriverGamepad::RegisterCallbacks");
+
     glfwSetJoystickCallback(OnConnectDisconnect);
 }
 
 void IDriverGamepad::Update()
 {
+    ZoneScopedN("IDriverGamepad::Update");
+
     if (!connected) return;
     if (gamepadMode)
     {

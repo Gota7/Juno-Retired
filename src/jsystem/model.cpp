@@ -1,5 +1,6 @@
 #include "model.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <tracy/Tracy.hpp>
 
 JModel::JModel(std::vector<std::unique_ptr<JMesh>>& meshes, std::vector<std::string> textureNames, std::vector<std::unique_ptr<JMaterial>>& materials, JShader& shader, glm::mat4 matrix) :
 matrix(matrix),
@@ -7,6 +8,8 @@ meshes(std::move(meshes)),
 materials(std::move(materials)),
 shader(shader)
 {
+    ZoneScopedN("JModel::JModel");
+
     shader.Use();
     if (textureNames.size() > 0)
     {
@@ -28,6 +31,8 @@ meshes(std::move(meshes)),
 materials(std::move(materials)),
 shader(shader)
 {
+    ZoneScopedN("JModel::JModel");
+
     shader.Use();
     if (textureNames.size() > 0)
     {
@@ -45,6 +50,7 @@ shader(shader)
 
 JModel::JModel(std::string path, JShader& shader, glm::mat4 matrix) : shader(shader), matrix(matrix)
 {
+    ZoneScopedN("JModel::JModel");
 
     // Initial setup.
     Assimp::Importer import;
@@ -99,6 +105,8 @@ JModel::JModel(std::string path, JShader& shader, glm::mat4 matrix) : shader(sha
 
 void JModel::AddTexture(const std::string& name)
 {
+    ZoneScopedN("JModel::AddTexture");
+
     if (textureNameToTextureIndex.find(name) == textureNameToTextureIndex.end())
     {
         int num = textureNameToTextureIndex.size();
@@ -112,6 +120,8 @@ void JModel::AddTexture(const std::string& name)
 
 void JModel::AddTexture(const std::string& left, const std::string& right, const std::string& top, const std::string& bottom, const std::string& front, const std::string& back)
 {
+    ZoneScopedN("JModel::AddTexture");
+
     std::string combinedName = COMBINED_CUBEMAP_NAME(left, right, top, bottom, front, back);
     if (textureNameToTextureIndex.find(combinedName) == textureNameToTextureIndex.end())
     {
@@ -126,6 +136,7 @@ void JModel::AddTexture(const std::string& left, const std::string& right, const
 
 void JModel::ImportNode(const aiScene* scene, aiNode* node)
 {
+    ZoneScopedN("JModel::ImportNode");
 
     // Import all meshes.
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -144,6 +155,8 @@ void JModel::ImportNode(const aiScene* scene, aiNode* node)
 
 void JModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
 {
+    ZoneScopedN("JModel::ImportMesh");
+
     std::vector<JModelVertex> vertices;
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -194,6 +207,8 @@ void JModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
 
 void JModel::Render(JShader* other, unsigned int instanceCount)
 {
+    ZoneScopedN("JModel::Render");
+
     JShader* toUse = &shader;
     if (other)
         toUse = other;

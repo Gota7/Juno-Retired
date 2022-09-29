@@ -1,5 +1,6 @@
 #include "frame.h"
 #include <iostream>
+#include <tracy/Tracy.hpp>
 
 double JFrame::currentFrame = 0; // Current time in seconds.
 double JFrame::lastFrame = 0; // Last frame in seconds.
@@ -54,6 +55,7 @@ void WaitTime(double seconds)
 
 void JFrame::SetFPS(unsigned int fps)
 {
+    ZoneScopedN("JFrame::SetFPS");
     if (fps < 1) targetTime = 0;
     else targetTime = 1.0 / fps;
 }
@@ -75,4 +77,5 @@ void JFrame::Update()
         lastSecond = currentFrame;
         std::cout << "FPS: " << fps << std::endl;
     }
+    FrameMark;
 }

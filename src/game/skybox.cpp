@@ -1,6 +1,8 @@
 #include "skybox.h"
 #include "scenario.h"
 
+#include <tracy/Tracy.hpp>
+
 Vertex skyboxVertices[] = {
     Vertex(glm::vec3(-1.0f,  1.0f, -1.0f)), // 0, 5, 8, 9, 24, 29           0
     Vertex(glm::vec3(-1.0f, -1.0f, -1.0f)), // 1, 7, 30 - 1                 1
@@ -30,6 +32,8 @@ GLuint skyboxIndices[] =
 
 GSkybox::GSkybox(GScenario* scenario, ModelCubemapTextures textures)
 {
+    ZoneScopedN("GSkybox::GSkybox");
+
     std::string combinedNames = COMBINED_CUBEMAP_NAME(std::get<0>(textures[0]), std::get<1>(textures[0]), std::get<2>(textures[0]), std::get<3>(textures[0]), std::get<4>(textures[0]), std::get<5>(textures[0]));
     if (!scenario->modelGroup.ModelLoaded(combinedNames))
     {
@@ -63,5 +67,7 @@ GSkybox::GSkybox(GScenario* scenario, ModelCubemapTextures textures)
 
 void GSkybox::Render()
 {
+    ZoneScopedN("GSkybox::Render");
+
     model->Render();
 }

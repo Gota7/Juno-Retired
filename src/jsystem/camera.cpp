@@ -1,7 +1,11 @@
 #include "camera.h"
 
+#include <tracy/Tracy.hpp>
+
 void JCamera::Update()
 {
+    ZoneScopedN("JCamera::Update");
+
     if (!needsMatrixUpdate) return;
     glm::vec3 front;
     front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));

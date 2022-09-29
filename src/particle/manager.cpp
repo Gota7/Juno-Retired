@@ -1,5 +1,7 @@
 #include "manager.h"
 
+#include <tracy/Tracy.hpp>
+
 // Particle mesh data.
 VertexUV particleVertices[] = {
     VertexUV(glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec2(0.0f, 1.0f)),
@@ -14,6 +16,8 @@ int particleIndices[] = {
 
 PManager::PManager(int systemsToReserve)
 {
+    ZoneScopedN("PManager::PManager");
+
     systems.reserve(systemsToReserve);
     mesh = std::make_unique<JMesh>(
         particleVertices,
@@ -32,6 +36,8 @@ PManager::PManager(int systemsToReserve)
 
 PSystem& PManager::AddSystem(std::string name, glm::vec3 pos, glm::vec3* dir)
 {
+    ZoneScopedN("PManager::AddSystem");
+
     if (definitions.find(name) == definitions.end())
     {
         definitions[name] = PSystemDefinition(textureCache, name);
@@ -41,11 +47,15 @@ PSystem& PManager::AddSystem(std::string name, glm::vec3 pos, glm::vec3* dir)
 
 PSystem& PManager::AddSystem(PSystemDefinition& def, glm::vec3 pos, glm::vec3* dir)
 {
+    ZoneScopedN("PManager::AddSystem");
+
     return systems.emplace_back(def, pos, dir);
 }
 
 PSystemGravity& PManager::AddSystemGravity(std::string name, std::unique_ptr<RGravity> gravity)
 {
+    ZoneScopedN("PManager::AddSystemGravity");
+
     if (definitions.find(name) == definitions.end())
     {
         definitions[name] = PSystemDefinition(textureCache, name);
@@ -55,11 +65,15 @@ PSystemGravity& PManager::AddSystemGravity(std::string name, std::unique_ptr<RGr
 
 PSystemGravity& PManager::AddSystemGravity(PSystemDefinition& def, std::unique_ptr<RGravity> gravity)
 {
+    ZoneScopedN("PManager::AddSystemGravity");
+
     return gravitySystems.emplace_back(def, std::move(gravity));
 }
 
 void PManager::Update()
 {
+    ZoneScopedN("PManager::Update");
+
     for (int i = systems.size() - 1; i >= 0; i--)
     {
         PSystem& sys = systems[i];
@@ -88,6 +102,8 @@ void PManager::Update()
 
 void PManager::Render(JShader& shader)
 {
+    ZoneScopedN("PManager::Render");
+
     shader.Use();
     shader.SetInt("tex", 0);
     shader.SetFloat("aspect", JFrame::aspect);

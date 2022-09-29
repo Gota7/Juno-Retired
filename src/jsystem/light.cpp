@@ -1,8 +1,11 @@
 #include "light.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <tracy/Tracy.hpp>
 
 void JLightPoint::SetVars(JShader& shader, std::string lightName)
 {
+    ZoneScopedN("JLightPoint::SetVars");
+
     shader.SetVec3(lightName + ".position", glm::value_ptr(position));
     shader.SetVec3(lightName + ".ambient", glm::value_ptr(ambient));
     shader.SetVec3(lightName + ".diffuse", glm::value_ptr(diffuse));
@@ -13,6 +16,8 @@ void JLightPoint::SetVars(JShader& shader, std::string lightName)
 
 void JLightDirectional::SetVars(JShader& shader, std::string lightName)
 {
+    ZoneScopedN("JLightDirectional::SetVars");
+
     shader.SetVec3(lightName + ".direction", glm::value_ptr(direction));
     shader.SetVec3(lightName + ".ambient", glm::value_ptr(ambient));
     shader.SetVec3(lightName + ".diffuse", glm::value_ptr(diffuse));
@@ -23,6 +28,8 @@ void JLightDirectional::SetVars(JShader& shader, std::string lightName)
 
 void JLightSpot::SetVars(JShader& shader, std::string lightName)
 {
+    ZoneScopedN("JLightSpot::SetVars");
+
     shader.SetVec3(lightName + ".position", glm::value_ptr(position));
     shader.SetVec3(lightName + ".direction", glm::value_ptr(direction));
     shader.SetVec3(lightName + ".ambient", glm::value_ptr(ambient));

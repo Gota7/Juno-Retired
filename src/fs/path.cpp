@@ -29,6 +29,7 @@
 #include "path.h"
 
 #include <string.h>
+#include <tracy/Tracy.hpp>
 
 std::string basePath = "";
 
@@ -36,6 +37,7 @@ std::string basePath = "";
 
 std::string FPath::GetExecutablePath()
 {
+   ZoneScopedN("FPath::GetExecutablePath");
    char rawPathName[MAX_PATH];
    GetModuleFileNameA(NULL, rawPathName, MAX_PATH);
    return std::string(rawPathName);
@@ -43,6 +45,7 @@ std::string FPath::GetExecutablePath()
 
 std::string FPath::GetExecutableDir()
 {
+    ZoneScopedN("FPath::GetExecutableDir");
     std::string executablePath = getExecutablePath();
     char* exePath = new char[executablePath.length() + 1];
     strcpy_s(exePath, executablePath.length() + 1, executablePath.c_str());
@@ -54,6 +57,7 @@ std::string FPath::GetExecutableDir()
 
 std::string FPath::MergePaths(std::string pathA, std::string pathB)
 {
+  ZoneScopedN("FPath::MergePaths");
   char combined[MAX_PATH];
   PathCombineA(combined, pathA.c_str(), pathB.c_str());
   std::string mergedPath(combined);
@@ -66,13 +70,15 @@ std::string FPath::MergePaths(std::string pathA, std::string pathB)
 
 std::string FPath::GetExecutablePath()
 {
-   char rawPathName[PATH_MAX];
-   realpath(PROC_SELF_EXE, rawPathName);
-   return  std::string(rawPathName);
+    ZoneScopedN("FPath::GetExecutablePath");
+    char rawPathName[PATH_MAX];
+    realpath(PROC_SELF_EXE, rawPathName);
+    return std::string(rawPathName);
 }
 
 std::string FPath::GetExecutableDir()
 {
+    ZoneScopedN("FPath::GetExecutableDir");
     std::string executablePath = GetExecutablePath();
     char *executablePathStr = new char[executablePath.length() + 1];
     strcpy(executablePathStr, executablePath.c_str());
@@ -83,7 +89,8 @@ std::string FPath::GetExecutableDir()
 
 std::string FPath::MergePaths(std::string pathA, std::string pathB)
 {
-  return pathA+"/"+pathB;
+    ZoneScopedN("FPath::MergePaths");
+    return pathA+"/"+pathB;
 }
 
 #endif
@@ -91,6 +98,7 @@ std::string FPath::MergePaths(std::string pathA, std::string pathB)
 #ifdef __APPLE__
     std::string FPath::GetExecutablePath()
     {
+        ZoneScopedN("FPath::GetExecutablePath");
         char rawPathName[PATH_MAX];
         char realPathName[PATH_MAX];
         uint32_t rawPathSize = (uint32_t)sizeof(rawPathName);
@@ -103,6 +111,7 @@ std::string FPath::MergePaths(std::string pathA, std::string pathB)
 
     std::string FPath::GetExecutableDir()
     {
+        ZoneScopedN("FPath::GetExecutableDir");
         std::string executablePath = getExecutablePath();
         char *executablePathStr = new char[executablePath.length() + 1];
         strcpy(executablePathStr, executablePath.c_str());
@@ -113,17 +122,23 @@ std::string FPath::MergePaths(std::string pathA, std::string pathB)
 
     std::string FPath::MergePaths(std::string pathA, std::string pathB)
     {
+        ZoneScopedN("FPath::MergePaths");
+
         return pathA+"/"+pathB;
     }
 #endif
 
 bool FPath::FileExists(const std::string& filePath)
 {
-   return access(filePath.c_str(), 0) == 0;
+    ZoneScopedN("FPath::FileExists");
+
+    return access(filePath.c_str(), 0) == 0;
 }
 
 std::string FPath::RelPath(std::string path)
 {
+    ZoneScopedN("FPath::RelPath");
+
     if (basePath == "") basePath = GetExecutableDir();
     std::string ret = basePath;
     std::string delimiter = "/";

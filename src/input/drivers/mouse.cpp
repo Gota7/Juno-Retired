@@ -1,9 +1,13 @@
 #include "mouse.h"
 
+#include <tracy/Tracy.hpp>
+
 IDriverMouse* IDriverMouse::globalMouse;
 
 void IDriverMouse::OnButtonPress(GLFWwindow* window, int button, int action, int mods)
 {
+    ZoneScopedN("IDriverMouse::OnButtonPress");
+
     if (button > MOUSE_MIDDLE_BUTTON) return;
     if (action == GLFW_PRESS)
     {
@@ -17,12 +21,16 @@ void IDriverMouse::OnButtonPress(GLFWwindow* window, int button, int action, int
 
 void IDriverMouse::OnSroll(GLFWwindow* window, double xOffset, double yOffset)
 {
+    ZoneScopedN("IDriverMouse::OnScroll");
+
     globalMouse->currInputs[MOUSE_SCROLL_X_POS] += xOffset;
     globalMouse->currInputs[MOUSE_SCROLL_Y_POS] += yOffset;
 }
 
 void IDriverMouse::UpdateMovement(IDriverMouseButtons mouseButton, float& xPos, float& yPos)
 {
+    ZoneScopedN("IDriverMouse::UpdateMovement");
+
     if (currInputs[mouseButton] && prevInputs[mouseButton] != 0.0f) // Mouse has been down.
     {
         xPos = currInputs[MOUSE_X_MOVE];
@@ -37,6 +45,8 @@ void IDriverMouse::UpdateMovement(IDriverMouseButtons mouseButton, float& xPos, 
 
 void IDriverMouse::SupportedButtons(std::vector<int>& supportedButtons)
 {
+    ZoneScopedN("IDriverMouse::SupportedButtons");
+
     supportedButtons.push_back(MOUSE_LEFT_BUTTON);
     supportedButtons.push_back(MOUSE_RIGHT_BUTTON);
     supportedButtons.push_back(MOUSE_MIDDLE_BUTTON);
@@ -48,12 +58,16 @@ void IDriverMouse::SupportedButtons(std::vector<int>& supportedButtons)
 
 void IDriverMouse::RegisterCallbacks()
 {
+    ZoneScopedN("IDriverMouse::RegisterCallbacks");
+
     glfwSetMouseButtonCallback(window, OnButtonPress);
     glfwSetScrollCallback(window, OnSroll);
 }
 
 void IDriverMouse::Update()
 {
+    ZoneScopedN("IDriverMouse::Update");
+
     currInputs[MOUSE_SCROLL_X_MOVE] = currInputs[MOUSE_SCROLL_X_POS] - prevInputs[MOUSE_SCROLL_X_POS];
     currInputs[MOUSE_SCROLL_Y_MOVE] = currInputs[MOUSE_SCROLL_Y_POS] - prevInputs[MOUSE_SCROLL_Y_POS];
     IDriver::Update();

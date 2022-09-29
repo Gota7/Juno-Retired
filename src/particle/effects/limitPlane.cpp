@@ -1,7 +1,11 @@
 #include "limitPlane.h"
 
+#include <tracy/Tracy.hpp>
+
 void PEffectLimitPlane::Process(PParticle& particle, glm::vec3& vel)
 {
+    ZoneScopedN("PEffectLimitPlane::Process");
+
     if (behaviour == PEFFECT_LIMITPLANE_CHANGE_SPEED)
     {
         if (particle.pos.y < posY && posY < particle.pos.y + particle.offset.y)

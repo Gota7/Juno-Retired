@@ -15,3 +15,4 @@ bin/
 .DS_Store
 *~
 *.blend1
+leaks.txt

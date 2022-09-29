@@ -1,6 +1,7 @@
 #include "window.h"
 
 #include <iostream>
+#include <tracy/TracyOpenGL.hpp>
 
 GLFWwindow* Window_Init(std::string title)
 {
@@ -46,6 +47,7 @@ void Window_Main(GLFWwindow* window, WindowCallback callback)
     {
         if (callback) callback(window);
         glfwSwapBuffers(window);
+        TracyGpuCollect;
         glfwPollEvents();
     }
 }

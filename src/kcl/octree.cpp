@@ -1,11 +1,14 @@
 #include "octree.h"
 #include "util.h"
 
+#include <tracy/Tracy.hpp>
+
 // Maximum boxes allowed at the base of the octree instead of the usual 8 for children.
 const unsigned int MAX_BASE_OCTREE_COUNT = 128;
 
 KOctree::KOctree(std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3>>& triangleData, unsigned int maxTriangles, float minWidth) : maxTriangles(maxTriangles), minWidth(minWidth)
 {
+    ZoneScopedN("KOctree::KOctree");
 
     // Get triangles.
     for (unsigned int i = 0; i < triangleData.size(); i++)
@@ -64,6 +67,8 @@ KOctree::KOctree(std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::ve
 
 KOctree::KOctree(glm::vec3 base, float width, std::vector<unsigned int> triangles, std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3>>& triangleData, unsigned int maxTriangles, float minWidth) : maxTriangles(maxTriangles), minWidth(minWidth)
 {
+    ZoneScopedN("KOctree::KOctree");
+
     glm::vec3 center = base + glm::vec3(width, width, width) / 2.0f;
     this->width = glm::vec3(width, width, width);
     baseWidth = glm::min(this->width.x, this->width.y, this->width.z);
@@ -95,6 +100,8 @@ KOctree::KOctree(glm::vec3 base, float width, std::vector<unsigned int> triangle
 
 void KOctree::GetTriangles(const glm::vec3& pos, float radius, std::vector<unsigned int>& list)
 {
+    ZoneScopedN("KOctree::GetTriangles");
+
     if (SphereboxOverlap(pos, radius, base, base + width))
     {
         if (isLeaf)
@@ -113,6 +120,8 @@ void KOctree::GetTriangles(const glm::vec3& pos, float radius, std::vector<unsig
 
 bool KOctree::SphereboxOverlap(const glm::vec3& pos, float radius, const glm::vec3& c1, const glm::vec3& c2)
 {
+    ZoneScopedN("KOctree::SphereboxOverlap");
+
     float distSquared = radius * radius;
     if (pos.x < c1.x) distSquared -= KUtil::Square(pos.x - c1.x);
     else if (pos.x > c2.x) distSquared -= KUtil::Square(pos.x - c2.x);
@@ -125,6 +134,8 @@ bool KOctree::SphereboxOverlap(const glm::vec3& pos, float radius, const glm::ve
 
 bool KOctree::TriboxOverlap(std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3>& tri, glm::vec3 center, float halfWidth)
 {
+    ZoneScopedN("KOctree::TriboxOverlap");
+
     glm::vec3 u = std::get<0>(tri) - center;
     glm::vec3 v = std::get<1>(tri) - center;
     glm::vec3 w = std::get<2>(tri) - center;
@@ -143,6 +154,8 @@ bool KOctree::TriboxOverlap(std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec
 
 bool KOctree::EdgeTest(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float hw)
 {
+    ZoneScopedN("KOctree::EdgeTest");
+
     glm::vec3 e = v1 - v0;
     if (EdgeAxisTest(e.z, -e.y, v0.y, v0.z, v2.y, v2.z, hw))
         return true;
@@ -155,6 +168,8 @@ bool KOctree::EdgeTest(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float hw)
 
 bool KOctree::EdgeAxisTest(float a1, float a2, float b1, float b2, float c1, float c2, float hw)
 {
+    ZoneScopedN("KOctree::EdgeAxisTest");
+
     float p = a1 * b1 + a2 * b2;
     float q = a1 * c1 + a2 * c2;
     float r = hw * (glm::abs(a1) + glm::abs(a2));

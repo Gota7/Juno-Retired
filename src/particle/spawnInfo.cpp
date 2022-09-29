@@ -3,6 +3,7 @@
 #if WIN32
     #define YAML_CPP_STATIC_DEFINE
 #endif
+#include <tracy/Tracy.hpp>
 #include <yaml-cpp/yaml.h>
 
 namespace YAML {
@@ -31,6 +32,7 @@ YAML::Emitter& operator << (YAML::Emitter& out, const glm::vec3& v);
 
 void PSpawnInfo::Load(PTextureCache& texCache, std::string name)
 {
+    ZoneScopedN("PSpawnInfo::Load");
     YAML::Node root = YAML::LoadFile("res/pcl/SpawnInfo/" + name + ".yaml");
     std::string shape = root["SpawnShape"].as<std::string>();
     if (shape == "Sphere") spawnShape = P_SPAWNSHAPE_SPHERE;

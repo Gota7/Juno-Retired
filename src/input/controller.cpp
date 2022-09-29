@@ -1,7 +1,10 @@
 #include "controller.h"
 
+#include <tracy/Tracy.hpp>
+
 IController::IController(GLFWwindow* window) : keyboard(window), mouse(window), gamepads{ IDriverGamepad(window), IDriverGamepad(window), IDriverGamepad(window), IDriverGamepad(window) }
 {
+    ZoneScopedN("IController::IController");
 
     // Setup the drivers.
     IDriverKeyboard::globalKeyboard = &keyboard;
@@ -38,6 +41,7 @@ IController::IController(GLFWwindow* window) : keyboard(window), mouse(window), 
 
 void IController::ResetDefaultInputs()
 {
+    ZoneScopedN("IController::ResetDefaultInputs");
 
     // Just map mouse input.
     mouseButtons.mapping[MOUSE_BT_LEFT].driverNum = CONTROLLER_DRIVER_MOUSE;
@@ -111,6 +115,8 @@ void IController::ResetDefaultInputs()
 
 void IController::Update()
 {
+    ZoneScopedN("IController::Update");
+
     for (auto driver : drivers)
     {
         driver->Update();

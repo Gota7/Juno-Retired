@@ -2,19 +2,26 @@
 
 #include "manager.h"
 #include "system.h"
+#include <tracy/Tracy.hpp>
 
 glm::vec3 RandomNormalizedXY()
 {
+    ZoneScopedN("RandomNormalizedXY");
+
     return glm::normalize(glm::vec3(JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f), 0));
 }
 
 glm::vec3 RandomNormalized()
 {
+    ZoneScopedN("RandomNormalized");
+
     return glm::normalize(glm::vec3(JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f)));
 }
 
 PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->definition->spawnInfo.texture)
 {
+    ZoneScopedN("PParticle::PParticle");
+
     PSpawnInfo& info = system->definition->spawnInfo;
     switch (info.spawnShape)
     {
@@ -68,6 +75,8 @@ PParticle::PParticle(PSystem* system, int index, int total) : sprite(system->def
 
 void PParticle::Update(PSystem* system)
 {
+    ZoneScopedN("PParticle::Update");
+
     PSpawnInfo& info = system->definition->spawnInfo;
     if (info.followSystem) pos = system->pos + offset;
 
@@ -86,6 +95,8 @@ void PParticle::Update(PSystem* system)
 
 void PParticle::Render(PManager* manager, JShader& shader, bool glitter)
 {
+    ZoneScopedN("PParticle::Render");
+
     glm::mat4 mat = glm::scale(glm::translate(glm::mat4(1.0), pos), glm::vec3(1.0, 1.0, 1.0) * scale);
     shader.SetMatrix("model", glm::value_ptr(mat));
     shader.SetVec4("color", glm::value_ptr(glm::vec4(color, alpha)));
