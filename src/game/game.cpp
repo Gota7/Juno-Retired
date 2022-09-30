@@ -48,7 +48,7 @@ GGame::GGame(GLFWwindow* window)
     //system.gravity->offset = 1.5f;
 
     // Uniform buffer setup.
-    matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STATIC_DRAW);
+    matrices = std::make_unique<JUniformBuffer>(sizeof(glm::mat4) * 2, GL_STREAM_DRAW);
     matrices->ConnectToShader(*shader, "Matrices");
     matrices->ConnectToShader(*particleShader, "Matrices");
     matrices->ConnectToShader(*kclShader, "Matrices");
