@@ -1,12 +1,17 @@
 #include "torus.h"
 
+#include <tracy/Tracy.hpp>
+
 RGravityTorus::RGravityTorus(glm::vec3 pos, glm::vec3 dir, float radius, float diskRadius, RGravityTorusEdgeType edgeType, bool bothSides) : pos(pos), dir(dir), radius(radius), diskRadius(diskRadius), edgeType(edgeType), bothSides(bothSides)
 {
+    ZoneScopedN("RGravityTorus::RGravityTorus");
     UpdateMtxIdentity();
 }
 
 void RGravityTorus::UpdateMtx(const glm::mat4& mtx)
 {
+    ZoneScopedN("RGravityTorus::UpdateMtx");
+
     posTranslated = mtx * glm::vec4(pos, 1.0f);
     dirTranslated = mtx * glm::vec4(dir, 0.0f);
     float len = glm::length(dirTranslated);
@@ -16,6 +21,7 @@ void RGravityTorus::UpdateMtx(const glm::mat4& mtx)
 
 bool RGravityTorus::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist)
 {
+    ZoneScopedN("RGravityTorus::CalcOwnGravity");
 
     // Direction to position.
     glm::vec3 dirToPos = pos - posTranslated;
@@ -76,5 +82,7 @@ bool RGravityTorus::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, floa
 
 glm::vec3 RGravityTorus::RandomInRange()
 {
+    ZoneScopedN("RGravityTorus::RandomInRange");
+
     return posTranslated + glm::vec3(JRandom::RandomInRange(-range, range), JRandom::RandomInRange(-range, range), JRandom::RandomInRange(-range, range));
 }

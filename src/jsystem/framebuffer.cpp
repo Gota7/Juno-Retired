@@ -1,10 +1,12 @@
 #include "framebuffer.h"
 #include <iostream>
 #include <tracy/Tracy.hpp>
+#include <tracy/TracyOpenGL.hpp>
 
 Framebuffer Framebuffer_Create()
 {
     ZoneScopedN("Framebuffer_Create");
+    TracyGpuZone("Framebuffer_Create");
 
     Framebuffer ret;
     glGenFramebuffers(1, &ret);
@@ -15,12 +17,14 @@ Framebuffer Framebuffer_Create()
 void Framebuffer_Delete(Framebuffer framebuffer)
 {
     ZoneScopedN("Framebuffer_Delete");
+    TracyGpuZone("Framebuffer_Delete");
     glDeleteFramebuffers(1, &framebuffer);
 }
 
 JFramebuffer::JFramebuffer(int width, int height) : texture(width, height)
 {
     ZoneScopedN("JFramebuffer::JFramebuffer");
+    TracyGpuZone("JFramebuffer::JFramebuffer");
 
     framebuffer = Framebuffer_Create();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.texture, 0);
@@ -36,12 +40,14 @@ JFramebuffer::JFramebuffer(int width, int height) : texture(width, height)
 void JFramebuffer::Bind()
 {
     ZoneScopedN("JFramebuffer::Bind");
+    TracyGpuZone("JFramebuffer::Bind");
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 }
 
 JFramebuffer::~JFramebuffer()
 {
     ZoneScopedN("JFramebuffer::~JFramebuffer");
+    TracyGpuZone("JFramebuffer::~JFramebuffer");
     glDeleteRenderbuffers(1, &renderbuffer);
     Framebuffer_Delete(framebuffer);
 }

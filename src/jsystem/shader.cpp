@@ -2,10 +2,12 @@
 #include <fstream>
 #include <iostream>
 #include <tracy/Tracy.hpp>
+#include <tracy/TracyOpenGL.hpp>
 
 Shader Shader_Compile(std::string filePath, GLenum type)
 {
     ZoneScopedN("Shader_Compile");
+    TracyGpuZone("Shader_Compile");
     Shader ret = glCreateShader(type);
     std::ifstream inFile(filePath.c_str());
     std::string data = std::string(std::istreambuf_iterator<char>(inFile), std::istreambuf_iterator<char>());
@@ -27,12 +29,14 @@ Shader Shader_Compile(std::string filePath, GLenum type)
 void Shader_Delete(Shader shader)
 {
     ZoneScopedN("Shader_Delete");
+    TracyGpuZone("Shader_Delete");
     glDeleteShader(shader);
 }
 
 ShaderProgram Shader_CreateProgram(ShaderList shaders)
 {
     ZoneScopedN("Shader_CreateProgram");
+    TracyGpuZone("Shader_CreateProgram");
     ShaderProgram ret = glCreateProgram();
     std::vector<Shader> shds;
     for (auto& shd : shaders)
@@ -59,6 +63,7 @@ ShaderProgram Shader_CreateProgram(ShaderList shaders)
 void Shader_DeleteProgram(ShaderProgram program)
 {
     ZoneScopedN("Shader_DeleteProgram");
+    TracyGpuZone("Shader_DeleteProgram");
     glDeleteProgram(program);
 }
 
@@ -71,42 +76,49 @@ JShader::JShader(ShaderList shaders)
 void JShader::Use()
 {
     ZoneScopedN("JShader::Use");
+    TracyGpuZone("JShader::Use");
     glUseProgram(shaderProgram);
 }
 
 void JShader::SetBool(const std::string& name, bool value)
 {
     ZoneScopedN("JShader::SetBool");
+    TracyGpuZone("JShader::SetBool");
     glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), (int)value);
 }
 
 void JShader::SetInt(const std::string& name, int value)
 {
     ZoneScopedN("JShader::SetInt");
+    TracyGpuZone("JShader::SetInt");
     glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
 }
 
 void JShader::SetFloat(const std::string& name, float value)
 {
     ZoneScopedN("JShader::SetFloat");
+    TracyGpuZone("JShader::SetFloat");
     glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
 }
 
 void JShader::SetVec3(const std::string& name, const GLfloat* value)
 {
     ZoneScopedN("JShader::SetVec3");
+    TracyGpuZone("JShader::SetVec3");
     glUniform3fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, value);
 }
 
 void JShader::SetVec4(const std::string& name, const GLfloat* value)
 {
     ZoneScopedN("JShader::SetVec4");
+    TracyGpuZone("JShader::SetVec4");
     glUniform4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, value);
 }
 
 void JShader::SetMatrix(const std::string& name, const GLfloat* value)
 {
     ZoneScopedN("JShader::SetMatrix");
+    TracyGpuZone("JShader::SetMatrix");
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE, value);
 }
 

@@ -1,12 +1,17 @@
 #include "wire.h"
 
+#include <tracy/Tracy.hpp>
+
 RGravityWire::RGravityWire(std::vector<glm::vec3> points) : points(points)
 {
+    ZoneScopedN("RGravityWire::RGravityWire");
     UpdateMtxIdentity();
 }
 
 void RGravityWire::UpdateMtx(const glm::mat4& mtx)
 {
+    ZoneScopedN("RGravityWire::UpdateMtx");
+
     pointsTranslated.clear();
     for (auto& p : points)
     {
@@ -16,6 +21,7 @@ void RGravityWire::UpdateMtx(const glm::mat4& mtx)
 
 bool RGravityWire::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist)
 {
+    ZoneScopedN("RGravityWire::CalcOwnGravity");
 
     // Sanity check.
     if (pointsTranslated.size() == 0) return false;
@@ -48,6 +54,8 @@ bool RGravityWire::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float
 
 glm::vec3 RGravityWire::RandomInRange()
 {
+    ZoneScopedN("RGravityWire::RandomInRange");
+
     float min = offset;
     float max = range;
     if (max < min) max = 1000.0f; // Some arbitrary high number.

@@ -1,7 +1,11 @@
 #include "manager.h"
 
+#include <tracy/Tracy.hpp>
+
 void RManager::AddGravity(std::unique_ptr<RGravity> gravity, unsigned int priority)
 {
+    ZoneScopedN("RManager::AddGravity");
+
     if (priority != 0) gravity->priority = priority;
     gravity->managed = true;
     for (int i = 0; i < gravities.size(); i++)
@@ -17,6 +21,8 @@ void RManager::AddGravity(std::unique_ptr<RGravity> gravity, unsigned int priori
 
 bool RManager::CalcGravity(const glm::vec3& pos, RGravityType type, glm::vec3* outDir, float* outMag, RGravityOutInfo* outInfo)
 {
+    ZoneScopedN("RManager::CalcGravity");
+
     glm::vec3 totalGravity(0.0f);
     bool foundGravity = false;
     float largestMag = -1.0f;

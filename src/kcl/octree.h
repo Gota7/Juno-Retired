@@ -25,7 +25,7 @@ struct KOctree
     KOctree(glm::vec3 base, float width, std::vector<unsigned int> triangles, std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3>>& triangleData, unsigned int maxTriangles, float minWidth);
 
     // Gather triangles to collide with.
-    void GetTriangles(const glm::vec3& pos, float radius, std::vector<unsigned int>& list);
+    void GetTriangles(const glm::vec3& pos, float radius, std::vector<std::vector<unsigned int>*>& list);
 
     // If a sphere overlaps a cube.
     static bool SphereboxOverlap(const glm::vec3& pos, float radius, const glm::vec3& c1, const glm::vec3& c2);

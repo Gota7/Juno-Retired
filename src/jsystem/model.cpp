@@ -1,6 +1,7 @@
 #include "model.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <tracy/Tracy.hpp>
+#include <tracy/TracyOpenGL.hpp>
 
 JModel::JModel(std::vector<std::unique_ptr<JMesh>>& meshes, std::vector<std::string> textureNames, std::vector<std::unique_ptr<JMaterial>>& materials, JShader& shader, glm::mat4 matrix) :
 matrix(matrix),
@@ -208,6 +209,7 @@ void JModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
 void JModel::Render(JShader* other, unsigned int instanceCount)
 {
     ZoneScopedN("JModel::Render");
+    TracyGpuZone("JModel::Render");
 
     JShader* toUse = &shader;
     if (other)

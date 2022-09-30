@@ -1,12 +1,16 @@
 #include "cube.h"
 
+#include <tracy/Tracy.hpp>
+
 RGravityCube::RGravityCube(glm::mat4 mtx, RGravityCubeValidAreaFlags validAreas) : mtx(mtx), validAreas(validAreas)
 {
+    ZoneScopedN("RGravityCube::RGravityCube");
     UpdateMtxIdentity();
 }
 
 int RGravityCube::CalcGravityArea(const glm::vec3& pos)
 {
+    ZoneScopedN("RGravityCube::CalcGravityArea");
 
     // Get direction from translated position to current position.
     glm::vec3 dirToPos = pos - glm::vec3(mtxTranslated[3]);
@@ -77,6 +81,8 @@ int RGravityCube::CalcGravityArea(const glm::vec3& pos)
 
 bool RGravityCube::CalcFaceGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist, int flags)
 {
+    ZoneScopedN("RGravityCube::CalcFaceGravity");
+
     if (flags == CUBE_AREA_X_LEFT + CUBE_AREA_Y_INSIDE + CUBE_AREA_Z_INSIDE)
     {
         glm::vec3 axisX(mtxTranslated[0][0], mtxTranslated[0][1], mtxTranslated[0][2]);
@@ -125,6 +131,8 @@ bool RGravityCube::CalcFaceGravity(const glm::vec3& pos, glm::vec3* outDir, floa
 
 bool RGravityCube::CalcEdgeGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist, int flags)
 {
+    ZoneScopedN("RGravityCube::CalcEdgeGravity");
+
     glm::vec3 axis;
     glm::vec3 influence;
     glm::vec3 axisX(mtxTranslated[0][0], mtxTranslated[0][1], mtxTranslated[0][2]);
@@ -219,6 +227,8 @@ bool RGravityCube::CalcEdgeGravity(const glm::vec3& pos, glm::vec3* outDir, floa
 
 bool RGravityCube::CalcCornerGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist, int flags)
 {
+    ZoneScopedN("RGravityCube::CalcCornerGravity");
+
     glm::vec3 tmp(0.0f);
     glm::vec3 axisX(mtxTranslated[0][0], mtxTranslated[0][1], mtxTranslated[0][2]);
     glm::vec3 axisY(mtxTranslated[1][0], mtxTranslated[1][1], mtxTranslated[1][2]);
@@ -279,6 +289,8 @@ bool RGravityCube::CalcCornerGravity(const glm::vec3& pos, glm::vec3* outDir, fl
 
 void RGravityCube::UpdateMtx(const glm::mat4& mtx)
 {
+    ZoneScopedN("RGravityCube::UpdateMtx");
+
     mtxTranslated = mtx * this->mtx;
     glm::vec3 axisX(mtxTranslated[0][0], mtxTranslated[0][1], mtxTranslated[0][2]);
     glm::vec3 axisY(mtxTranslated[1][0], mtxTranslated[1][1], mtxTranslated[1][2]);
@@ -288,6 +300,8 @@ void RGravityCube::UpdateMtx(const glm::mat4& mtx)
 
 bool RGravityCube::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist)
 {
+    ZoneScopedN("RGravityCube::CalcOwnGravity");
+
     int flags = CalcGravityArea(pos);
     if (flags == CUBE_AREA_BAD) return false;
     if (!CalcFaceGravity(pos, outDir, outDist, flags))
@@ -306,6 +320,8 @@ bool RGravityCube::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float
 
 glm::vec3 RGravityCube::RandomInRange()
 {
+    ZoneScopedN("RGravityCube::RandomInRange");
+
     float mag = range >= 0 ? range : 6.0f;
     glm::vec3 tmp(JRandom::RandomInRange(-mag, mag), JRandom::RandomInRange(-mag, mag), JRandom::RandomInRange(-mag, mag));
     return glm::vec4(tmp, 1.0f) * mtxTranslated;

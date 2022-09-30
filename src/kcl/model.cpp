@@ -474,39 +474,42 @@ bool KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
 
     // Search for triangles.
     glm::vec3 transPos = invMatrix * glm::vec4(pos, 1.0f);
-    std::vector<unsigned int> tris;
-    octree.GetTriangles(transPos, KUtil::ScaleFloat(invMatrix, radius), tris);
+    std::vector<std::vector<unsigned int>*> triLists;
+    octree.GetTriangles(transPos, KUtil::ScaleFloat(invMatrix, radius), triLists);
 
     // Interact with the triangles.
     std::vector<KModelPenetrationInfo> pens;
     int floorIndex = -1;
     float maxFloorVec = -INFINITY;
-    for (auto tri : tris)
+    for (auto triList : triLists)
     {
-        KModelPenetrationInfo pen;
-        if (CalcPenetration(triangles[tri], pos, radius, gravDir, pen))
+        for (auto tri : *triList)
         {
-            if (pen.type == PENETRATION_FLOOR)
+            KModelPenetrationInfo pen;
+            if (CalcPenetration(triangles[tri], pos, radius, gravDir, pen))
             {
-                if (floorIndex == -1)
+                if (pen.type == PENETRATION_FLOOR)
                 {
-                    floorIndex = pens.size();
-                    pens.push_back(pen); // We should only allow one floor collision.
-                    maxFloorVec = glm::dot(pen.penetration, pen.penetration);
+                    if (floorIndex == -1)
+                    {
+                        floorIndex = pens.size();
+                        pens.push_back(pen); // We should only allow one floor collision.
+                        maxFloorVec = glm::dot(pen.penetration, pen.penetration);
+                    }
+                    else
+                    {
+                        float newDot = glm::dot(pen.penetration, pen.penetration);
+                        if (newDot > maxFloorVec)
+                        {
+                            maxFloorVec = newDot;
+                            pens[floorIndex] = pen;
+                        }
+                    }
                 }
                 else
                 {
-                    float newDot = glm::dot(pen.penetration, pen.penetration);
-                    if (newDot > maxFloorVec)
-                    {
-                        maxFloorVec = newDot;
-                        pens[floorIndex] = pen;
-                    }
+                    pens.push_back(pen);
                 }
-            }
-            else
-            {
-                pens.push_back(pen);
             }
         }
     }

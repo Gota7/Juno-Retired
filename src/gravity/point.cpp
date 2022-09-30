@@ -1,17 +1,23 @@
 #include "point.h"
 
+#include <tracy/Tracy.hpp>
+
 RGravityPoint::RGravityPoint(glm::vec3 pos) : pos(pos)
 {
+    ZoneScopedN("RGravityPoint::RGravityPoint");
     UpdateMtxIdentity();
 }
 
 void RGravityPoint::UpdateMtx(const glm::mat4& mtx)
 {
+    ZoneScopedN("RGravityPoint::UpdateMtx");
+
     posTranslated = mtx * glm::vec4(pos, 1.0);
 }
 
 bool RGravityPoint::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist)
 {
+    ZoneScopedN("RGravityPoint::CalcOwnGravity");
 
     // Direction to point gravity.
     glm::vec3 dir = posTranslated - pos;
@@ -33,6 +39,8 @@ bool RGravityPoint::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, floa
 
 glm::vec3 RGravityPoint::RandomInRange()
 {
+    ZoneScopedN("RGravityPoint::RandomInRange");
+
     float min = offset;
     float max = range;
     if (max < min) max = 1000.0f; // Some arbitrary high number.

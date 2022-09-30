@@ -1,22 +1,29 @@
 #include "parallel.h"
 
+#include <tracy/Tracy.hpp>
+
 RGravityParallel::RGravityParallel(glm::vec3 pos, glm::vec3 direction, float baseDistance) : rangeType(PARALLEL_RANGE_SPHERE), pos(pos), direction(direction), baseDistance(baseDistance)
 {
+    ZoneScopedN("RGravityParallel::RGravityParallel");
     UpdateMtxIdentity();
 }
 
 RGravityParallel::RGravityParallel(glm::vec3 pos, glm::vec3 direction, RGravityParallelDistanceTypeEnum distanceType, glm::mat4 boxMtx) : rangeType(PARALLEL_RANGE_BOX), pos(pos), direction(direction), distanceType(distanceType), boxMtx(boxMtx)
 {
+    ZoneScopedN("RGravityParallel::RGravityParallel");
     UpdateMtxIdentity();
 }
 
 RGravityParallel::RGravityParallel(glm::vec3 pos, glm::vec3 direction, float cylinderRadius, float cylinderHeight) : rangeType(PARALLEL_RANGE_CYLINDER), pos(pos), direction(direction), cylinderRadius(cylinderRadius), cylinderHeight(cylinderHeight)
 {
+    ZoneScopedN("RGravityParallel::RGravityParallel");
     UpdateMtxIdentity();
 }
 
 bool RGravityParallel::IsInSphericalRange(const glm::vec3& pos, float* outDist)
 {
+    ZoneScopedN("RGravityParallel::IsInSphericalRange");
+
     if (range >= 0)
     {
         glm::vec3 diff = pos - posTranslated;
@@ -39,6 +46,7 @@ bool RGravityParallel::IsInSphericalRange(const glm::vec3& pos, float* outDist)
 
 bool RGravityParallel::IsInBoxRange(const glm::vec3& pos, float* outDist)
 {
+    ZoneScopedN("RGravityParallel::IsInBoxRange");
 
     // Get local space coordinates.
     glm::vec3 localSpace = pos - glm::vec3(boxMtxTranslated[3]);
@@ -87,6 +95,8 @@ bool RGravityParallel::IsInBoxRange(const glm::vec3& pos, float* outDist)
 
 bool RGravityParallel::IsInCylindricalRange(const glm::vec3& pos, float* outDist)
 {
+    ZoneScopedN("RGravityParallel::IsInCylindricalRange");
+
     glm::vec3 dirToPoint = pos - posTranslated; // Direction to point in field.
     float depth = glm::dot(dirToPoint, directionTranslated);
     dirToPoint = directionTranslated + dirToPoint * -depth;
@@ -99,6 +109,8 @@ bool RGravityParallel::IsInCylindricalRange(const glm::vec3& pos, float* outDist
 
 bool RGravityParallel::IsInRange(const glm::vec3& pos, float* outDist)
 {
+    ZoneScopedN("RGravityParallel::IsInRange");
+
     switch (rangeType)
     {
         case PARALLEL_RANGE_SPHERE: return IsInSphericalRange(pos, outDist);
@@ -110,6 +122,8 @@ bool RGravityParallel::IsInRange(const glm::vec3& pos, float* outDist)
 
 glm::mat4 RGravityParallel::MakeMtxUp(glm::vec3 up, glm::vec3 pos)
 {
+    ZoneScopedN("RGravityParallel::MakeMtxUp");
+
     glm::mat4 mat(1.0f);
     int maxElemIndex = 0;
     if (glm::abs(up.y) > glm::abs(up.x) && glm::abs(up.y) > glm::abs(up.z)) maxElemIndex = 1;
@@ -128,6 +142,8 @@ glm::mat4 RGravityParallel::MakeMtxUp(glm::vec3 up, glm::vec3 pos)
 
 void RGravityParallel::UpdateMtx(const glm::mat4& mtx)
 {
+    ZoneScopedN("RGravityParallel::UpdateMtx");
+
     posTranslated = mtx * glm::vec4(pos, 1.0f);
     direction = glm::normalize(direction);
     directionTranslated = mtx * glm::vec4(direction, 0.0f);
@@ -143,6 +159,8 @@ void RGravityParallel::UpdateMtx(const glm::mat4& mtx)
 
 bool RGravityParallel::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist)
 {
+    ZoneScopedN("RGravityParallel::CalcOwnGravity");
+
     if (!IsInRange(pos, outDist)) return false;
     *outDir = -directionTranslated;
     return true;
@@ -150,6 +168,8 @@ bool RGravityParallel::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, f
 
 glm::vec3 RGravityParallel::RandomInRange()
 {
+    ZoneScopedN("RGravityParallel::RandomInRange");
+
     if (rangeType == PARALLEL_RANGE_SPHERE)
     {
         float min = offset;

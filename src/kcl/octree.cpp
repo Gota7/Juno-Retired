@@ -98,7 +98,7 @@ KOctree::KOctree(glm::vec3 base, float width, std::vector<unsigned int> triangle
     }
 }
 
-void KOctree::GetTriangles(const glm::vec3& pos, float radius, std::vector<unsigned int>& list)
+void KOctree::GetTriangles(const glm::vec3& pos, float radius, std::vector<std::vector<unsigned int>*>& list)
 {
     ZoneScopedN("KOctree::GetTriangles");
 
@@ -106,7 +106,7 @@ void KOctree::GetTriangles(const glm::vec3& pos, float radius, std::vector<unsig
     {
         if (isLeaf)
         {
-            list.insert(list.end(), triangles.begin(), triangles.end());
+            list.push_back(&triangles);
         }
         else
         {

@@ -1,7 +1,11 @@
 #include "gravity.h"
 
+#include <tracy/Tracy.hpp>
+
 bool RGravity::CalcGravity(const glm::vec3& pos, glm::vec3* outDir, float* outMag)
 {
+    ZoneScopedN("RGravity::CalcGravity");
+
     glm::vec3 dir;
     float dist;
     if (!CalcOwnGravity(pos, &dir, &dist)) return false;
@@ -23,6 +27,8 @@ bool RGravity::CalcGravity(const glm::vec3& pos, glm::vec3* outDir, float* outMa
 
 bool RGravity::InRange(float radius)
 {
+    ZoneScopedN("RGravity::InRange");
+
     if (range < 0.0f)
     {
         return true;
@@ -36,6 +42,8 @@ bool RGravity::InRange(float radius)
 
 bool RGravity::InRangeSquared(float radius)
 {
+    ZoneScopedN("RGravity::InRangeSquared");
+
     if (range < 0.0f)
     {
         return true;
@@ -49,5 +57,7 @@ bool RGravity::InRangeSquared(float radius)
 
 void RGravity::UpdateMtxIdentity()
 {
+    ZoneScopedN("RGravity::UpdateMtxIdentity");
+
     UpdateMtx(glm::mat4(1.0f));
 }

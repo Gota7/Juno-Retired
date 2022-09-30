@@ -1,18 +1,23 @@
 #include "cone.h"
 
+#include <tracy/Tracy.hpp>
+
 RGravityCone::RGravityCone(glm::mat4 mtx, float topCutRate, bool enableBottom) : mtx(mtx), topCutRate(topCutRate), enableBottom(enableBottom)
 {
+    ZoneScopedN("RGravityCone::RGravityCone");
     UpdateMtxIdentity();
 }
 
 glm::vec3 RGravityCone::ProjElem(glm::vec3& a, glm::vec3& b, float* outLen)
 {
+    ZoneScopedN("RGravityCone::ProjElem");
     *outLen = glm::dot(a, b);
     return a + b * -(*outLen);
 }
 
 glm::vec3 RGravityCone::ProjToLine(const glm::vec3& pos, glm::vec3& p0, glm::vec3& p1)
 {
+    ZoneScopedN("RGravityCone::ProjToLine");
     glm::vec3 scratch = p1 - p0;
     float proj = glm::dot(scratch, pos) - glm::dot(scratch, p0);
     float coord = proj / glm::dot(scratch, scratch);
@@ -21,6 +26,7 @@ glm::vec3 RGravityCone::ProjToLine(const glm::vec3& pos, glm::vec3& p0, glm::vec
 
 bool RGravityCone::CalcGravityFromPos(const glm::vec3& pos, glm::vec3 other, glm::vec3* outDir, float* outDist)
 {
+    ZoneScopedN("RGravityCone::CalcGravityFromPos");
     *outDir = other - pos;
     *outDist = glm::length(*outDir);
     if (InRange(*outDist))
@@ -33,16 +39,19 @@ bool RGravityCone::CalcGravityFromPos(const glm::vec3& pos, glm::vec3 other, glm
 
 glm::vec3 RGravityCone::LerpVec(glm::vec3& a, glm::vec3& b, float alpha)
 {
+    ZoneScopedN("RGravityCone::LerpVec");
     return a + (b - a) * alpha;
 }
 
 float RGravityCone::LerpVal(float a, float b, float alpha)
 {
+    ZoneScopedN("RGravityCone::LerpVal");
     return a + (b - a) * alpha;
 }
 
 void RGravityCone::UpdateMtx(const glm::mat4& mtx)
 {
+    ZoneScopedN("RGravityCone::UpdateMtx");
     mtxTranslated = mtx * this->mtx;
     glm::vec3 axisX(mtxTranslated[0][0], mtxTranslated[0][1], mtxTranslated[0][2]);
     magTranslated = glm::length(axisX);
@@ -50,6 +59,7 @@ void RGravityCone::UpdateMtx(const glm::mat4& mtx)
 
 bool RGravityCone::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist)
 {
+    ZoneScopedN("RGravityCone::CalcOwnGravity");
 
     // Get Y axis.
     glm::vec3 axisY(mtxTranslated[1][0], mtxTranslated[1][1], mtxTranslated[1][2]);
@@ -201,6 +211,7 @@ bool RGravityCone::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float
 
 glm::vec3 RGravityCone::RandomInRange()
 {
+    ZoneScopedN("RGravityCone::RandomInRange");
     glm::vec3 tmp(JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f), JRandom::RandomInRange(-1.0f, 1.0f));
     return glm::vec4(tmp, 1.0f) * mtxTranslated;
 }

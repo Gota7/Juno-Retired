@@ -3,10 +3,12 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include <tracy/Tracy.hpp>
+#include <tracy/TracyOpenGL.hpp>
 
 Texture Texture_Create(std::string path, int& width, int& height, int& numChannels)
 {
     ZoneScopedN("Texture_Create");
+    TracyGpuZone("Texture_Create");
 
     Texture ret;
     glGenTextures(1, &ret);
@@ -34,6 +36,7 @@ Texture Texture_Create(std::string path, int& width, int& height, int& numChanne
 Texture Texture_Generate(int width, int height)
 {
     ZoneScopedN("Texture_Generate");
+    TracyGpuZone("Texture_Generate");
 
     Texture ret;
     glGenTextures(1, &ret);
@@ -47,6 +50,7 @@ Texture Texture_Generate(int width, int height)
 Texture Texture_CubemapCreate(std::string right, std::string left, std::string top, std::string bottom, std::string front, std::string back)
 {
     ZoneScopedN("Texture_CubemapCreate");
+    TracyGpuZone("Texture_CubemapCreate");
 
     auto LoadFace = [](std::string& path, int id)
     {
@@ -83,6 +87,7 @@ Texture Texture_CubemapCreate(std::string right, std::string left, std::string t
 void Texture_Delete(Texture texture)
 {
     ZoneScopedN("Texture_Delete");
+    TracyGpuZone("Texture_Delete");
     glDeleteTextures(1, &texture);
 }
 
@@ -108,6 +113,7 @@ JTexture::JTexture(std::string right, std::string left, std::string top, std::st
 void JTexture::Use()
 {
     ZoneScopedN("JTexture::Use");
+    TracyGpuZone("JTexture::Use");
     if (!cubemap) glBindTexture(GL_TEXTURE_2D, texture);
     else glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 }

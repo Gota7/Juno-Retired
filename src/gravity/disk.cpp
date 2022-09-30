@@ -1,13 +1,19 @@
 #include "disk.h"
 
+#include <tracy/Tracy.hpp>
+
 RGravityDisk::RGravityDisk(glm::vec3 pos, glm::vec3 direction, glm::vec3 sideDirection, float radius, float validDegrees, bool bothSides, bool edgeGravity) : pos(pos), direction(direction), sideDirection(sideDirection), radius(radius), validDegrees(validDegrees), bothSides(bothSides), edgeGravity(edgeGravity)
 {
+    ZoneScopedN("RGravityDisk::RGravityDisk");
+
     UpdateParams();
     UpdateMtxIdentity();
 }
 
 void RGravityDisk::UpdateParams()
 {
+    ZoneScopedN("RGravityDisk::UpdateParams");
+
     float theta = glm::radians(validDegrees * 0.5f);
     validCos = glm::cos(theta);
     float len = glm::dot(direction, sideDirection);
@@ -18,6 +24,8 @@ void RGravityDisk::UpdateParams()
 
 void RGravityDisk::UpdateMtx(const glm::mat4& mtx)
 {
+    ZoneScopedN("RGravityDisk::UpdateMtx");
+
     posTranslated = mtx * glm::vec4(pos, 1.0f);
     directionTranslated = mtx * glm::vec4(direction, 0.0f);
     sideDirectionTranslated = mtx * glm::vec4(sideDirectionOrtho, 0.0f);
@@ -28,6 +36,7 @@ void RGravityDisk::UpdateMtx(const glm::mat4& mtx)
 
 bool RGravityDisk::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float* outDist)
 {
+    ZoneScopedN("RGravityDisk::CalcOwnGravity");
 
     // Direction to position.
     glm::vec3 dirToPos = pos - posTranslated;
@@ -77,6 +86,8 @@ bool RGravityDisk::CalcOwnGravity(const glm::vec3& pos, glm::vec3* outDir, float
 
 glm::vec3 RGravityDisk::RandomInRange()
 {
+    ZoneScopedN("RGravityDisk::RandomInRange");
+
     float min = offset;
     float max = range;
     if (max < min) max = 1000.0f; // Some arbitrary high number.
