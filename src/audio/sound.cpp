@@ -1,12 +1,13 @@
 #include "sound.h"
 
+#include "../fs.h"
 #include <tracy/Tracy.hpp>
 
 ASound::ASound(std::string path, float volume, float pan, float pitch)
 {
     ZoneScopedN("ASound::ASound");
 
-    sound = LoadSound(path.c_str());
+    sound = LoadSound(FPath::RelPath(path).c_str());
     SetSoundVolume(sound, volume);
     SetSoundPan(sound, pan);
     SetSoundPitch(sound, pitch);

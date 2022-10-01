@@ -1,4 +1,5 @@
 #include "game.h"
+#include "../fs.h"
 #include "../kcl.h"
 #include "cameras/freeCam.h"
 #include <fstream>
@@ -66,9 +67,8 @@ std::map<int, GScenarioEntry> GGame::GetScenarioList(std::string level)
 {
     ZoneScopedN("GGame::GetScenarioList");
 
-    std::fstream file;
     std::map<int, GScenarioEntry> ret;
-    file.open("res/scn/" + level + "/Scenarios.txt", std::ios::in);
+    std::ifstream file = FLoader::OpenFile("res/scn/" + level + "/Scenarios.txt");
     if (file.is_open())
     {
         std::string tp;

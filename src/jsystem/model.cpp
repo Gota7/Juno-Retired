@@ -1,4 +1,5 @@
 #include "model.h"
+#include "../fs.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <tracy/Tracy.hpp>
 #include <tracy/TracyOpenGL.hpp>
@@ -55,7 +56,7 @@ JModel::JModel(std::string path, JShader& shader, glm::mat4 matrix) : shader(sha
 
     // Initial setup.
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
+    const aiScene* scene = import.ReadFile(FPath::RelPath(path), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
     relativeDirectory = path.substr(0, path.find_last_of('/'));
     if (relativeDirectory != "")
         relativeDirectory += "/";

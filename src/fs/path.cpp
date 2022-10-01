@@ -83,8 +83,9 @@ std::string FPath::GetExecutableDir()
     char *executablePathStr = new char[executablePath.length() + 1];
     strcpy(executablePathStr, executablePath.c_str());
     char* executableDir = dirname(executablePathStr);
-    delete [] executablePathStr;
-    return std::string(executableDir);
+    std::string ret = std::string(executableDir);
+    delete[] executablePathStr;
+    return ret;
 }
 
 std::string FPath::MergePaths(std::string pathA, std::string pathB)
@@ -116,8 +117,9 @@ std::string FPath::MergePaths(std::string pathA, std::string pathB)
         char *executablePathStr = new char[executablePath.length() + 1];
         strcpy(executablePathStr, executablePath.c_str());
         char* executableDir = dirname(executablePathStr);
-        delete [] executablePathStr;
-        return std::string(executableDir);
+        std::string ret = std::string(executableDir);
+        delete[] executablePathStr;
+        return ret;
     }
 
     std::string FPath::MergePaths(std::string pathA, std::string pathB)
@@ -150,5 +152,6 @@ std::string FPath::RelPath(std::string path)
         ret = MergePaths(ret, token);
         path.erase(0, pos + delimiter.length());
     }
+    ret = MergePaths(ret, path);
     return ret;
 }

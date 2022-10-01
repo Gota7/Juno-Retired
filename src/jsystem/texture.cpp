@@ -1,4 +1,5 @@
 #include "texture.h"
+#include "../fs.h"
 #include "stb_image.h"
 #include <iostream>
 #include <GLFW/glfw3.h>
@@ -17,7 +18,7 @@ Texture Texture_Create(std::string path, int& width, int& height, int& numChanne
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    stbi_uc* data = stbi_load(path.c_str(), &width, &height, &numChannels, STBI_rgb_alpha);
+    stbi_uc* data = stbi_load(FPath::RelPath(path).c_str(), &width, &height, &numChannels, STBI_rgb_alpha);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -55,7 +56,7 @@ Texture Texture_CubemapCreate(std::string right, std::string left, std::string t
     auto LoadFace = [](std::string& path, int id)
     {
         int width, height, numChannels;
-        stbi_uc* data = stbi_load(path.c_str(), &width, &height, &numChannels, STBI_rgb_alpha);
+        stbi_uc* data = stbi_load(FPath::RelPath(path).c_str(), &width, &height, &numChannels, STBI_rgb_alpha);
         if (data)
         {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + id, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);

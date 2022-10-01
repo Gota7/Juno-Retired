@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../fs.h"
 #include "buttons.h"
 #include "drivers/gamepad.h"
 #include "drivers/keyboard.h"
@@ -148,8 +149,7 @@ bool IControllerAssignment<T, U>::ButtonReleased(T button)
 template<typename T, size_t U>
 void IControllerAssignment<T, U>::LoadConfig(std::string path)
 {
-    std::fstream file;
-    file.open(path, std::ios::in);
+    std::ifstream file = FLoader::OpenFile(path);
     if (file.is_open())
     {
         std::string tp;
@@ -176,7 +176,7 @@ void IControllerAssignment<T, U>::LoadConfig(std::string path)
 template<typename T, size_t U>
 void IControllerAssignment<T, U>::SaveConfig(std::string path)
 {
-    std::ofstream file(path);
+    std::ofstream file = FLoader::SaveFile(path);
     if (file.is_open())
     {
         for (unsigned int i = 0; i < U; i++)

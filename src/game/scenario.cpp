@@ -1,4 +1,5 @@
 #include "scenario.h"
+#include "../fs.h"
 #include <fstream>
 #include <memory>
 #include <sstream>
@@ -173,7 +174,7 @@ void GScenario::Load(std::string yaml)
     ZoneScopedN("GScenario::Load");
 
     // Initial setup.
-    YAML::Node root = YAML::LoadFile(yaml);
+    YAML::Node root = YAML::LoadFile(FPath::RelPath(yaml));
 
     // Fog.
     if (root["Fog"].IsDefined())
@@ -353,8 +354,7 @@ void GScenario::Save(std::string yaml)
     ZoneScopedN("GScenario::Save");
 
     // Initial setup.
-    std::fstream file;
-    file.open(yaml, std::ios::out);
+    std::ofstream file = FLoader::SaveFile(yaml);
     file.clear();
     YAML::Emitter root(file);
 

@@ -1,5 +1,6 @@
 #include "spawnInfo.h"
 
+#include "../fs.h"
 #if WIN32
     #define YAML_CPP_STATIC_DEFINE
 #endif
@@ -33,7 +34,7 @@ YAML::Emitter& operator << (YAML::Emitter& out, const glm::vec3& v);
 void PSpawnInfo::Load(PTextureCache& texCache, std::string name)
 {
     ZoneScopedN("PSpawnInfo::Load");
-    YAML::Node root = YAML::LoadFile("res/pcl/SpawnInfo/" + name + ".yaml");
+    YAML::Node root = YAML::LoadFile(FPath::RelPath("res/pcl/SpawnInfo/" + name + ".yaml"));
     std::string shape = root["SpawnShape"].as<std::string>();
     if (shape == "Sphere") spawnShape = P_SPAWNSHAPE_SPHERE;
     else if (shape == "CircleRandom") spawnShape = P_SPAWNSHAPE_CIRCLE_RANDOM;

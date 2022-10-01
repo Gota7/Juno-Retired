@@ -1,5 +1,6 @@
 #include "system.h"
 
+#include "../fs.h"
 #include "manager.h"
 #if WIN32
     #define YAML_CPP_STATIC_DEFINE
@@ -11,7 +12,7 @@ PSystemDefinition::PSystemDefinition(PTextureCache& texCache, std::string name)
 {
     ZoneScopedN("PSystemDefinition::PSystemDefinition");
 
-    YAML::Node root = YAML::LoadFile("res/pcl/Definitions/" + name + ".yaml");
+    YAML::Node root = YAML::LoadFile(FPath::RelPath("res/pcl/Definitions/" + name + ".yaml"));
     spawnInfo.Load(texCache, root["SpawnInfo"].as<std::string>());
 }
 

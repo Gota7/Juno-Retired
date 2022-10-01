@@ -1,12 +1,13 @@
 #include "music.h"
 
+#include "../fs.h"
 #include <tracy/Tracy.hpp>
 
 AMusic::AMusic(std::string path, unsigned int loopStart, unsigned int loopEnd, float volume, float pan, float pitch)
 {
     ZoneScopedN("AMusic::AMusic");
 
-    music = LoadMusicStream(path.c_str());
+    music = LoadMusicStream(FPath::RelPath(path).c_str());
     SetMusicVolume(music, volume);
     SetMusicPan(music, pan);
     SetMusicPitch(music, pitch);
@@ -24,7 +25,7 @@ void AMusic::SetVol(float newVolume)
 void AMusic::SetPan(float newPan)
 {
     ZoneScopedN("AMusic::SetPan");
-    
+
     SetMusicPan(music, newPan);
 }
 
@@ -45,7 +46,7 @@ void AMusic::SetPos(float newPos)
 float AMusic::GetPos()
 {
     ZoneScopedN("AMusic::GetPos");
-    
+
     return GetMusicTimePlayed(music);
 }
 

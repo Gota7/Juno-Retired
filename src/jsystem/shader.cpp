@@ -1,4 +1,5 @@
 #include "shader.h"
+#include "../fs.h"
 #include <fstream>
 #include <iostream>
 #include <tracy/Tracy.hpp>
@@ -9,10 +10,8 @@ Shader Shader_Compile(std::string filePath, GLenum type)
     ZoneScopedN("Shader_Compile");
     TracyGpuZone("Shader_Compile");
     Shader ret = glCreateShader(type);
-    std::ifstream inFile(filePath.c_str());
-    std::string data = std::string(std::istreambuf_iterator<char>(inFile), std::istreambuf_iterator<char>());
+    std::string data = FLoader::ReadAllLines(filePath);
     const char* dataP = data.c_str();
-    inFile.close();
     glShaderSource(ret, 1, &dataP, NULL);
     glCompileShader(ret);
     GLint success;
