@@ -1,5 +1,6 @@
 #include "gamepad.h"
 
+#include "../../fs.h"
 #include <tracy/Tracy.hpp>
 
 IDriverGamepad* IDriverGamepad::globalGamepads[NUM_PLAYERS];
@@ -9,6 +10,8 @@ void IDriverGamepad::Init()
 {
     ZoneScopedN("IDriverGamepad::Init");
 
+    std::string data = FLoader::ReadAllLines("res/con/gamecontrollerdb.txt");
+    glfwUpdateGamepadMappings(data.c_str());
     int playerNum = 0;
     for (int jid = GLFW_JOYSTICK_1; jid <= GLFW_JOYSTICK_LAST; jid++)
     {
