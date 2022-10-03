@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -24,9 +25,11 @@ void Shader_DeleteProgram(ShaderProgram program);
 struct JShader
 {
     ShaderProgram shaderProgram = 0;
+    std::map<std::string, GLint> uniformLocations;
 
     JShader(ShaderList shaders);
     void Use();
+    GLint GetUniformLocation(const std::string& name);
     void SetBool(const std::string& name, bool value);
     void SetInt(const std::string& name, int value);
     void SetFloat(const std::string& name, float value);

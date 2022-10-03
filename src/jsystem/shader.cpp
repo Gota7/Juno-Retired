@@ -79,46 +79,61 @@ void JShader::Use()
     glUseProgram(shaderProgram);
 }
 
+GLint JShader::GetUniformLocation(const std::string& name)
+{
+    auto item = uniformLocations.find(name);
+    if (item == uniformLocations.end())
+    {
+        GLint ret = glGetUniformLocation(shaderProgram, name.c_str());
+        uniformLocations[name] = ret;
+        return ret;
+    }
+    else
+    {
+        return item->second;
+    }
+}
+
 void JShader::SetBool(const std::string& name, bool value)
 {
     ZoneScopedN("JShader::SetBool");
     TracyGpuZone("JShader::SetBool");
-    glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), (int)value);
+    glUniform1i(GetUniformLocation(name), (int)value);
 }
 
 void JShader::SetInt(const std::string& name, int value)
 {
     ZoneScopedN("JShader::SetInt");
     TracyGpuZone("JShader::SetInt");
-    glUniform1i(glGetUniformLocation(shaderProgram, name.c_str()), value);
+    glUniform1i(GetUniformLocation(name), value);
 }
 
 void JShader::SetFloat(const std::string& name, float value)
 {
     ZoneScopedN("JShader::SetFloat");
     TracyGpuZone("JShader::SetFloat");
-    glUniform1f(glGetUniformLocation(shaderProgram, name.c_str()), value);
+    glUniform1f(GetUniformLocation(name), value);
 }
 
 void JShader::SetVec3(const std::string& name, const GLfloat* value)
 {
     ZoneScopedN("JShader::SetVec3");
     TracyGpuZone("JShader::SetVec3");
-    glUniform3fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, value);
+    glUniform3fv(GetUniformLocation(name), 1, value);
 }
 
 void JShader::SetVec4(const std::string& name, const GLfloat* value)
 {
     ZoneScopedN("JShader::SetVec4");
     TracyGpuZone("JShader::SetVec4");
-    glUniform4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, value);
+    glUniform4fv(GetUniformLocation(name), 1, value);
 }
 
 void JShader::SetMatrix(const std::string& name, const GLfloat* value)
 {
     ZoneScopedN("JShader::SetMatrix");
     TracyGpuZone("JShader::SetMatrix");
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE, value);
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, value);
 }
 
 JShader::~JShader()
