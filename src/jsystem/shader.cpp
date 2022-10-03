@@ -129,6 +129,13 @@ void JShader::SetVec4(const std::string& name, const GLfloat* value)
     glUniform4fv(GetUniformLocation(name), 1, value);
 }
 
+void JShader::SetMatrix3(const std::string& name, const GLfloat* value)
+{
+    ZoneScopedN("JShader::SetMatrix3");
+    TracyGpuZone("JShader::SetMatrix3");
+    glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, value);
+}
+
 void JShader::SetMatrix(const std::string& name, const GLfloat* value)
 {
     ZoneScopedN("JShader::SetMatrix");

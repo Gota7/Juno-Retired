@@ -12,6 +12,7 @@ shader(shader)
 {
     ZoneScopedN("JModel::JModel");
 
+    invTransposeMatrix = glm::transpose(glm::inverse(matrix));
     shader.Use();
     if (textureNames.size() > 0)
     {
@@ -35,6 +36,7 @@ shader(shader)
 {
     ZoneScopedN("JModel::JModel");
 
+    invTransposeMatrix = glm::transpose(glm::inverse(matrix));
     shader.Use();
     if (textureNames.size() > 0)
     {
@@ -55,6 +57,7 @@ JModel::JModel(std::string path, JShader& shader, glm::mat4 matrix) : shader(sha
     ZoneScopedN("JModel::JModel");
 
     // Initial setup.
+    invTransposeMatrix = glm::transpose(glm::inverse(matrix));
     Assimp::Importer import;
     const aiScene* scene = import.ReadFile(FPath::RelPath(path), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
     relativeDirectory = path.substr(0, path.find_last_of('/'));
@@ -222,6 +225,7 @@ void JModel::Render(JShader* other, unsigned int instanceCount)
         textures[i]->Use();
     }
     toUse->SetMatrix("model", glm::value_ptr(matrix));
+    toUse->SetMatrix3("invTransposeModel", glm::value_ptr(invTransposeMatrix));
     for (auto& mesh : meshes)
     {
         materials[mesh->materialIndex]->SetVars(*toUse);

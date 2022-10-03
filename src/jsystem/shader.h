@@ -35,6 +35,7 @@ struct JShader
     void SetFloat(const std::string& name, float value);
     void SetVec3(const std::string& name, const GLfloat* value);
     void SetVec4(const std::string& name, const GLfloat* value);
+    void SetMatrix3(const std::string& name, const GLfloat* value);
     void SetMatrix(const std::string& name, const GLfloat* value);
     ~JShader();
 };

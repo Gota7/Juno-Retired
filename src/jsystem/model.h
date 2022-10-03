@@ -24,6 +24,7 @@ typedef std::vector<std::tuple<std::string, std::string, std::string, std::strin
 struct JModel
 {
     glm::mat4 matrix = glm::mat4(1.0f);
+    glm::mat3 invTransposeMatrix = glm::mat3(1.0f);
     std::vector<std::unique_ptr<JMesh>> meshes;
     std::vector<std::unique_ptr<JTexture>> textures;
     std::vector<std::unique_ptr<JMaterial>> materials;
