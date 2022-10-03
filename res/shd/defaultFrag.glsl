@@ -47,6 +47,7 @@ struct Fog {
 in vec4 EyeSpacePos;
 in vec3 Normal;
 in vec3 FragPos;
+in vec3 viewDir;
 in vec2 TexCoords;
 
 // Out vals.
@@ -57,7 +58,6 @@ uniform LightPoint lightPoint;
 uniform LightDirectional lightDirectional;
 uniform LightSpot lightSpot;
 uniform Material material;
-uniform vec3 viewPos;
 uniform Fog fog;
 
 // calculates the color when using a directional light.
@@ -162,11 +162,9 @@ float getFogFactor(float fogCoordinate)
 void main()
 {
     // Properties.
-    vec3 norm = normalize(Normal);
-    vec3 viewDir = normalize(viewPos - FragPos);
-    vec4 result = CalcDirLight(lightDirectional, norm, viewDir);
-    result += CalcPointLight(lightPoint, norm, FragPos, viewDir);
-    result += CalcSpotLight(lightSpot, norm, FragPos, viewDir);
+    vec4 result = CalcDirLight(lightDirectional, Normal, viewDir);
+    result += CalcPointLight(lightPoint, Normal, FragPos, viewDir);
+    result += CalcSpotLight(lightSpot, Normal, FragPos, viewDir);
     if (fog.enabled)
     {
         float fogCoordinate = abs(EyeSpacePos.z / EyeSpacePos.w);

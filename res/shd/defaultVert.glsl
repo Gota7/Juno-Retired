@@ -13,11 +13,13 @@ layout (std140) uniform Matrices
 };
 uniform mat4 model;
 uniform mat3 invTransposeModel;
+uniform vec3 viewPos;
 
 // Out to fragment.
 out vec4 EyeSpacePos;
 out vec3 FragPos;
 out vec3 Normal;
+out vec3 viewDir;
 out vec2 TexCoords;
 
 // Main func.
@@ -26,6 +28,7 @@ void main()
     FragPos = vec3(model * vec4(aPos, 1.0));
     EyeSpacePos = view * vec4(FragPos, 1.0);
     gl_Position = projection * EyeSpacePos;
-    Normal = invTransposeModel * aNormal;
+    Normal = normalize(invTransposeModel * aNormal);
+    viewDir = normalize(viewPos - FragPos);
     TexCoords = aTexCoords;
 }
