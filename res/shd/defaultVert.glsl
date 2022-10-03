@@ -26,6 +26,6 @@ void main()
     FragPos = vec3(model * vec4(aPos, 1.0));
     EyeSpacePos = view * vec4(FragPos, 1.0);
     gl_Position = projection * EyeSpacePos;
-    Normal = invTransposeModel * aNormal; // Note: Do the matrix creation before hand on CPU, inverse is expensive for shaders!
+    Normal = invTransposeModel * aNormal;
     TexCoords = aTexCoords;
 }
