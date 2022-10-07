@@ -9,7 +9,7 @@ struct KBody
     glm::vec3 pos = glm::vec3(0.0f);
     glm::vec3 vel = glm::vec3(0.0f);
     glm::vec3 acc = glm::vec3(0.0f);
-    glm::vec3 velMax = glm::vec3(10.0f, 10.0f, 10.0f);
+    glm::vec3 velMax = glm::vec3(3.0f, 3.0f, 3.0f);
     float radius;
     bool colliderEnabled = true;
     bool hitLastFrame = false;

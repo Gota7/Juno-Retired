@@ -1,7 +1,6 @@
 #include "game.h"
 #include "../fs.h"
 #include "../kcl.h"
-#include "cameras/freeCam.h"
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
@@ -58,7 +57,7 @@ GGame::GGame(GLFWwindow* window)
     input = std::make_unique<IController>(window);
 
     // Camera setup.
-    camera = std::make_unique<GFreeCam>(input.get());
+    camera = std::make_unique<GFollowCam>(input.get());
     camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 
 }

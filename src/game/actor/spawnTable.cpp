@@ -1,10 +1,12 @@
 #include "spawnTable.h"
 
 #include "obj/lameSphere.h"
+#include "player/gota.h"
 #include <tracy/Tracy.hpp>
 
 std::map<std::string, SpawnFunc> GSpawnTable::ACTOR_SPAWN_TABLE =
 {
+    { "Gota", GActorPlayerGota::Spawn },
     { "LameSphere", GActorLameSphere::Spawn }
 };
 

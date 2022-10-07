@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../../jsystem.h"
 #include "../../input.h"
-#include <GLFW/glfw3.h>
+#include "../../jsystem.h"
 
 // Free cam.
 struct GFreeCam : JCamera
