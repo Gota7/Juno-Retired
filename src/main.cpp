@@ -110,7 +110,7 @@ int main()
     // Run and close.
     Window_Main(window, window_callback);
     ASystem_Close();
-    Window_Close();
+    Window_Close(window);
     return 0;
 
 }

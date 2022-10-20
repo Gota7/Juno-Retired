@@ -23,4 +23,4 @@ GLFWwindow* Window_Init(std::string title);
 void Window_Main(GLFWwindow* window, WindowCallback callback = nullptr);
 
 // Close window.
-void Window_Close();
+void Window_Close(GLFWwindow* window);
