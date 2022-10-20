@@ -1,13 +1,18 @@
 #pragma once
 
+#include "constants.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
 
-// Settings.
-#define SCR_WIDTH 1024
-#define SCR_HEIGHT 576
-//#define DEBUG
+#ifdef VULKAN
+#include <vulkan/vulkan.h>
+#endif
+
+// Vulkan instance variables.
+#ifdef VULKAN
+extern VkInstance VulkanInstance;
+#endif
 
 typedef void (*WindowCallback)(GLFWwindow* window);
 

@@ -11,6 +11,9 @@ Texture Texture_Create(std::string path, int& width, int& height, int& numChanne
     ZoneScopedN("Texture_Create");
     TracyGpuZone("Texture_Create");
 
+#ifdef VULKAN
+    return 0;
+#else
     Texture ret;
     glGenTextures(1, &ret);
     glBindTexture(GL_TEXTURE_2D, ret);
@@ -32,6 +35,7 @@ Texture Texture_Create(std::string path, int& width, int& height, int& numChanne
         stbi_image_free(data);
         return 0;
     }
+#endif
 }
 
 Texture Texture_Generate(int width, int height)
@@ -39,6 +43,9 @@ Texture Texture_Generate(int width, int height)
     ZoneScopedN("Texture_Generate");
     TracyGpuZone("Texture_Generate");
 
+#ifdef VULKAN
+    return 0;
+#else
     Texture ret;
     glGenTextures(1, &ret);
     glBindTexture(GL_TEXTURE_2D, ret);
@@ -46,6 +53,7 @@ Texture Texture_Generate(int width, int height)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     return ret;
+#endif
 }
 
 Texture Texture_CubemapCreate(std::string right, std::string left, std::string top, std::string bottom, std::string front, std::string back)
@@ -53,6 +61,9 @@ Texture Texture_CubemapCreate(std::string right, std::string left, std::string t
     ZoneScopedN("Texture_CubemapCreate");
     TracyGpuZone("Texture_CubemapCreate");
 
+#ifdef VULKAN
+    return 0;
+#else
     auto LoadFace = [](std::string& path, int id)
     {
         int width, height, numChannels;
@@ -83,13 +94,18 @@ Texture Texture_CubemapCreate(std::string right, std::string left, std::string t
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     return ret;
+#endif
 }
 
 void Texture_Delete(Texture texture)
 {
     ZoneScopedN("Texture_Delete");
     TracyGpuZone("Texture_Delete");
+
+#ifdef VULKAN
+#else
     glDeleteTextures(1, &texture);
+#endif
 }
 
 JTexture::JTexture(std::string path)
@@ -115,8 +131,12 @@ void JTexture::Use()
 {
     ZoneScopedN("JTexture::Use");
     TracyGpuZone("JTexture::Use");
+
+#ifdef VULKAN
+#else
     if (!cubemap) glBindTexture(GL_TEXTURE_2D, texture);
     else glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+#endif
 }
 
 JTexture::~JTexture()

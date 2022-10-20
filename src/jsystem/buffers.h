@@ -1,5 +1,6 @@
 #pragma once
 
+#include "constants.h"
 #include "shader.h"
 #include <glad/glad.h>
 #include <stddef.h>

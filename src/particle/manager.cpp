@@ -1,5 +1,6 @@
 #include "manager.h"
 
+#include "../jsystem.h"
 #include <tracy/Tracy.hpp>
 
 // Particle mesh data.
@@ -104,6 +105,8 @@ void PManager::Render(JShader& shader)
 {
     ZoneScopedN("PManager::Render");
 
+#ifdef VULKAN
+#else
     shader.Use();
     shader.SetInt("tex", 0);
     shader.SetFloat("aspect", JFrame::aspect);
@@ -114,4 +117,5 @@ void PManager::Render(JShader& shader)
     for (auto& system : gravitySystems)
         system.Render(this, shader);
     glEnable(GL_CULL_FACE);
+#endif
 }

@@ -8,6 +8,7 @@
 #include "jsystem/vertexModes/vertexUV.h"
 #include "jsystem/buffers.h"
 #include "jsystem/camera.h"
+#include "jsystem/constants.h"
 #include "jsystem/frame.h"
 #include "jsystem/framebuffer.h"
 #include "jsystem/light.h"

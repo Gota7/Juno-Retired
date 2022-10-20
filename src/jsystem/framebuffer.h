@@ -1,5 +1,6 @@
 #pragma once
 
+#include "constants.h"
 #include "texture.h"
 #include <glad/glad.h>
 

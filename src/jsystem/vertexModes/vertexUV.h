@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../constants.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -13,9 +14,12 @@ struct VertexUV
 
     static void SetAttributes()
     {
+#ifdef VULKAN
+#else
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexUV), (void*)offsetof(VertexUV, vertex));
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexUV), (void*)offsetof(VertexUV, uv));
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
+#endif
     }
 };

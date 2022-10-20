@@ -3,6 +3,10 @@
 #include <iostream>
 #include <tracy/TracyOpenGL.hpp>
 
+#ifdef VULKAN
+VkInstance VulkanInstance;
+#endif
+
 #ifdef DEBUG
 void APIENTRY glDebugOutput(GLenum source,
                             GLenum type,
@@ -78,6 +82,13 @@ GLFWwindow* Window_Init(std::string title)
         glfwTerminate();
         return nullptr;
     }
+
+    // Vulkan stuff.
+#ifdef VULKAN
+
+    // GL stuff.
+#else
+
     glfwMakeContextCurrent(window);
 
     // glad: load all OpenGL function pointers
@@ -98,6 +109,7 @@ GLFWwindow* Window_Init(std::string title)
         glDebugMessageCallback(glDebugOutput, nullptr);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
     }
+#endif
 #endif
     return window;
 

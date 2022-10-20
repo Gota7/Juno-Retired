@@ -462,9 +462,13 @@ void GScenario::Render()
     ZoneScopedN("GScenario::Render");
 
     // Draw skybox.
+#ifdef VULKAN
+    skybox->Render();
+#else
     glDepthFunc(GL_LEQUAL);
     skybox->Render();
     glDepthFunc(GL_LESS);
+#endif
 
     // Draw planets.
     for (auto& planet : planets)

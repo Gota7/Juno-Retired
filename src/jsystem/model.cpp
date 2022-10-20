@@ -162,6 +162,8 @@ void JModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
 {
     ZoneScopedN("JModel::ImportMesh");
 
+#ifdef VULKAN
+#else
     std::vector<JModelVertex> vertices;
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -208,6 +210,7 @@ void JModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
         mesh->mMaterialIndex
     ));
     JModelVertex::SetAttributes();
+#endif
 }
 
 void JModel::Render(JShader* other, unsigned int instanceCount)
@@ -215,6 +218,8 @@ void JModel::Render(JShader* other, unsigned int instanceCount)
     ZoneScopedN("JModel::Render");
     TracyGpuZone("JModel::Render");
 
+#ifdef VULKAN
+#else
     JShader* toUse = &shader;
     if (other)
         toUse = other;
@@ -231,4 +236,5 @@ void JModel::Render(JShader* other, unsigned int instanceCount)
         materials[mesh->materialIndex]->SetVars(*toUse);
         mesh->Render(instanceCount);
     }
+#endif
 }

@@ -8,17 +8,25 @@ Framebuffer Framebuffer_Create()
     ZoneScopedN("Framebuffer_Create");
     TracyGpuZone("Framebuffer_Create");
 
+#ifdef VULKAN
+    return 0;
+#else
     Framebuffer ret;
     glGenFramebuffers(1, &ret);
     glBindFramebuffer(GL_FRAMEBUFFER, ret);
     return ret;
+#endif
 }
 
 void Framebuffer_Delete(Framebuffer framebuffer)
 {
     ZoneScopedN("Framebuffer_Delete");
     TracyGpuZone("Framebuffer_Delete");
+
+#ifdef VULKAN
+#else
     glDeleteFramebuffers(1, &framebuffer);
+#endif
 }
 
 JFramebuffer::JFramebuffer(int width, int height) : texture(width, height)
@@ -26,6 +34,8 @@ JFramebuffer::JFramebuffer(int width, int height) : texture(width, height)
     ZoneScopedN("JFramebuffer::JFramebuffer");
     TracyGpuZone("JFramebuffer::JFramebuffer");
 
+#ifdef VULKAN
+#else
     framebuffer = Framebuffer_Create();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.texture, 0);
     glGenRenderbuffers(1, &renderbuffer);
@@ -35,19 +45,28 @@ JFramebuffer::JFramebuffer(int width, int height) : texture(width, height)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, EMPTY_FRAMEBUFFER);
+#endif
 }
 
 void JFramebuffer::Bind()
 {
     ZoneScopedN("JFramebuffer::Bind");
     TracyGpuZone("JFramebuffer::Bind");
+
+#ifdef VULKAN
+#else
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+#endif
 }
 
 JFramebuffer::~JFramebuffer()
 {
     ZoneScopedN("JFramebuffer::~JFramebuffer");
     TracyGpuZone("JFramebuffer::~JFramebuffer");
+
+#ifdef VULKAN
+#else
     glDeleteRenderbuffers(1, &renderbuffer);
     Framebuffer_Delete(framebuffer);
+#endif
 }

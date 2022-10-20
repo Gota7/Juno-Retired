@@ -41,9 +41,13 @@ void window_callback(GLFWwindow* window)
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+
+#ifdef VULKAN
+#else
     glViewport(0, 0, width, height);
     framebuffer = std::make_unique<JFramebuffer>(width, height);
     JFrame::aspect = (float)width / height;
+#endif
 }
 
 // Main function.
@@ -83,6 +87,16 @@ int main()
     VertexUV::SetAttributes();
     framebuffer = std::make_unique<JFramebuffer>(SCR_WIDTH, SCR_HEIGHT);
 
+    // Graphics stuff.
+#ifdef VULKAN
+#else
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+#endif
+
     // Game.
     game = std::make_unique<GGame>(window);
     game->LoadLevelScenario("TestMap", 0);
@@ -103,6 +117,10 @@ int main()
 
 void window_draw(GLFWwindow* window)
 {
+
+#ifdef VULKAN
+    game->Render();
+#else
 
 #ifndef __APPLE__
     // Use framebuffer.
@@ -127,6 +145,8 @@ void window_draw(GLFWwindow* window)
     glActiveTexture(GL_TEXTURE0);
     framebuffer->texture.Use();
     quadMesh->Render();
+#endif
+
 #endif
 
     // Finally update frame.
