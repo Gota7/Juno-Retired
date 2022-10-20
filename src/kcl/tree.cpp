@@ -101,6 +101,6 @@ std::vector<KMesh*> KTree::FindIntersections(const glm::vec3& pos)
     ZoneScopedN("KTree::FindIntersections");
 
     std::vector<KMesh*> ret;
-    if (KUtil::PointInBox(pos, root->boxPos, root->boxSize)) root->FindIntersections(pos, ret);
+    if (root && KUtil::PointInBox(pos, root->boxPos, root->boxSize)) root->FindIntersections(pos, ret);
     return ret;
 }

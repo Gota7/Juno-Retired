@@ -4,6 +4,7 @@
 #include "../jsystem.h"
 #include "../particle.h"
 #include "cameras/followCam.h"
+#include "cameras/freeCam.h"
 #include "scenario.h"
 #include <map>
 #include <memory>
@@ -13,7 +14,8 @@
 struct GGame
 {
     std::unique_ptr<GScenario> scenario;
-    std::unique_ptr<GFollowCam> camera;
+    //std::unique_ptr<GFollowCam> camera;
+    std::unique_ptr<GFreeCam> camera;
     std::unique_ptr<JShader> shader;
     std::unique_ptr<JShader> skyboxShader;
     std::unique_ptr<JShader> particleShader;

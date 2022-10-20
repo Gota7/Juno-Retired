@@ -6,10 +6,7 @@
 #include <assimp/scene.h>
 #include <tracy/Tracy.hpp>
 
-constexpr float FLOOR_TO_WALL_THRESHOLD = 0.375f; // Floors should generally be facing in the same direction as up but not too much.
-constexpr float WALL_TO_CEILING_THRESHOLD = -0.8f; // Have to be similar in the opposite direction for ceiling.
-
-KModel::KModel(std::string path, glm::mat4 matrix) : matrix(matrix)
+KModel::KModel(std::string path, glm::mat4 matrix, float triangleThickness) : matrix(matrix), triangleThickness(triangleThickness)
 {
     ZoneScopedN("KModel::KModel");
 
@@ -114,6 +111,34 @@ void KModel::ImportMesh(const aiScene* scene, aiMesh* mesh)
 
 }
 
+glm::vec3 KModel::GetVertex(KModelTriangle& tri, int vertexNum)
+{
+    ZoneScopedN("KModel::GetVertex");
+
+    if (vertexNum == 1)
+    {
+        glm::vec3 a = IndexToVector(tri.direction1VectorIndex);
+        glm::vec3 b = IndexToVector(tri.normalVectorIndex);
+        a = glm::cross(a, b);
+        b = IndexToVector(tri.direction2VectorIndex);
+        float dist = tri.length / glm::dot(a, b);
+        return IndexToPoint(tri.originPointIndex) + a * dist;
+    }
+    else if (vertexNum == 2)
+    {
+        glm::vec3 a = IndexToVector(tri.normalVectorIndex);
+        glm::vec3 b = IndexToVector(tri.direction0VectorIndex);
+        a = glm::cross(a, b);
+        b = IndexToVector(tri.direction2VectorIndex);
+        float dist = tri.length / glm::dot(a, b);
+        return IndexToPoint(tri.originPointIndex) + a * dist;
+    }
+    else
+    {
+        return IndexToPoint(tri.originPointIndex);
+    }
+}
+
 std::unique_ptr<JModel> KModel::ToJModel(JShader& shader)
 {
     ZoneScopedN("KModel::ToJModel");
@@ -129,23 +154,12 @@ std::unique_ptr<JModel> KModel::ToJModel(JShader& shader)
         for (auto ind : vecs)
         {
             auto& tri = triangles[ind];
-            glm::vec3 dir0 = vectors[tri.direction0VectorIndex];
-            glm::vec3 dir1 = vectors[tri.direction1VectorIndex];
-            glm::vec3 dir2 = vectors[tri.direction2VectorIndex];
-            glm::vec3 n = vectors[tri.normalVectorIndex];
-            glm::vec3 crossB = glm::cross(n, dir1);
-            glm::vec3 crossA = glm::cross(n, dir0);
-            float dotB = glm::dot(crossB, dir2);
-            float dotA = glm::dot(crossA, dir2);
-            glm::vec3 p1 = points[tri.originPointIndex];
-            glm::vec3 p2 = p1 + crossB * (dotB != 0.0f ? tri.length / dotB : 0.0f);
-            glm::vec3 p3 = p1 + crossA * (dotA != 0.0f ? tri.length / dotA : 0.0f);
             indices.push_back(vertices.size());
-            vertices.push_back(Vertex(p1));
+            vertices.push_back(Vertex(GetVertex(tri, 0)));
             indices.push_back(vertices.size());
-            vertices.push_back(Vertex(p2));
+            vertices.push_back(Vertex(GetVertex(tri, 1)));
             indices.push_back(vertices.size());
-            vertices.push_back(Vertex(p3));
+            vertices.push_back(Vertex(GetVertex(tri, 2)));
         }
         mats.push_back(std::make_unique<JMaterialSolid>());
         JMaterialSolid* mat = static_cast<JMaterialSolid*>(mats[mats.size() - 1].get());
@@ -177,14 +191,49 @@ std::unique_ptr<JModel> KModel::ToJModel(JShader& shader)
 
 }
 
-// See https://www.youtube.com/watch?v=6hUK1Wbajt4&list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&index=6 for bulk of implementation details.
-bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float radius, const glm::vec3& gravDir, KModelPenetrationInfo& outInfo)
+// See https://github.com/magcius/noclip.website/blob/9cf0b026b4c00660cbcf3523bd9c3f9a078aa5a6/src/SuperMarioGalaxy/KCollisionServer.ts
+bool KModel::CalcPenetrationArrow(KModelTriangle& tri, const glm::vec3& pos, const glm::vec3& dir, KModelPenetrationInfo& outInfo)
+{
+    ZoneScopedN("KModel::CalcPenetrationArrow");
+
+    // Load variables.
+    glm::vec3 p = IndexToPoint(tri.originPointIndex);
+    glm::vec3 n = IndexToVector(tri.normalVectorIndex);
+    glm::vec3 localPos = pos - p;
+
+    // Projection.
+    float proj = glm::dot(n, localPos);
+    if (proj < 0.0f) return false;
+    float projDir = glm::dot(n, dir);
+    if (proj + projDir >= 0.0f) return false;
+
+    // Distances.
+    float dist = -(proj / projDir);
+    glm::vec3 maxPos = localPos + dir * dist;
+
+    // Try desting distance with each edge.
+    glm::vec3 d0 = IndexToVector(tri.direction0VectorIndex);
+    float d0Dot = glm::dot(maxPos, d0);
+    if (d0Dot >= 0.01f) return false;
+
+    glm::vec3 d1 = IndexToVector(tri.direction1VectorIndex);
+    float d1Dot = glm::dot(maxPos, d1);
+    if (d1Dot >= 0.01f) return false;
+
+    glm::vec3 d2 = IndexToVector(tri.direction2VectorIndex);
+    float d2Dot = glm::dot(maxPos, d2) - tri.length;
+    if (d2Dot >= 0.01f) return false;
+
+    // Return distance info.
+    outInfo.collisionType = COLLISION_FACE;
+    outInfo.distance = dist;
+    return true;
+
+}
+
+bool KModel::CalcPenetrationSphere(KModelTriangle& tri, const glm::vec3& pos, float radius, float scale, KModelPenetrationInfo& outInfo)
 {
     ZoneScopedN("KModel::CalcPenetration");
-
-    // Transform sphere to collider coordinates.
-    glm::vec3 newPos = invMatrix * glm::vec4(pos, 1.0f);
-    radius = KUtil::ScaleFloat(invMatrix, radius);
 
     // Get initial variables.
     // EDIT: I think it is best to not have references here as dereferencing for a lot of math is not a good idea.
@@ -193,7 +242,7 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
     glm::vec3 d0 = vectors[tri.direction0VectorIndex];
     glm::vec3 d1 = vectors[tri.direction1VectorIndex];
     glm::vec3 d2 = vectors[tri.direction2VectorIndex];
-    glm::vec3 v = newPos - p; // Vector from p to sphere's position.
+    glm::vec3 v = pos - p; // Vector from p to sphere's position.
 
     // Get projection of V in each direction. Dot product works since all directions are normal.
     float vD0 = glm::dot(v, d0);
@@ -203,93 +252,15 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
     float vD2 = glm::dot(v, d2) - tri.length; // L must be subracted since d2 is L away from P.
     if (vD2 >= radius) return false;
 
-    // If any of these values are not less than R, this means the sphere can not be in range of the triangle in any of the directions.
-    // EDIT: Optimization to quit early above, no need to do more dot products if not needed.
-    //if (vD0 >= radius || vD1 >= radius || vD2 >= radius) return false;
-
     // Ok, we know the sphere is in the prism formed by the triangle, but is it in range of the normal?
     float vN = glm::dot(v, n);
     if (radius - vN < 0.0f) return false; // Out of range!
 
-    // Get if floor, wall, or ceiling.
-    glm::vec3 normalDir = matrix * glm::vec4(n, 0.0f); // Shouldn't need to normalize?
-    glm::vec3 upDir = -gravDir;
-    float angle = glm::dot(normalDir, upDir); // Normally divide by ||normalDir|| * ||upDir|| but that should be one.
-    if (angle >= WALL_TO_CEILING_THRESHOLD)
-    {
-        if (angle >= FLOOR_TO_WALL_THRESHOLD)
-        {
-            outInfo.type = PENETRATION_FLOOR;
-        }
-        else
-        {
-            outInfo.type = PENETRATION_WALL;
-        }
-    }
-    else
-    {
-        outInfo.type = PENETRATION_CEILING;
-    }
-    outInfo.collisionType = COLLISION_UNDEF;
-
-    // // Figure out to do face, edge, or vertex test. First the components are orded by size.
-    // std::vector<float> dots;
-    // dots.push_back(vD0);
-    // dots.push_back(vD1);
-    // dots.push_back(vD2);
-    // std::sort(dots.begin(), dots.end());
-    // std::reverse(dots.begin(), dots.end());
-
-    // // Order directions appropriately. Probably not the most optimal but I really don't know how to do this.
-    // std::vector<glm::vec3> dirs;
-    // if (dots[0] == vD0) dirs.push_back(d0);
-    // else if (dots[0] == vD1) dirs.push_back(d1);
-    // else if (dots[0] == vD2) dirs.push_back(d2);
-    // if (dots[1] == vD0) dirs.push_back(d0);
-    // else if (dots[1] == vD1) dirs.push_back(d1);
-    // else if (dots[1] == vD2) dirs.push_back(d2);
-    // if (dots[2] == vD0) dirs.push_back(d0);
-    // else if (dots[2] == vD1) dirs.push_back(d1);
-    // else if (dots[2] == vD2) dirs.push_back(d2);
-
     // We can skip directly to pass face test if all components are <= 0. More work needs to be done if this is not the case.
     float dist;
+    outInfo.collisionType = COLLISION_UNDEF;
     if (vD0 > 0 || vD1 > 0 || vD2 > 0)
     {
-        // bool edgeTest = dots[0] * glm::dot(dirs[0], dirs[1]) > dots[1];
-        // float vh;
-
-        // // Do the edge test.
-        // if (edgeTest)
-        // {
-
-        //     // The closest edge is the one with the biggest dot product with the direction. I mean what did you expect.
-        //     float distEdgeToSphere = glm::sqrt(KUtil::Square(dots[0]) + KUtil::Square(vN));
-        //     if (distEdgeToSphere >= radius) return false; // Too far from the edge to collide.
-        //     vh = dots[0]; // Wow so easy!
-
-        // }
-
-        // // Do the vertex test.
-        // else
-        // {
-        //     float& a0 = dots[0];
-        //     float& a1 = dots[1];
-        //     float& aN = vN;
-        //     float c = glm::dot(dirs[0], dirs[1]);
-        //     if (KUtil::Square(a1 - a0 * c) / (1 - KUtil::Square(c)) + KUtil::Square(a0) + KUtil::Square(aN) >= KUtil::Square(radius)) return false; // Formula is here: https://youtu.be/6hUK1Wbajt4?list=PL0TeYaSr_hNedZtktHufaFNO1usnQOuom&t=352
-        //     vh = glm::sqrt(
-        //         KUtil::Square(dots[1] - dots[0] * glm::dot(dirs[0], dirs[1]))
-        //         / (1 - KUtil::Square(glm::dot(dirs[0], dirs[1])))
-        //             + KUtil::Square(dots[1])
-        //     ); // What in the actual fuck.
-        // }
-        // outInfo->penetration = normalDir * (glm::sqrt(KUtil::Square(radius) - KUtil::Square(vh)) - vN);
-        // outInfo->faceCollision = false;
-        // return true;
-
-        // Ok, so our face test is correct and the edge test works too, but the vertex test is complete wack.
-        // So new approach. See https://github.com/magcius/noclip.website/blob/fe4284a26c7757ffbbe843f695d2bb6014bd96af/src/SuperMarioGalaxy/KCollisionServer.ts#L314
 
         // Declare vars.
         float radiusSq = KUtil::Square(radius);
@@ -415,107 +386,70 @@ bool KModel::CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float ra
         outInfo.collisionType = COLLISION_FACE;
 
     }
-    if (dist < 0.0f || dist > 5.0f) return false;
-    outInfo.penetration = normalDir * dist;
+    float maxDist = triangleThickness * scale;
+    if (dist < 0.0f || dist > maxDist) return false;
+    outInfo.distance = dist;
     return true;
 
 }
 
-void KModel::Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& penetrations)
+bool KModel::CalcPenetrationPoint(KModelTriangle& tri, const glm::vec3& pos, float thickness, KModelPenetrationInfo& outInfo)
 {
-    ZoneScopedN("KModel::Unpenetrate");
+    ZoneScopedN("KModel::CalcPenetrationPoint");
 
-    // First get the aggregate vector. TODO: THESE ONLY WORK ASSUMING Y IS THE UP VECTOR! WE NEED TO USE AN ORTHONORMAL BASIS FROM GRAVITY FOR PROPER VECS!
-    if (penetrations.size() == 0) return;
-    glm::vec3 minBounds(0.0f);
-    glm::vec3 maxBounds(0.0f); // We must cap at origin since we don't want a min to be positive and the other way around.
-    for (auto& pen : penetrations)
+    glm::vec3 p = IndexToPoint(tri.originPointIndex);
+    glm::vec3 v = pos - p;
+
+    // Try desting distance with each edge.
+    glm::vec3 d0 = IndexToVector(tri.direction0VectorIndex);
+    float d0Dot = glm::dot(v, d0);
+    if (d0Dot < 0.0f) return false;
+
+    glm::vec3 d1 = IndexToVector(tri.direction1VectorIndex);
+    float d1Dot = glm::dot(v, d1);
+    if (d1Dot < 0.0f) return false;
+
+    glm::vec3 d2 = IndexToVector(tri.direction2VectorIndex);
+    float d2Dot = glm::dot(v, d2) - tri.length;
+    if (d2Dot < 0.0f) return false;
+
+    // Normal test.
+    glm::vec3 n = IndexToVector(tri.normalVectorIndex);
+    float dist = -glm::dot(n, v);
+    float maxDist = thickness * triangleThickness;
+    if (dist < 0.0f || dist > maxDist) return false;
+
+    // Return distance info.
+    outInfo.collisionType = COLLISION_FACE;
+    outInfo.distance = dist;
+    return true;
+
+}
+
+bool KModel::CheckSphere(const glm::vec3& pos, float radius, float scale, unsigned int maxResults, std::vector<KModelCheckResult>& results)
+{
+    ZoneScopedN("KModel::CheckSphere");
+
+    glm::vec3 newPos = pos - translation;
+    // TODO!!!
+}
+
+bool KModel::CheckPoint(const glm::vec3& pos, float thickness, unsigned int maxResults, std::vector<KModelCheckResult>& results)
+{
+    ZoneScopedN("KModel::CheckPoint");
+
+    glm::vec3 newPos = pos - translation;
+    KModelPenetrationInfo info;
+    std::vector<std::vector<unsigned int>*> tris;
+    octree.GetTriangles(newPos, thickness, tris);
+    for (auto triSet : tris)
+    for (auto triInd : *triSet)
     {
-        glm::vec3 bounds(0.0f);
-        switch (pen.type)
+        if (CalcPenetrationPoint(triangles[triInd], newPos, thickness, info))
         {
-            case PENETRATION_FLOOR:
-                bounds += glm::vec3(0.0f, pen.penetration.y, 0.0f); // Vertical component only.
-                break;
-            case PENETRATION_WALL:
-                if (pen.collisionType == COLLISION_FACE) bounds += glm::vec3(pen.penetration.x, 0.0f, pen.penetration.z); // Horizontal component only.
-                else bounds += pen.penetration;
-                break;
-            case PENETRATION_CEILING:
-                bounds += pen.penetration; // Use all for ceiling.
-                break;
-        }
-        if (bounds.x < minBounds.x) minBounds.x = bounds.x;
-        if (bounds.y < minBounds.y) minBounds.y = bounds.y;
-        if (bounds.z < minBounds.z) minBounds.z = bounds.z;
-        if (bounds.x > maxBounds.x) maxBounds.x = bounds.x;
-        if (bounds.y > maxBounds.y) maxBounds.y = bounds.y;
-        if (bounds.z > maxBounds.z) maxBounds.z = bounds.z;
-    }
-    pos += minBounds + maxBounds; // Just add the bounds together to transform the sphere back. Sphere is already in world coordinates.
-}
-
-glm::vec3 KModel::Position()
-{
-    ZoneScopedN("KModel::Position");
-
-    return glm::vec3(matrix * glm::vec4(0.0f)); // Get new origin point.
-}
-
-glm::vec3 KModel::Range()
-{
-    ZoneScopedN("KModel::Range");
-
-    return glm::vec3(1000.0f, 1000.0f, 1000.0f); // Idk very temporary.
-}
-
-bool KModel::Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir)
-{
-    ZoneScopedN("KModel::Uncollide");
-
-    // Search for triangles.
-    glm::vec3 transPos = invMatrix * glm::vec4(pos, 1.0f);
-    std::vector<std::vector<unsigned int>*> triLists;
-    octree.GetTriangles(transPos, KUtil::ScaleFloat(invMatrix, radius), triLists);
-
-    // Interact with the triangles.
-    std::vector<KModelPenetrationInfo> pens;
-    int floorIndex = -1;
-    float maxFloorVec = -INFINITY;
-    for (auto triList : triLists)
-    {
-        for (auto tri : *triList)
-        {
-            KModelPenetrationInfo pen;
-            if (CalcPenetration(triangles[tri], pos, radius, gravDir, pen))
-            {
-                if (pen.type == PENETRATION_FLOOR)
-                {
-                    if (floorIndex == -1)
-                    {
-                        floorIndex = pens.size();
-                        pens.push_back(pen); // We should only allow one floor collision.
-                        maxFloorVec = glm::dot(pen.penetration, pen.penetration);
-                    }
-                    else
-                    {
-                        float newDot = glm::dot(pen.penetration, pen.penetration);
-                        if (newDot > maxFloorVec)
-                        {
-                            maxFloorVec = newDot;
-                            pens[floorIndex] = pen;
-                        }
-                    }
-                }
-                else
-                {
-                    pens.push_back(pen);
-                }
-            }
+            results.push_back(KModelCheckResult(triangles[triInd], info));
+            if (results.size() >= maxResults) return true;
         }
     }
-    //std::cout << pens.size() << std::endl;
-    Unpenetrate(pos, pens); // Actually take care of making them not penetrated.
-    return pens.size() > 0;
-
+    return results.size() > 0;
 }

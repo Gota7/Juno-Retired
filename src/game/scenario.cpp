@@ -221,7 +221,7 @@ void GScenario::Load(std::string yaml)
             {
                 miscModels.push_back(cMod->ToJModel(kclShader));
             }
-            this->colliders.AddMesh(std::move(cMod));
+            //this->colliders.AddMesh(std::move(cMod)); TODO!!!
             colliderInfo.push_back(c);
         }
     }

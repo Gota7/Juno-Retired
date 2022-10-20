@@ -57,7 +57,8 @@ GGame::GGame(GLFWwindow* window)
     input = std::make_unique<IController>(window);
 
     // Camera setup.
-    camera = std::make_unique<GFollowCam>(input.get());
+    //camera = std::make_unique<GFollowCam>(input.get());
+    camera = std::make_unique<GFreeCam>(input.get());
     camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 
 }

@@ -17,14 +17,6 @@ struct KModelTriangle
     unsigned int terrainType; // Index of material in linked CLPS.
 };
 
-// Penetration type.
-enum KPenetrationType
-{
-    PENETRATION_FLOOR,
-    PENETRATION_WALL,
-    PENETRATION_CEILING
-};
-
 // Collision type.
 enum KModelTriangleCollisionType
 {
@@ -41,13 +33,21 @@ enum KModelTriangleCollisionType
 // Collider information.
 struct KModelPenetrationInfo
 {
-    glm::vec3 penetration;
-    KPenetrationType type;
+    float distance;
     KModelTriangleCollisionType collisionType;
 };
 
+// Check result.
+struct KModelCheckResult
+{
+    KModelTriangle& tri;
+    KModelPenetrationInfo info;
+
+    KModelCheckResult(KModelTriangle& tri, KModelPenetrationInfo info) : tri(tri), info(info) {}
+};
+
 // JKCL model file format.
-struct KModel : KMesh
+struct KModel
 {
     std::vector<glm::vec3> points; // Collection of origin points.
     std::vector<glm::vec3> vectors; // Direction vectors. ALL DIRECTIONS SHOULD BE NORMALIZED!
@@ -58,11 +58,13 @@ struct KModel : KMesh
     std::vector<std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3>> triangleData; // Used during construction for octree generation.
     std::map<unsigned int, std::vector<unsigned int>> matToTriangleMeshes; // Convert a material index to a collection of triangles.
     unsigned int numMaterials; // Number of materials in the model. Used to convert to JModel.
+    glm::vec3 translation; // Translation of the collision in world space.
     glm::mat4 matrix; // General matrix.
     glm::mat4 invMatrix; // Inverse matrix.
+    float triangleThickness; // Thickness to round each triangle.
 
     // Create a new collision model.
-    KModel(std::string path, glm::mat4 matrix = glm::mat4(1.0f));
+    KModel(std::string path, glm::mat4 matrix = glm::mat4(1.0f), float triangleThickness = 0.005f);
 
     // Get or add a point.
     unsigned int GetOrAddPoint(glm::vec3 pt);
@@ -70,24 +72,39 @@ struct KModel : KMesh
     // Get or add a vector.
     unsigned int GetOrAddVec(glm::vec3 vec);
 
+    // Convert an index to a point.
+    inline glm::vec3 IndexToPoint(unsigned int pointIndex) { return points[pointIndex]; }
+
+    // Convert an index to a vector.
+    inline glm::vec3 IndexToVector(unsigned int vectorIndex) { return vectors[vectorIndex]; }
+
     // Import a node.
     void ImportNode(const aiScene* scene, aiNode* node);
 
     // Import a mesh.
     void ImportMesh(const aiScene* scene, aiMesh* mesh);
 
+    // Get a vertex position.
+    glm::vec3 GetVertex(KModelTriangle& tri, int vertexNum);
+
     // Convert to JModel for convenience.
     std::unique_ptr<JModel> ToJModel(JShader& shader);
 
-    // Calculate penetration of a sphere relative to collision coordinates. Returns if it succeeds.
-    bool CalcPenetration(KModelTriangle& tri, const glm::vec3& pos, float radius, const glm::vec3& gravDir, KModelPenetrationInfo& outInfo);
+    // Calculate penetration of an arrow. Returns if it succeeds.
+    bool CalcPenetrationArrow(KModelTriangle& tri, const glm::vec3& pos, const glm::vec3& dir, KModelPenetrationInfo& outInfo);
 
-    // Make a sphere stop colliding with the mesh. Make sure to only pass one floor collision at a time.
-    static void Unpenetrate(glm::vec3& pos, std::vector<KModelPenetrationInfo>& penetrations);
+    // Calculate penetration of a sphere. Returns if it succeeds.
+    bool CalcPenetrationSphere(KModelTriangle& tri, const glm::vec3& pos, float radius, float scale, KModelPenetrationInfo& outInfo);
 
-    // V-functions.
-    virtual glm::vec3 Position();
-    virtual glm::vec3 Range();
-    virtual bool Uncollide(glm::vec3& pos, float radius, const glm::vec3& gravDir);
+    // Calculate penetration of a point. Returns if it succeeds.
+    bool CalcPenetrationPoint(KModelTriangle& tri, const glm::vec3& pos, float thickness, KModelPenetrationInfo& outInfo);
+
+    // TODO: ARROW CHECKING!!!
+
+    // Check collision with a sphere. Returns if it succeeds.
+    bool CheckSphere(const glm::vec3& pos, float radius, float scale, unsigned int maxResults, std::vector<KModelCheckResult>& results);
+
+    // Check collision with a point. Returns if it succeeds.
+    bool CheckPoint(const glm::vec3& pos, float thickness, unsigned int maxResults, std::vector<KModelCheckResult>& results);
 
 };
