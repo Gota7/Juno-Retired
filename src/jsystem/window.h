@@ -2,6 +2,9 @@
 
 #include "constants.h"
 #include <glad/glad.h>
+#ifdef VULKAN
+#define GLFW_INCLUDE_VULKAN
+#endif
 #include <GLFW/glfw3.h>
 #include <string>
 

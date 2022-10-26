@@ -1,22 +1,125 @@
 #include "window.h"
 
 #include <iostream>
+#include <optional>
 #include <tracy/TracyOpenGL.hpp>
 #include <vector>
 
+// Sorry, this is probably the most messy file in the codebase.
+// Vulkan has a lot more overhead than I thought it would just to get something on screen.
+// Doesn't help that the JSystem was built with OpenGL in mind so it's like trying to stuff something in a bag that can only barely fit.
+
 #ifdef VULKAN
+
+#ifdef DEBUG
+
+const std::vector<const char*> ValidationLayers =
+{
+    "VK_LAYER_KHRONOS_validation"
+};
+
+#endif
+
 VkInstance VulkanInstance;
+VkPhysicalDevice VulkanPhysicalDevice = VK_NULL_HANDLE;
+VkDevice VulkanDevice;
+VkSurfaceKHR VulkanSurface;
+VkQueue VulkanGraphicsQueue;
+VkQueue VulkanPresentationQueue;
+
+std::optional<uint32_t> VulkanDeviceFamilies(VkPhysicalDevice device)
+{
+    std::optional<uint32_t> indices;
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+    int i = 0;
+    for (const auto& queueFamily : queueFamilies)
+    {
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, VulkanSurface, &presentSupport);
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT && presentSupport)
+        {
+            indices = i;
+        }
+        if (indices.has_value())
+        {
+            break;
+        }
+        i++;
+    }
+    return indices;
+}
+
+void GetVulkanPhysicalDevice()
+{
+
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(VulkanInstance, &deviceCount, nullptr);
+    if (deviceCount == 0)
+    {
+        throw std::runtime_error("Failed to find GPUs with Vulkan support!");
+    }
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(VulkanInstance, &deviceCount, devices.data());
+    for (const auto& device : devices)
+    {
+        if (VulkanDeviceFamilies(device).has_value())
+        {
+            VulkanPhysicalDevice = device;
+            break;
+        }
+    }
+
+    if (VulkanPhysicalDevice == VK_NULL_HANDLE)
+    {
+        throw std::runtime_error("Failed to find a suitable GPU!");
+    }
+
+}
+
+void VulkanMakeLogicalDevice()
+{
+    auto indices = VulkanDeviceFamilies(VulkanPhysicalDevice);
+
+    VkDeviceQueueCreateInfo queueCreateInfo{};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = indices.value();
+    queueCreateInfo.queueCount = 1;
+    float queuePriority = 1.0f;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+
+    VkPhysicalDeviceFeatures deviceFeatures{};
+    VkDeviceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    createInfo.pQueueCreateInfos = &queueCreateInfo;
+    createInfo.queueCreateInfoCount = 1;
+    createInfo.pEnabledFeatures = &deviceFeatures;
+    createInfo.enabledExtensionCount = 0;
+#ifdef DEBUG
+    createInfo.enabledLayerCount = static_cast<uint32_t>(ValidationLayers.size());
+    createInfo.ppEnabledLayerNames = ValidationLayers.data();
+#else
+    createInfo.enabledLayerCount = 0;
+#endif
+    if (vkCreateDevice(VulkanPhysicalDevice, &createInfo, nullptr, &VulkanDevice) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create logical device!");
+    }
+    vkGetDeviceQueue(VulkanDevice, indices.value(), 0, &VulkanGraphicsQueue);
+    vkGetDeviceQueue(VulkanDevice, indices.value(), 0, &VulkanPresentationQueue);
+
+}
+
 #endif
 
 #ifdef DEBUG
 #ifdef VULKAN
 
 VkDebugUtilsMessengerEXT DebugMessenger;
-
-const std::vector<const char*> ValidationLayers =
-{
-    "VK_LAYER_KHRONOS_validation"
-};
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
 {
@@ -114,6 +217,10 @@ GLFWwindow* Window_Init(std::string title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+#ifdef VULKAN
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+#endif
+
 #ifdef DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 #endif
@@ -188,13 +295,22 @@ GLFWwindow* Window_Init(std::string title)
 
     // Setup debug messenger if needed.
 #ifdef DEBUG
-        VkDebugUtilsMessengerCreateInfoEXT createInfo2;
-        PopulateDebugMessengerCreateInfo(createInfo2);
-        if (CreateDebugUtilsMessengerEXT(VulkanInstance, &createInfo2, nullptr, &DebugMessenger) != VK_SUCCESS)
-        {
-            throw std::runtime_error("Failed to set up debug messenger!");
-        }
+    VkDebugUtilsMessengerCreateInfoEXT createInfo2;
+    PopulateDebugMessengerCreateInfo(createInfo2);
+    if (CreateDebugUtilsMessengerEXT(VulkanInstance, &createInfo2, nullptr, &DebugMessenger) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to set up debug messenger!");
+    }
 #endif
+
+    if (glfwCreateWindowSurface(VulkanInstance, window, nullptr, &VulkanSurface) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create window surface!");
+    }
+
+    // Select device.
+    GetVulkanPhysicalDevice();
+    VulkanMakeLogicalDevice();
 
     // GL stuff.
 #else
@@ -239,9 +355,11 @@ void Window_Main(GLFWwindow* window, WindowCallback callback)
 void Window_Close(GLFWwindow* window)
 {
 #ifdef VULKAN
+    vkDestroyDevice(VulkanDevice, nullptr);
 #ifdef DEBUG
     DestroyDebugUtilsMessengerEXT(VulkanInstance, DebugMessenger, nullptr);
 #endif
+    vkDestroySurfaceKHR(VulkanInstance, VulkanSurface, nullptr);
     vkDestroyInstance(VulkanInstance, nullptr);
 #endif
     glfwDestroyWindow(window);
